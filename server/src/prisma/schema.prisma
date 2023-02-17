@@ -1,0 +1,74 @@
+generator client {
+  provider  = "prisma-client-py"
+  interface = "asyncio"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = "postgresql://postgres:postgres@localhost:5432/management"
+}
+
+model User {
+  id                 String             @id @default(nanoid())
+  email              String             @unique @db.VarChar(255)
+  first_name         String             @db.VarChar(255)
+  last_name          String             @db.VarChar(255)
+  password           String             @db.VarChar(255)
+  created_at         DateTime           @default(now())
+  updated_at         DateTime           @updatedAt
+  verification       Verification?
+  plants_collections PlantsCollection[]
+}
+
+model Verification {
+  id          String   @id @default(nanoid())
+  code        String   @default(nanoid(8))
+  verified    Boolean  @default(false)
+  verified_at DateTime @updatedAt
+
+  user_id String @unique
+  user    User   @relation(fields: [user_id], references: [id], onDelete: Cascade)
+}
+
+model PlantsCollection {
+  id         String   @id @default(nanoid())
+  name       String   @db.VarChar(255)
+  created_at DateTime @default(now())
+  plants     Plant[]
+
+  user_id String
+  user    User   @relation(fields: [user_id], references: [id])
+}
+
+model Plant {
+  id            String                @id @default(nanoid())
+  name          String                @default("New Plant") @db.VarChar(255)
+  // waterAmount: 1000 -> 1liter
+  water_amount  Int                   @default(1000)
+  auto_irrigate Boolean               @default(true)
+  created_at    DateTime              @default(now())
+  updated_at    DateTime              @updatedAt
+  irrigations   Irrigation[]
+  timestamps    IrrigationTimestamp[]
+
+  collection_id String?           @unique
+  collection    PlantsCollection? @relation(fields: [collection_id], references: [id], onDelete: Cascade)
+}
+
+model Irrigation {
+  id String   @id @default(nanoid())
+  at DateTime @default(now())
+
+  plant_id String @unique
+  plant    Plant  @relation(fields: [plant_id], references: [id], onDelete: Cascade)
+}
+
+model IrrigationTimestamp {
+  id     String @id @default(nanoid())
+  hour   Int
+  minute Int
+  second Int    @default(0)
+
+  plant_id String
+  plant    Plant  @relation(fields: [plant_id], references: [id])
+}
