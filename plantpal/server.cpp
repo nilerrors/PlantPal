@@ -3,10 +3,11 @@
 #include <HTTPClient.h>
 #include "server.h"
 #include "res.h"
-#include "wifi_credentials.h"
+#include "credentials.h"
 
 
 Responses responses;
+Credentials credentials;
 
 
 ConfigServer::ConfigServer() {
@@ -59,7 +60,7 @@ void ConfigServer::createServer() {
             Serial.println("Connected");
             Serial.println(WiFi.localIP());
 
-            writeWiFiCredentials(ssid, pass);
+            credentials.writeWiFi(ssid, pass);
 
             change_wifi_request data;
             data.ssid = ssid;
@@ -88,7 +89,6 @@ void ConfigServer::begin() {
 void ConfigServer::handleClient() {
     if (running) {
         server->handleClient();
-        Serial.println("Handling client");
     }
 }
 

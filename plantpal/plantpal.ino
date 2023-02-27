@@ -1,6 +1,6 @@
 #include <WiFi.h>
 #include "server.h"
-#include "wifi_credentials.h"
+#include "credentials.h"
 
 
 #define proto_ssid "ESPCONF"
@@ -13,12 +13,13 @@ IPAddress subnet(255, 255, 255, 0);
 
 
 ConfigServer server;
+Credentials credentials;
 
 
 void setup() {
     Serial.begin(115200);
 
-    bool startConfigServer = wifiCredentialsNotWritten();
+    bool startConfigServer = credentials.wifiNotWritten();
 
     if (startConfigServer) {
         WiFi.mode(WIFI_AP_STA);
@@ -37,24 +38,23 @@ void setup() {
         Serial.print("Setting up Web Server ... ");
         server.begin();
         Serial.println("Done");
+
+        while (!server.ended()) {
+            server.handleClient();
+        }
     }
     else {
         String ssid, pass;
-        readWiFiCredentials(ssid, pass);
+        credentials.readWiFi(&ssid, &pass);
         WiFi.begin(ssid.c_str(), pass.c_str());
     }
 }
 
 void loop() {
-    if (!server.ended()) {
-        server.handleClient();
-        return;
-    }
-
     String ssid, pass;
 
-    readWiFiCredentials(ssid, pass);
-    Serial.println(ssid);
-    Serial.println(pass);
+    credentials.readWiFi(&ssid, &pass);
+    Serial.println(ssid.c_str());
+    Serial.println(pass.c_str());
     delay(3000);
 }
