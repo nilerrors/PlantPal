@@ -7,7 +7,6 @@
 
 
 Responses responses;
-Credentials credentials;
 
 
 ConfigServer::ConfigServer() {
@@ -60,7 +59,7 @@ void ConfigServer::createServer() {
             Serial.println("Connected");
             Serial.println(WiFi.localIP());
 
-            credentials.writeWiFi(ssid, pass);
+            changeWifiCallback(ssid, pass);
 
             change_wifi_request data;
             data.ssid = ssid;
@@ -78,6 +77,10 @@ void ConfigServer::createServer() {
         server->send(404, "text/html", responses.not_found());
         Serial.println("Not Found");
     });
+}
+
+void ConfigServer::onChangeWifi(WifiChangeHandler fn) {
+  changeWifiCallback = fn;
 }
 
 void ConfigServer::begin() {

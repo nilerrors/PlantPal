@@ -7,6 +7,9 @@ private:
   Preferences preferences;
 
 public:
+  void begin();
+  void end();
+
   void readWiFi(String *ssid, String *pass);
   void writeWiFi(String ssid, String pass);
   bool wifiNotWritten();

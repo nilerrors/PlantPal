@@ -1,26 +1,29 @@
 #include "credentials.h"
 
 
-void Credentials::readWiFi(String *ssid, String *password) {
-    const bool begin = preferences.begin("wifi", true);
-    if (!begin) {
-        Serial.println("Preferences for WiFi could not begin");
-        return;
-    }
+void Credentials::begin() {
+  if (!preferences.begin("plantpal")) {
+    Serial.println("Preferences could not begin");
+    return;
+  }
+}
+
+void Credentials::end() {
+  preferences.end();
+}
+
+void Credentials::readWiFi(String *ssid, String *pass) {
+    begin();
     *ssid = preferences.getString("ssid", "");
-    *password = preferences.getString("password", "");
-    preferences.end();
+    *pass = preferences.getString("pass", "");
+    end();
 }
 
 void Credentials::writeWiFi(String ssid, String pass) {
-    const bool begin = preferences.begin("wifi", false);
-    if (!begin) {
-        Serial.println("Preferences for WiFi could not begin");
-        return;
-    }
+    begin();
     preferences.putString("ssid", ssid);
     preferences.putString("pass", pass);
-    preferences.end();
+    end();
 }
 
 bool Credentials::wifiNotWritten() {
@@ -31,21 +34,13 @@ bool Credentials::wifiNotWritten() {
 
 
 void Credentials::readPlantID(String *id) {
-    const bool begin = preferences.begin("plant", true);
-    if (!begin) {
-        Serial.println("Preferences for Plant could not begin");
-        return;
-    }
+    begin();
     *id = preferences.getString("id", "");
-    preferences.end();
+    end();
 }
 
 void Credentials::writePlantID(String id) {
-    const bool begin = preferences.begin("plant", false);
-    if (!begin) {
-        Serial.println("Preferences for Plant could not begin");
-        return;
-    }
+    begin();
     preferences.putString("id", id);
-    preferences.end();
+    end();
 }
