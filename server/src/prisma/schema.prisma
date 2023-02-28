@@ -40,22 +40,29 @@ model PlantsCollection {
   user    User   @relation(fields: [user_id], references: [id])
 }
 
+enum IrrigationType {
+  time // Times, e.g.: [13:15:00, 01:30:00]
+  period // Amount per period, e.g.: 3 times per week
+}
+
 model Plant {
-  id            String                @id @default(nanoid())
-  name          String                @default("New Plant") @db.VarChar(255)
+  id                 String             @id @default(nanoid())
+  name               String             @default("New Plant") @db.VarChar(255)
   // waterAmount: 1000 -> 1liter
-  water_amount  Int                   @default(1000)
-  auto_irrigate Boolean               @default(true)
-  created_at    DateTime              @default(now())
-  updated_at    DateTime              @updatedAt
-  irrigations   Irrigation[]
-  timestamps    IrrigationTimestamp[]
+  water_amount       Int                @default(1000)
+  created_at         DateTime           @default(now())
+  updated_at         DateTime           @updatedAt
+  auto_irrigation    Boolean            @default(true)
+  irrigation_type    IrrigationType     @default(period)
+  irrigations_record IrrigationRecord[]
+  timestamps         Timestamp[]
+  periodstamps       Periodstamp[]
 
   collection_id String?           @unique
   collection    PlantsCollection? @relation(fields: [collection_id], references: [id], onDelete: Cascade)
 }
 
-model Irrigation {
+model IrrigationRecord {
   id String   @id @default(nanoid())
   at DateTime @default(now())
 
@@ -63,11 +70,34 @@ model Irrigation {
   plant    Plant  @relation(fields: [plant_id], references: [id], onDelete: Cascade)
 }
 
-model IrrigationTimestamp {
-  id     String @id @default(nanoid())
-  hour   Int
-  minute Int
-  second Int    @default(0)
+enum DayOfWeek {
+  monday
+  tuesday
+  wedensday
+  thursday
+  friday
+  saturday
+  sunday
+  everyday
+}
+
+model Timestamp {
+  id          String    @id @default(nanoid())
+  day_of_week DayOfWeek @default(everyday)
+  hour        Int
+  minute      Int
+  second      Int       @default(0)
+
+  plant_id String
+  plant    Plant  @relation(fields: [plant_id], references: [id])
+}
+
+model Periodstamp {
+  id          String    @id @default(nanoid())
+  day_of_week DayOfWeek @default(everyday)
+  hour        Int
+  minute      Int
+  second      Int       @default(0)
 
   plant_id String
   plant    Plant  @relation(fields: [plant_id], references: [id])
