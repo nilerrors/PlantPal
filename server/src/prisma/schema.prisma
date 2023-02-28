@@ -9,7 +9,7 @@ datasource db {
 }
 
 model User {
-  id                 String             @id @default(nanoid())
+  id                 String             @id @default(cuid())
   email              String             @unique @db.VarChar(255)
   first_name         String             @db.VarChar(255)
   last_name          String             @db.VarChar(255)
@@ -21,8 +21,8 @@ model User {
 }
 
 model Verification {
-  id          String   @id @default(nanoid())
-  code        String   @default(nanoid(8))
+  id          String   @id @default(cuid())
+  code        String   @default(cuid())
   verified    Boolean  @default(false)
   verified_at DateTime @updatedAt
 
@@ -31,7 +31,7 @@ model Verification {
 }
 
 model PlantsCollection {
-  id         String   @id @default(nanoid())
+  id         String   @id @default(cuid())
   name       String   @db.VarChar(255)
   created_at DateTime @default(now())
   plants     Plant[]
@@ -46,7 +46,7 @@ enum IrrigationType {
 }
 
 model Plant {
-  id                 String             @id @default(nanoid())
+  id                 String             @id @default(cuid())
   name               String             @default("New Plant") @db.VarChar(255)
   // waterAmount: 1000 -> 1liter
   water_amount       Int                @default(1000)
@@ -63,7 +63,7 @@ model Plant {
 }
 
 model IrrigationRecord {
-  id String   @id @default(nanoid())
+  id String   @id @default(cuid())
   at DateTime @default(now())
 
   plant_id String @unique
@@ -82,7 +82,7 @@ enum DayOfWeek {
 }
 
 model Timestamp {
-  id          String    @id @default(nanoid())
+  id          String    @id @default(cuid())
   day_of_week DayOfWeek @default(everyday)
   hour        Int
   minute      Int
@@ -93,7 +93,7 @@ model Timestamp {
 }
 
 model Periodstamp {
-  id          String    @id @default(nanoid())
+  id          String    @id @default(cuid())
   day_of_week DayOfWeek @default(everyday)
   hour        Int
   minute      Int

@@ -38,24 +38,26 @@ async def create_user(user: schemas.UserSignup) -> dict | None:
 
     created_user = await prisma.user.create(data={
         'email': user.email,
-        'firstName': user.first_name,
-        'lastName': user.last_name,
+        'first_name': user.first_name,
+        'last_name': user.last_name,
         'password': hasher.get_password_hash(user.password)
     })
 
+    # Standard Collection of plants
+    await prisma.plants_collection.create(data={
+        'name': '#Plants',
+        'user_id': created_user.id
+    })
+
     verification = await prisma.verification.create(data={
-        'user': {
-            'connect': {
-                'id': created_user.id
-            }
-        }
+        'user_id': created_user.id
     })
 
     return {
         'id': created_user.id,
         'email': created_user.email,
-        'first_name': created_user.firstName,
-        'last_name': created_user.lastName,
+        'first_name': created_user.first_name,
+        'last_name': created_user.last_name,
         'verified': verification.verified,
         'verification_id': verification.id
     }
@@ -80,8 +82,8 @@ async def authenticate_user(user: schemas.UserLogin):
 async def update_user(user: schemas.UserUpdate):
     updated_user = await prisma.user.update(data={
         'email': user.email,
-        'firstName': user.first_name,
-        'lastName': user.last_name,
+        'first_name': user.first_name,
+        'last_name': user.last_name,
     },
     where={
         'email': user.email

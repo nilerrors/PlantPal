@@ -5,14 +5,19 @@ from . import schemas
 
 
 
-async def get_plant(user_email: str, plant_id: str):
+async def get_plant(user_email: str, plant_id: str, plant_collection_name: str = "$Plants"):
     user = await auth.crud.get_user_by_email(user_email)
     if user is None:
         return None
 
+    plant_collection = await prisma.plant_collection.find_first(where={
+        'name': plant_collection_name,
+        'user_id': user.id
+    })
+
     return await prisma.plant.find_first(where={
         'id': plant_id,
-        'userId': user.id
+        'collection_id': plant_collection.id,
     },
     include={
         'irrigations': {
@@ -27,25 +32,16 @@ async def get_plants(user_email: str):
         return None
 
     return await prisma.plant.find_many(where={
-        'userId': user.id
+        'user_id': user.id
     })
 
 
-async def create_plant(user_email: str, plant: schemas.PlantCreate):
+async def create_plant(user_email: str):
     user = await auth.crud.get_user_by_email(user_email)
     if user is None:
         return None
 
-    created_plant = await prisma.plant.create(data={
-        'macAddress': plant.mac_address,
-        'name': plant.name,
-        'waterAmount': plant.water_amount,
-        'user': {
-            'connect': {
-                'id': user.id
-            }
-        }
-    })
+    created_plant = await prisma.plant.create()
 
     return created_plant
 
@@ -72,11 +68,7 @@ async def irrigate_plant(irrigation: schemas.PlantIrrigation):
         return False
 
     plant_irrigation = await prisma.irrigation.create(data={
-        'plant': {
-            'connect': {
-                'id': plant.id
-            }
-        }
+        'plant_id': plant.id
     })
 
     return plant_irrigation is not None

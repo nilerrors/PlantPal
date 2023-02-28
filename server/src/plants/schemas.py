@@ -5,22 +5,9 @@ class PlantBase(BaseModel):
     pass
 
 
-class PlantCreate(PlantBase):
-    mac_address: str
-    name: str
+class PlantUpdate(PlantBase):
+    name: str = "New Plant"
     water_amount: int = 1000
-
-    @validator('mac_address')
-    def validate_mac_address(cls, value):
-        if value is None:
-            raise ValueError('mac_address must be provided')
-        
-        mac_address_regex = "^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})|([0-9a-fA-F]{4}\\.[0-9a-fA-F]{4}\\.[0-9a-fA-F]{4})$"
-
-        if not re.search(re.compile(mac_address_regex), value):
-            raise ValueError('mac_address must be valid')
-        
-        return value
 
     @validator('water_amount')
     def validate_range(cls, value):
@@ -33,5 +20,3 @@ class PlantCreate(PlantBase):
 
 class PlantIrrigation(PlantBase):
     plant_id: str
-    user_email: EmailStr
-    user_password: str
