@@ -52,10 +52,10 @@ void setup() {
         credentials.readWiFi(&ssid, &pass);
         WiFi.begin(ssid.c_str(), pass.c_str());
         Serial.print("Connecting to WiFi ");
-        int times;
+        int times = 0;
         while (!WiFi.status() != WL_CONNECTED) {
           times++;
-          if (times > 60000) { // 60000 -> 60sec
+          if (times > 20) { // 60000 -> 60sec
             Serial.println(" Could not connect");
             credentials.writeWiFi("", "");
             Serial.println("Wifi network credentials need to be updated.");
@@ -63,7 +63,7 @@ void setup() {
             ESP.restart();            
           }
           Serial.print(".");
-          delay(100);
+          delay(1000);
         }
         Serial.println(" Connected");
     }

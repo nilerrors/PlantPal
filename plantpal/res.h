@@ -15,11 +15,9 @@ typedef struct {
 class Responses
 {
 private:
-    const char* base(String body, String title, bool styles);
+    const char* base(String body, String title);
 public:
-    const char* root();
-    const char* available_networks(int len, network networks[]);
-    const char* change_wifi(request_error error);
-    const char* change_wifi(change_wifi_request data);
+    const char* root(int len, network networks[]);
+    const char* change_wifi(String ssid);
     const char* not_found();
 };

@@ -17,11 +17,6 @@ void ConfigServer::createServer() {
     server = new WebServer();
 
     server->on("/", HTTP_GET, [&]() {
-        server->send(200, "text/html", responses.root());
-        Serial.println("Root");
-    });
-
-    server->on("/available_networks", HTTP_GET, [&]() {
         int n = WiFi.scanNetworks();
         network* networks = new network[n];
         for (int i = 0; i < n; i++) {
@@ -30,14 +25,14 @@ void ConfigServer::createServer() {
             netw.open = WiFi.encryptionType(i) == WIFI_AUTH_OPEN;
             networks[i] = netw;
         }
-        server->send(200, "application/json", responses.available_networks(n, networks));
-        Serial.println("Available Networks");
+        server->send(200, "text/html", responses.root(n, networks));
+        Serial.println("Root");
     });
 
     server->on("/create_plant", HTTP_POST, [&]() {
-        if (!server->hasArg("email") || !server->hasArg("password")) {
-            String res = "{\"message\":\"Bad Request\",\"detail\":\"Data could not be validated\"}";
-            server->send(400, "application/json", res.c_str());
+        if (!server->hasArg("email") || !server->hasArg("pass")) {
+            String res = "<h1>Bad Request</h1><hr><p>Data could not be validated</p>";
+            server->send(400, "text/html", res.c_str());
         }
         else {
             if (WiFi.status() == WL_CONNECTED) {
@@ -61,32 +56,32 @@ void ConfigServer::createServer() {
                     if (httpResponseCode == 200) {
                         Serial.println("Successfully created plant in the database.");
 
-                        String res = "{\"message\":\"Succesfully Created\",\"detail\":\"Plant is added to account.\"}";
-                        server->send(200, "application/json", res.c_str());
+                        String res = "<h1>Succesfully Created</h1><hr><p>Plant is added to account.</p>" + payload;
+                        server->send(200, "text/html", res.c_str());
                     }
                     else if (httpResponseCode == 401) {
-                        String res = "{\"message\":\"Unauthorized\",\"detail\":\"Account email and password do not correspond.\"}";
-                        server->send(401, "application/json", res.c_str());
+                        String res = "<h1>Unauthorized</h1><hr><p>Account email and password do not correspond.</p>";
+                        server->send(401, "text/html", res.c_str());
                     }
                     Serial.println(payload);
                 }
                 else {
-                    String res = "{\"message\":\"Network Error\",\"detail\":\"Could not reach the Database server\"}";
-                    server->send(500, "application/json", res.c_str());
+                    String res = "<h1>Network Error</h1><hr><p>Could not reach the Database server</p>";
+                    server->send(500, "text/html", res.c_str());
                 }
                 
                 http.end();
             } else {
-                String res = "{\"message\":\"Network Error\",\"detail\":\"Not connected to network\"}";
-                server->send(500, "application/json", res.c_str());
+                String res = "<h1>Network Error</h1><hr><p>Not connected to network</p>";
+                server->send(500, "text/html", res.c_str());
             }
         }
     });
 
     server->on("/change_wifi", HTTP_POST, [&]() {
         if (!server->hasArg("ssid") || !server->hasArg("pass")) {
-            String res = "{\"message\":\"Bad Request\",\"detail\":\"Data could not be validated\"}";
-            server->send(400, "application/json", res.c_str());
+            String res = "<h1>Bad Request</h1><hr><p>Data could not be validated</p>";
+            server->send(400, "text/html", res.c_str());
         }
         else {
             String ssid = server->arg("ssid");
@@ -101,8 +96,8 @@ void ConfigServer::createServer() {
             int times = 0;
             while (WiFi.status() != WL_CONNECTED) {
                 if (times > 10) {
-                    String res = "{\"message\":\"Network Error\",\"detail\":\"Could not connect to network\"}";
-                    server->send(500, "application/json", res.c_str());
+                    String res = "<h1>Network Error</h1><h1><p>Could not connect to network</p>";
+                    server->send(500, "text/html", res.c_str());
                     WiFi.disconnect();
                     return;
                 }
@@ -115,12 +110,7 @@ void ConfigServer::createServer() {
 
             changeWifiCallback(ssid, pass);
 
-            change_wifi_request data;
-            data.ssid = ssid;
-
-            String res = "{\"message\":\"Connection Succesful\",\"detail\":\"Connected to network with SSID "+ ssid + "\"}";
-            server->send(200, "application/json", res.c_str());
-            delay(3000);
+            server->send(200, "text/html", responses.change_wifi(ssid));
 
             // WiFi.mode(WIFI_STA);
             // end();
