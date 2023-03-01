@@ -57,6 +57,8 @@ void setup() {
           times++;
           if (times > 60000) { // 60000 -> 60sec
             Serial.println(" Could not connect");
+            credentials.writeWiFi("", "");
+            Serial.println("Wifi network credentials need to be updated.");
             Serial.println("Restarting ESP");
             ESP.restart();            
           }
