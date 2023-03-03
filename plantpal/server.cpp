@@ -39,13 +39,17 @@ void ConfigServer::createServer() {
                 WiFiClient wifiClient;
                 HTTPClient http;
 
-                http.begin(wifiClient, "https://10.3.41.39:8000/plants/");
+                http.begin(wifiClient, "https://10.3.41.39:8000/plants_collection/plants/");
 
                 String email = server->arg("email");
-                String password = server->arg("password");
+                String password = server->arg("pass");
+
+                uint64_t chipid = ESP.getEfuseMac();
+                char chipid_str[17];
+                sprintf(chipid_str, "%016llX", chipid);
 
                 http.addHeader("Content-Type", "application/json");
-                String httpRequestData = "{\"email\":\"" + email + "\",\"password\":\"" + password + "\"}";
+                String httpRequestData = "{\"email\":\"" + email + "\",\"password\":\"" + password + "\",\"chip_id\":\"" + chipid_str + "\"}";
 
                 int httpResponseCode = http.POST(httpRequestData);
 
