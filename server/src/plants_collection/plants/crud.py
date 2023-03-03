@@ -71,6 +71,7 @@ async def get_plants(user_email: str, collection_id: str):
 
 
 async def create_plant(plant: schemas.PlantCreate):
+    print(plant.dict())
     user = await auth.crud.get_user_by_email_password(plant.email, plant.password)
     if user is None:
         return None

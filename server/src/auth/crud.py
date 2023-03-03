@@ -22,13 +22,18 @@ async def get_user_by_email(email: str):
 
 
 async def get_user_by_email_password(email: str, password: str):
-    return await prisma.user.find_first(where={
+    user = await prisma.user.find_first(where={
         'email': email,
-        'password': hasher.get_password_hash(password)
     },
     include={
         'verification': True
     })
+
+    if user is None or not hasher.verify_password(password, user.password):
+        return None
+    
+    return user
+
 
 
 async def create_user(user: schemas.UserSignup) -> dict | None:
