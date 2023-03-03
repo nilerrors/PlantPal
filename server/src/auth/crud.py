@@ -44,7 +44,7 @@ async def create_user(user: schemas.UserSignup) -> dict | None:
     })
 
     # Standard Collection of plants
-    await prisma.plants_collection.create(data={
+    await prisma.plantscollection.create(data={
         'name': '#Plants',
         'user_id': created_user.id
     })

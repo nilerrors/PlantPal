@@ -47,6 +47,7 @@ enum IrrigationType {
 
 model Plant {
   id                 String             @id @default(cuid())
+  chip_id            String             @db.VarChar(16)
   name               String             @default("New Plant") @db.VarChar(255)
   // waterAmount: 1000 -> 1liter
   water_amount       Int                @default(1000)
@@ -58,12 +59,13 @@ model Plant {
   timestamps         Timestamp[]
   periodstamps       Periodstamp[]
 
-  collection_id String?           @unique
-  collection    PlantsCollection? @relation(fields: [collection_id], references: [id], onDelete: Cascade)
+  collection_id String           @unique
+  collection    PlantsCollection @relation(fields: [collection_id], references: [id], onDelete: Cascade)
 }
 
 model IrrigationRecord {
   id String   @id @default(cuid())
+  water_amount Int @default(1000)
   at DateTime @default(now())
 
   plant_id String @unique

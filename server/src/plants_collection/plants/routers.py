@@ -7,12 +7,12 @@ router = APIRouter(prefix="/plants")
 
 
 @router.get('/')
-async def get_plants(Authorize: AuthJWT = Depends()):
+async def get_plants(collection_id: str, Authorize: AuthJWT = Depends()):
     Authorize.jwt_required()
 
     print(Authorize.get_jwt_subject())
     user_email = Authorize.get_jwt_subject()
-    user_plants = await crud.get_plants(user_email)
+    user_plants = await crud.get_plants(user_email, collection_id)
 
     return {'plants': user_plants}
 
@@ -31,11 +31,8 @@ async def get_plant(plant_id: str, Authorize: AuthJWT = Depends()):
 
 
 @router.post("/")
-async def create_plant(plant: schemas.PlantCreate, Authorize: AuthJWT = Depends()):
-    Authorize.jwt_required()
-
-    user_email = Authorize.get_jwt_subject()
-    created_plant = await crud.create_plant(user_email, plant)
+async def create_plant(plant: schemas.PlantCreate):
+    created_plant = await crud.create_plant(plant)
     
     if created_plant is None:
         raise HTTPException(status.HTTP_401_UNAUTHORIZED, "User email and password do not correspond")
@@ -43,7 +40,7 @@ async def create_plant(plant: schemas.PlantCreate, Authorize: AuthJWT = Depends(
     return created_plant.dict()
 
 
-@router.delete("/")
+@router.delete("/{plant_id}")
 async def delete_plant(plant_id: str, Authorize: AuthJWT = Depends()):
     Authorize.jwt_required()
     
@@ -59,9 +56,7 @@ async def delete_plant(plant_id: str, Authorize: AuthJWT = Depends()):
 @router.post("/{plant_id}/irrigate")
 async def plant_irrigation(irrigation: schemas.PlantIrrigation):
     plant_irrigated = await crud.irrigate_plant(irrigation)
-    if plant_irrigated is None:
-        raise HTTPException(status.HTTP_401_UNAUTHORIZED, "User email and password do not correspond")
-    elif not plant_irrigated:
-        raise HTTPException(status.HTTP_404_NOT_FOUND, "Plant with given id not found")
+    if not plant_irrigated:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "Plant with given id and Chip ID not found")
     
     return {'message': 'Plant irrigated'}

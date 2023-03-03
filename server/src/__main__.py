@@ -3,7 +3,8 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from fastapi_jwt_auth import AuthJWT
 from fastapi_jwt_auth.exceptions import AuthJWTException
-from . import config, auth, plants
+
+from . import config, auth, plants_collection
 from .prisma import prisma
 
 
@@ -46,4 +47,4 @@ def authjwt_exception_handler(request: Request, exc: AuthJWTException):
 
 
 app.include_router(auth.router, tags=["authentication"])
-app.include_router(plants.router, tags=["plants"])
+app.include_router(plants_collection.router, tags=["plants collection"])

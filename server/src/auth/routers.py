@@ -68,7 +68,7 @@ async def resend_verification(user: UserResendVerification):
         user.email,
         {
             'title': 'Verify Account',
-            'name': db_user.firstName,
+            'name': db_user.first_name,
             'verification_id': db_user.verification.id or ""
         },
         'verify.html'
