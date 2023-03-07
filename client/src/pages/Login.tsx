@@ -73,10 +73,7 @@ export function Login() {
                   <Form.Text className='small mb-3 pb-lg-2 text-danger'>
                     {error}{' '}
                     {error === 'Account is not verified' ? (
-                      <Link
-                        to='/verify-account'
-                        className='text-white-50 fw-bold'
-                      >
+                      <Link to='/verify' className='text-white-50 fw-bold'>
                         Resend Verification
                       </Link>
                     ) : null}

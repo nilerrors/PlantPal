@@ -22,7 +22,6 @@ model User {
 
 model Verification {
   id          String   @id @default(cuid())
-  code        String   @default(cuid())
   verified    Boolean  @default(false)
   verified_at DateTime @updatedAt
 
@@ -34,6 +33,7 @@ model PlantsCollection {
   id         String   @id @default(cuid())
   name       String   @db.VarChar(255)
   created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
   plants     Plant[]
 
   user_id String
@@ -47,7 +47,7 @@ enum IrrigationType {
 
 model Plant {
   id                 String             @id @default(cuid())
-  chip_id            String             @db.VarChar(16)
+  chip_id            String             @unique @db.VarChar(16)
   name               String             @default("New Plant") @db.VarChar(255)
   // waterAmount: 1000 -> 1liter
   water_amount       Int                @default(1000)
@@ -75,7 +75,7 @@ model IrrigationRecord {
 enum DayOfWeek {
   monday
   tuesday
-  wedensday
+  wednesday
   thursday
   friday
   saturday

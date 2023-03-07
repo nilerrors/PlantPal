@@ -36,7 +36,7 @@ export function VerifyEmail() {
   }, [])
 
   return (
-    <Container className='d-flex justify-content-center align-items-center h-100'>
+    <Container className='d-flex text-align-center justify-content-center align-items-center h-100'>
       {loading ? (
         <Badge bg='secondary'>Loading...</Badge>
       ) : (

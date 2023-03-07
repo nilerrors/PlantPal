@@ -6,7 +6,8 @@ import { Home } from './pages/Home'
 import { Login } from './pages/Login'
 import { Plant } from './pages/Plant'
 import { Plants } from './pages/Plants'
-import { PlantsAdd } from './pages/PlantsAdd'
+import { PlantsCollection } from './pages/PlantsCollection'
+import { SetupTutorial } from './pages/SetupTutorial'
 import { Signout } from './pages/Signout'
 import { Signup } from './pages/Signup'
 import { VerifyEmail } from './pages/VerifyEmail'
@@ -34,8 +35,12 @@ function App() {
           <main className='bg-dark text-white position-absolute p-0 m-0'>
             <Routes>
               <Route index element={<Home />} />
+              <Route path='/tutorial' element={<SetupTutorial />} />
+              <Route
+                path='/plants-collection/:id'
+                element={<PlantsCollection />}
+              />
               <Route path='/plants' element={<Plants />} />
-              <Route path='/plants/add' element={<PlantsAdd />} />
               <Route path='/plants/:id' element={<Plant />} />
               <Route path='/settings' element={<p>Hello Settings</p>} />
               <Route path='/signout' element={<Signout />} />

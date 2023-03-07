@@ -14,7 +14,7 @@ async def get_plant_collection(user_email: str, plant_collection_id: str):
     })
 
 
-async def get_plant_collection_by_name(user_email: str, plant_collection_name: str = "#Plants"):
+async def get_plant_collection_by_name(user_email: str, plant_collection_name: str = "$Plants"):
     user = await auth.crud.get_user_by_email(user_email)
     if user is None:
         return None
@@ -31,7 +31,7 @@ async def get_plant_by_chip_id(plant_id: str, chip_id: str):
         'chip_id': chip_id
     })
 
-async def get_plant(user_email: str, plant_id: str, plant_collection_name: str = "#Plants"):
+async def get_plant(user_email: str, plant_id: str, plant_collection_name: str = "$Plants"):
     user = await auth.crud.get_user_by_email(user_email)
     if user is None:
         return None
@@ -76,7 +76,7 @@ async def create_plant(plant: schemas.PlantCreate):
     if user is None:
         return None
 
-    standard_plant_collection = await get_plant_collection_by_name(user.email, "#Plants")
+    standard_plant_collection = await get_plant_collection_by_name(user.email, "$Plants")
 
     if standard_plant_collection is None:
         return None
@@ -89,7 +89,7 @@ async def create_plant(plant: schemas.PlantCreate):
     return created_plant
 
 
-async def delete_plant(user_email: str, plant_id: str, plant_collection_name: str = "#Plants"):
+async def delete_plant(user_email: str, plant_id: str, plant_collection_name: str = "$Plants"):
     plant = await get_plant(user_email, plant_id, plant_collection_name)
     if plant is None:
         return False

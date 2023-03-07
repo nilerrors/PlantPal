@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Container, Form, Row, Col, Card, Button, Alert } from 'react-bootstrap'
-import { Link } from 'react-router-dom'
+import { Link, Navigate, useNavigate } from 'react-router-dom'
 import { useAuthentication } from '../contexts/AuthenticationContext'
 import { useForm } from '../hooks/useForm'
 
@@ -9,9 +9,13 @@ export function EmailVerification() {
   document.body.style.background =
     'linear-gradient(to right, rgba(106, 17, 203, 1), rgba(37, 117, 252, 1))'
 
+  const [verificationCode, setVerficationCode] = useState('')
+
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [message, setMessage] = useState<string | null>(null)
+
+  const navigate = useNavigate()
 
   const { useApi } = useAuthentication()
 
@@ -48,6 +52,33 @@ export function EmailVerification() {
               style={{ borderRadius: '1rem', maxWidth: '400px' }}
             >
               <Card.Body className='p-5 d-flex flex-column align-items-center mx-auto w-100'>
+                <Form.Group className='mb-4 mx-5 w-100'>
+                  <Form.Control
+                    type='text'
+                    placeholder='Verification Code'
+                    className='bg-dark text-white'
+                    size='lg'
+                    name='verification-code'
+                    onChange={(e) => setVerficationCode(e.target.value)}
+                  />
+                </Form.Group>
+                <Button
+                  className='mx-2 px-5'
+                  color='white'
+                  size='lg'
+                  variant='secondary'
+                  onClick={() => {
+                    if (verificationCode.trim() == '') {
+                      setError('No verification code given')
+                      return
+                    }
+                    navigate(`/verify/${verificationCode}`)
+                    return
+                  }}
+                >
+                  {loading ? 'Loading...' : 'Verify'}
+                </Button>
+                <Form.Text>OR</Form.Text>
                 {message == null ? (
                   <>
                     {error != null ? (

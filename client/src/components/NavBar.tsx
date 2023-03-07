@@ -29,7 +29,7 @@ export function NavBar() {
     >
       <Container>
         <Link to='/'>
-          <Navbar.Brand>Plants Management</Navbar.Brand>
+          <Navbar.Brand>PlantPal</Navbar.Brand>
         </Link>
         {window.innerWidth < 600 ? (
           <MobileNavBar urls={urls} />

@@ -16,7 +16,7 @@ async def get_plants_collections(Authorize: AuthJWT = Depends()):
     user_email = Authorize.get_jwt_subject()
     user_plants = await crud.get_plants_collections(user_email)
 
-    return {'plants': user_plants}
+    return user_plants
 
 
 @router.get('/{plant_collection_id}')

@@ -81,8 +81,6 @@ export function AuthenticationContextProvider(props: {
       method: 'GET',
     }
   ) {
-    const { token } = useAuthentication()
-
     const headers: any = {
       'Content-Type': 'application/json',
       ...options.initHeaders,
