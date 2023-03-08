@@ -37,7 +37,7 @@ model PlantsCollection {
   plants     Plant[]
 
   user_id String
-  user    User   @relation(fields: [user_id], references: [id])
+  user    User   @relation(fields: [user_id], references: [id], onDelete: Cascade)
 }
 
 enum IrrigationType {

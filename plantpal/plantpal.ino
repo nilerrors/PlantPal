@@ -1,4 +1,5 @@
 #include <WiFi.h>
+#include <ArduinoJson.h>
 #include "server.h"
 #include "credentials.h"
 
@@ -40,8 +41,16 @@ void setup() {
           credentials.writeWiFi(ssid, pass);
           Serial.println("Wifi is written");
         });
+        server.onPlantCreated([&](String payload) {
+          StaticJsonDocument<512> doc;
+          deserializeJson(doc, payload.c_str());
+
+          String plant_id = doc["id"].as<String>();
+          int32_t water_amount = doc["water_amount"].as<signed int>();
+
+          credentials.writePlant(plant_id, water_amount);
+        });
         server.begin();
-        Serial.println("Done");
 
         while (!server.ended()) {
             server.handleClient();

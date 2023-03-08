@@ -21,6 +21,9 @@ async def get_plants_collection(user_email: str, plants_collection_id: str):
     return await prisma.plantscollection.find_first(where={
         'id': plants_collection_id,
         'user_id': user.id
+    },
+    include={
+        'plants': True
     })
 
 

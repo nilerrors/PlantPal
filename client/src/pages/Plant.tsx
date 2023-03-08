@@ -1,9 +1,11 @@
 import { useEffect, useState } from 'react'
+import { Container } from 'react-bootstrap'
 import { Navigate, useParams } from 'react-router-dom'
 import { useAuthentication } from '../contexts/AuthenticationContext'
+import { Plant } from '../types'
 
 export function Plant() {
-  const [plant, setPlant] = useState<any>(null)
+  const [plant, setPlant] = useState<Plant>()
   const [error, setError] = useState<string | null>(null)
   const { id } = useParams()
 
@@ -14,9 +16,7 @@ export function Plant() {
   }
 
   useEffect(() => {
-    useApi('/plants/' + id, {
-      method: 'POST',
-    })
+    useApi(`/plants_collection/plants/${id}`)
       .then((res) => {
         if (!res.ok) {
           res
@@ -30,14 +30,16 @@ export function Plant() {
   }, [])
 
   return (
-    <>
-      {id}
+    <Container className='bg-dark text-align-center'>
+      <h3>
+        '{plant?.name}' in {plant?.collection?.name}
+      </h3>
       <hr />
       {error != null ? (
         <>{error}</>
       ) : (
-        <>{JSON.stringify(plant, undefined, 2)}</>
+        <pre>{JSON.stringify(plant, undefined, 2)}</pre>
       )}
-    </>
+    </Container>
   )
 }

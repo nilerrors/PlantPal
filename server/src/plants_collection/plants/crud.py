@@ -51,7 +51,8 @@ async def get_plant(user_email: str, plant_id: str, plant_collection_name: str =
     include={
         'irrigations_record': {
             'take': 3
-        }
+        },
+        'collection': True
     })
 
 

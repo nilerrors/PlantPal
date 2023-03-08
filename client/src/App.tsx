@@ -36,12 +36,9 @@ function App() {
             <Routes>
               <Route index element={<Home />} />
               <Route path='/tutorial' element={<SetupTutorial />} />
-              <Route
-                path='/plants-collection/:id'
-                element={<PlantsCollection />}
-              />
               <Route path='/plants' element={<Plants />} />
-              <Route path='/plants/:id' element={<Plant />} />
+              <Route path='/plants/:id' element={<PlantsCollection />} />
+              <Route path='/plant/:id' element={<Plant />} />
               <Route path='/settings' element={<p>Hello Settings</p>} />
               <Route path='/signout' element={<Signout />} />
               <Route path='*' element={<Navigate to='/' />} />

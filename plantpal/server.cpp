@@ -58,10 +58,11 @@ void ConfigServer::createServer() {
                 if (httpResponseCode > 0) {
                     payload = http.getString();
                     if (httpResponseCode == 200) {
-                        Serial.println("Successfully created plant in the database.");
-
                         String res = "<h1>Succesfully Created</h1><hr><p>Plant is added to account.</p>" + payload;
                         server->send(200, "text/html", res.c_str());
+
+                        plantCreateCallback();
+                        end();
                     }
                     else if (httpResponseCode == 401) {
                         String res = "<h1>Unauthorized</h1><hr><p>Account email and password do not correspond.</p>";
@@ -130,6 +131,10 @@ void ConfigServer::createServer() {
 
 void ConfigServer::onChangeWifi(WifiChangeHandler fn) {
   changeWifiCallback = fn;
+}
+
+void ConfigServer::onPlantCreated(PlantCreateHandler fn) {
+  plantCreateCallback = fn;
 }
 
 void ConfigServer::begin() {

@@ -33,14 +33,16 @@ bool Credentials::wifiNotWritten() {
 }
 
 
-void Credentials::readPlantID(String *id) {
+void Credentials::readPlant(String *id, int32_t *water_amount) {
     begin();
-    *id = preferences.getString("id", "");
+    *id = preferences.getString("plant_id", "");
+    *water_amount = preferences.getInt("water_amount", "");
     end();
 }
 
-void Credentials::writePlantID(String id) {
+void Credentials::writePlant(String id, int32_t water_amount) {
     begin();
-    preferences.putString("id", id);
+    preferences.putString("plant_id", id);
+    preferences.putInt("water_amount", water_amount);
     end();
 }

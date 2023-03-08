@@ -1,25 +1,42 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
+import { Card, Collapse, Container, ListGroup } from 'react-bootstrap'
 import { useAuthentication } from '../contexts/AuthenticationContext'
+import { PlantsCollection } from '../types'
 
 export function Plants() {
-  const [plants, setPlants] = useState({})
+  const [plantsCollectionOpen, setPlantsCollectionOpen] = useState(true)
+  const [plantsCollections, setPlantsCollections] = useState<
+    PlantsCollection[]
+  >([])
 
   const { useApi } = useAuthentication()
 
   useEffect(() => {
-    useApi('/plants/')
+    useApi('/plants_collection/')
       .then((res) => res.json())
       .then((data) => {
-        setPlants(data?.plants)
+        setPlantsCollections(data)
       })
   }, [])
 
   return (
-    <>
-      <Link to='/plants/add'>Add Plant</Link>
+    <Container className='bg-dark text-align-center'>
+      <h3>Plants Collections</h3>
       <hr />
-      {JSON.stringify(plants, undefined, 2)}
-    </>
+      <Collapse in={plantsCollectionOpen}>
+        <ListGroup className='list-group-flush'>
+          {plantsCollections.map((p) => (
+            <Link to={`/plants/${p.id}`} key={p.id}>
+              <ListGroup.Item
+                variant={p.name == '$Plants' ? 'primary' : 'secondary'}
+              >
+                {p.name}
+              </ListGroup.Item>
+            </Link>
+          ))}
+        </ListGroup>
+      </Collapse>
+    </Container>
   )
 }
