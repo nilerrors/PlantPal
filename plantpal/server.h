@@ -13,6 +13,7 @@ private:
     bool running = false;
     WebServer* server;
     void createServer();
+    void respond(int code, const char  *content_type, const char *response, const char *title);
 public:
     ConfigServer();
     void begin();

@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 from fastapi_jwt_auth import AuthJWT
 from src.utils.send_email import send_email_async
 from .schemas import UserLogin, UserSignup, UserRemove, UserResendVerification
-from . import crud
+from . import crud, schemas
 
 
 router = APIRouter(prefix='/auth')
@@ -85,6 +85,21 @@ async def current_user(Authorize: AuthJWT = Depends()):
 
     user = Authorize.get_jwt_subject()
     return {'current_user': user}
+
+
+@router.get('/user', response_model=schemas.UserResponse)
+async def user(Authorize: AuthJWT = Depends()):
+    Authorize.jwt_required()
+
+    user = await crud.get_user_by_email(Authorize.get_jwt_subject())
+
+    if user is None:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, 'User does not exist')
+
+    return {
+        **user.dict(),
+        "verified": True if user.verification is not None and user.verification.verified else False
+    }
 
 
 @router.delete('/user')

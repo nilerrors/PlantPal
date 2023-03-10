@@ -36,6 +36,8 @@ async def create_plant(plant: schemas.PlantCreate):
     
     if created_plant is None:
         raise HTTPException(status.HTTP_401_UNAUTHORIZED, "User email and password do not correspond")
+    elif created_plant == 'chipid exists':
+        raise HTTPException(status.HTTP_409_CONFLICT, "ESP with given Chip ID already exists")
 
     return created_plant.dict()
 

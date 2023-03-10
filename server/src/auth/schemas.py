@@ -28,6 +28,8 @@ class UserResponse(UserBase):
     first_name: str
     last_name: str
     verified: bool
+    created_at: datetime.datetime
+    updated_at: datetime.datetime
 
 
 class UserUpdate(UserBase):

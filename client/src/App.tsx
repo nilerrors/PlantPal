@@ -7,6 +7,7 @@ import { Login } from './pages/Login'
 import { Plant } from './pages/Plant'
 import { Plants } from './pages/Plants'
 import { PlantsCollection } from './pages/PlantsCollection'
+import { Settings } from './pages/Settings'
 import { SetupTutorial } from './pages/SetupTutorial'
 import { Signout } from './pages/Signout'
 import { Signup } from './pages/Signup'
@@ -39,7 +40,7 @@ function App() {
               <Route path='/plants' element={<Plants />} />
               <Route path='/plants/:id' element={<PlantsCollection />} />
               <Route path='/plant/:id' element={<Plant />} />
-              <Route path='/settings' element={<p>Hello Settings</p>} />
+              <Route path='/settings' element={<Settings />} />
               <Route path='/signout' element={<Signout />} />
               <Route path='*' element={<Navigate to='/' />} />
             </Routes>

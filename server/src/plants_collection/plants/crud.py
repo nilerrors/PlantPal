@@ -1,3 +1,4 @@
+from prisma.errors import UniqueViolationError as PrismaUniqueViolationError
 from src.prisma import prisma
 from src import auth, plants_collection
 from . import schemas
@@ -81,11 +82,14 @@ async def create_plant(plant: schemas.PlantCreate):
 
     if standard_plant_collection is None:
         return None
-
-    created_plant = await prisma.plant.create({
-        'collection_id': standard_plant_collection.id,
-        'chip_id': plant.chip_id
-    })
+    
+    try:
+        created_plant = await prisma.plant.create({
+            'collection_id': standard_plant_collection.id,
+            'chip_id': plant.chip_id
+        })
+    except PrismaUniqueViolationError:
+        return "chipid exists"
 
     return created_plant
 

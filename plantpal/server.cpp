@@ -68,6 +68,9 @@ void ConfigServer::createServer() {
                         String res = "<h1>Unauthorized</h1><hr><p>Account email and password do not correspond.</p>";
                         server->send(401, "text/html", res.c_str());
                     }
+                    else if (httpResponseCode == 409) {
+
+                    }
                     Serial.println(payload);
                 }
                 else {
@@ -127,6 +130,10 @@ void ConfigServer::createServer() {
         server->send(404, "text/html", responses.not_found());
         Serial.println("Not Found");
     });
+}
+
+void ConfigServer::respond(int code, const char *content_type, const char *response, const char *title = "") {
+    server->send(code, content_type, responses.base(response, title));
 }
 
 void ConfigServer::onChangeWifi(WifiChangeHandler fn) {
