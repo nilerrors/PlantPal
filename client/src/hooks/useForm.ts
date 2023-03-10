@@ -1,10 +1,10 @@
 import { useState } from 'react'
 
-export const useForm = <T extends object>(callback: any, initialState: T) => {
+export const useForm = <T>(callback: any, initialState: T) => {
   const [values, setValues] = useState<T>(initialState)
 
   const onChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    console.log(event.target.name, event.target.value)
+    if (values == null) return
 
     if (!Object.keys(values).includes(event.target.name)) {
       throw Error(
@@ -18,14 +18,24 @@ export const useForm = <T extends object>(callback: any, initialState: T) => {
     setValues({ ...values, [event.target.name]: value })
   }
 
+  const onSelectChange = (): React.ChangeEventHandler<HTMLSelectElement> => {
+    return () => onChange
+  }
+
   const onSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
     await callback()
   }
 
+  const set = (_values: T) => {
+    setValues(_values)
+  }
+
   return {
     onChange,
+    onSelectChange,
     onSubmit,
+    set,
     values,
   }
 }

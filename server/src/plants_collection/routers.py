@@ -19,17 +19,17 @@ async def get_plants_collections(Authorize: AuthJWT = Depends()):
     return user_plants
 
 
-@router.get('/{plant_collection_id}')
+@router.get('/{plant_collection_id}', response_model=schemas.PlantsCollectionWithPlantsResponse)
 async def get_plants_collection(plant_collection_id: str, Authorize: AuthJWT = Depends()):
     Authorize.jwt_required()
     
     user_email = Authorize.get_jwt_subject()
-    plant = await crud.get_plants_collection(user_email, plant_collection_id)
+    plant_collection = await crud.get_plants_collection(user_email, plant_collection_id)
 
-    if plant is None:
+    if plant_collection is None:
         raise HTTPException(status.HTTP_404_NOT_FOUND, "Plant with given id not found")
 
-    return plant.dict()
+    return plant_collection
 
 
 @router.post("/")

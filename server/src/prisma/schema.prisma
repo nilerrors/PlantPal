@@ -46,27 +46,28 @@ enum IrrigationType {
 }
 
 model Plant {
-  id                 String             @id @default(cuid())
-  chip_id            String             @unique @db.VarChar(16)
-  name               String             @default("New Plant") @db.VarChar(255)
+  id                       String             @id @default(cuid())
+  chip_id                  String             @unique @db.VarChar(16)
+  name                     String             @default("New Plant") @db.VarChar(255)
   // waterAmount: 1000 -> 1liter
-  water_amount       Int                @default(1000)
-  created_at         DateTime           @default(now())
-  updated_at         DateTime           @updatedAt
-  auto_irrigation    Boolean            @default(true)
-  irrigation_type    IrrigationType     @default(period)
-  irrigations_record IrrigationRecord[]
-  timestamps         Timestamp[]
-  periodstamps       Periodstamp[]
+  water_amount             Int                @default(1000)
+  created_at               DateTime           @default(now())
+  updated_at               DateTime           @updatedAt
+  auto_irrigation          Boolean            @default(true)
+  irrigation_type          IrrigationType     @default(period)
+  irrigations_record       IrrigationRecord[]
+  timestamps               Timestamp[]
+  periodstamp_times_a_week Int                @default(0)
+  periodstamps             Periodstamp[]
 
   collection_id String           @unique
   collection    PlantsCollection @relation(fields: [collection_id], references: [id], onDelete: Cascade)
 }
 
 model IrrigationRecord {
-  id String   @id @default(cuid())
+  id String        @id @default(cuid())
   water_amount Int @default(1000)
-  at DateTime @default(now())
+  at DateTime      @default(now())
 
   plant_id String @unique
   plant    Plant  @relation(fields: [plant_id], references: [id], onDelete: Cascade)
@@ -84,6 +85,8 @@ enum DayOfWeek {
 }
 
 model Timestamp {
+  // Timestamps indicate a time,
+  // plants will get water on the selected time
   id          String    @id @default(cuid())
   day_of_week DayOfWeek @default(everyday)
   hour        Int
@@ -95,6 +98,9 @@ model Timestamp {
 }
 
 model Periodstamp {
+  // The user gives an amount of irrigations per week,
+  // based on that the api will generate
+  // random days, hours and minutes
   id          String    @id @default(cuid())
   day_of_week DayOfWeek @default(everyday)
   hour        Int

@@ -6,7 +6,7 @@ from . import crud, schemas
 router = APIRouter(prefix="/plants")
 
 
-@router.get('/')
+@router.get('/', response_model=schemas.PlantResponse)
 async def get_plants(collection_id: str, Authorize: AuthJWT = Depends()):
     Authorize.jwt_required()
 
@@ -17,7 +17,7 @@ async def get_plants(collection_id: str, Authorize: AuthJWT = Depends()):
     return {'plants': user_plants}
 
 
-@router.get('/{plant_id}')
+@router.get('/{plant_id}', response_model=schemas.PlantResponse)
 async def get_plant(plant_id: str, Authorize: AuthJWT = Depends()):
     Authorize.jwt_required()
     

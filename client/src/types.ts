@@ -4,11 +4,6 @@ export type IrrigationRecord = {
   at: Date
 }
 
-export enum IrrigationType {
-  time,
-  period,
-}
-
 export enum DayOfWeek {
   monday,
   tuesday,
@@ -36,7 +31,8 @@ export type Plant = {
   created_at: Date
   updated_at: Date
   auto_irrigation: boolean
-  irrigation_type: IrrigationType
+  periodstamp_times_a_week: number
+  irrigation_type: string
   irrigations_record: IrrigationRecord[]
   timestamps: TimeStamp[]
 
