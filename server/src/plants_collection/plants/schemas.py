@@ -28,6 +28,11 @@ class ChipID(str):
         return value
 
 
+class PlantGet(PlantBase):
+    id: str
+    collection_id: str
+
+
 class PlantCreate(PlantBase):
     email: EmailStr
     password: str
@@ -89,3 +94,5 @@ class PlantWithPeriodStampsResponse(PlantResponse):
     periodstamps: List[TimeStamp]
     
 
+class PlantWithIrrigationStampsResponse(PlantResponse):
+    stamps: List[TimeStamp]

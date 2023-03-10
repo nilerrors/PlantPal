@@ -32,6 +32,7 @@ async def get_plant_by_chip_id(plant_id: str, chip_id: str):
         'chip_id': chip_id
     })
 
+
 async def get_plant(user_email: str, plant_id: str, plant_collection_name: str = "$Plants"):
     user = await auth.crud.get_user_by_email(user_email)
     if user is None:
@@ -50,11 +51,78 @@ async def get_plant(user_email: str, plant_id: str, plant_collection_name: str =
         'collection_id': plant_collection.id,
     },
     include={
-        'irrigations_record': {
-            'take': 3
-        },
         'collection': True
     })
+
+
+async def get_plant_timestamps(user_email: str, plant_id: str, plant_collection_name: str = "$Plants"):
+    plant = await get_plant(user_email, plant_id, plant_collection_name)
+    if plant is None:
+        return None
+
+    return await prisma.plant.find_first(where={
+        'id': plant.id,
+    },
+    include={
+        'collection': True,
+        'timestamps': True
+    })
+
+
+async def get_plant_periodstamps(user_email: str, plant_id: str, plant_collection_name: str = "$Plants"):
+    plant = await get_plant(user_email, plant_id, plant_collection_name)
+    if plant is None:
+        return None
+
+    return await prisma.plant.find_first(where={
+        'id': plant.id,
+    },
+    include={
+        'collection': True,
+        'periodstamps': True
+    })
+
+
+async def get_plant_times(user_email: str, plant_id: str, plant_collection_name: str = "$Plants"):
+    plant = await get_plant(user_email, plant_id, plant_collection_name)
+    if plant is None:
+        return None
+
+    plant_data = await prisma.plant.find_first(where={
+        'id': plant_id,
+        'collection_id': plant_collection.id,
+    },
+    include={
+        'collection': True,
+        'timestamps': plant.irrigation_type == 'time',
+        'periodstamps': plant.irrigation_type == 'period',
+    })
+
+    if plant.irrigation_type == 'time':
+        return {
+            **plant_data.dict(),
+            'times': plant_data.timestamps
+        }
+    
+    return {
+        **plant_data.dict(),
+        'times': plant_data.periodstamps
+    }
+
+
+async def get_plant_irrigation_graph(user_email: str, plant_id: str, plant_collection_name: str = "$Plants"):
+    plant = await get_plant(user_email, plant_id, plant_collection_name)
+    if plant is None:
+        return None
+    
+    irrigation_records = await prisma.irrigationrecord.find_many(where={
+        'plant_id': plant.id
+    })
+
+    # User pygal for generating charts :-> pygal.org
+    map(lambda r: (r.at, r.water_amount), irrigation_records)
+
+    return ''
 
 
 async def get_plants(user_email: str, collection_id: str):
