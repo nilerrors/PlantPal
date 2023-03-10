@@ -3,7 +3,7 @@ import { useState } from 'react'
 export const useForm = <T>(callback: any, initialState: T) => {
   const [values, setValues] = useState<T>(initialState)
 
-  const onChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const onChange = (event: React.ChangeEvent<any>) => {
     if (values == null) return
 
     if (!Object.keys(values).includes(event.target.name)) {
@@ -18,10 +18,6 @@ export const useForm = <T>(callback: any, initialState: T) => {
     setValues({ ...values, [event.target.name]: value })
   }
 
-  const onSelectChange = (): React.ChangeEventHandler<HTMLSelectElement> => {
-    return () => onChange
-  }
-
   const onSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
     await callback()
@@ -33,7 +29,6 @@ export const useForm = <T>(callback: any, initialState: T) => {
 
   return {
     onChange,
-    onSelectChange,
     onSubmit,
     set,
     values,

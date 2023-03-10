@@ -105,7 +105,7 @@ export function Plant() {
                             name='irrigation_type'
                             className='bg-dark text-white'
                             size='lg'
-                            onChange={form.onSelectChange}
+                            onChange={form.onChange}
                             value={form.values?.irrigation_type}
                           >
                             <option>Irrigation Type</option>
@@ -122,7 +122,7 @@ export function Plant() {
                               min={0}
                               max={10}
                               size='lg'
-                              onChange={form.onSelectChange}
+                              onChange={form.onChange}
                               value={form.values?.periodstamp_times_a_week}
                             />
                           </Form.Group>
