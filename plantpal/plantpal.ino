@@ -1,7 +1,7 @@
 #include <WiFi.h>
 #include <ArduinoJson.h>
-#include "server.h"
-#include "credentials.h"
+#include "src/server.h"
+#include "src/credentials.h"
 
 
 #define proto_ssid "ESPCONF"

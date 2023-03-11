@@ -44,7 +44,7 @@ async def get_plant(plant: schemas.PlantGet, Authorize: AuthJWT = Depends()):
 
 
 @router.get('/{plant_id}/timestamps', response_model=schemas.PlantWithTimeStampsResponse)
-async def get_plant(plant: PlantGet, Authorize: AuthJWT = Depends()):
+async def get_plant(plant: schemas.PlantGet, Authorize: AuthJWT = Depends()):
     Authorize.jwt_required()
     
     user_email = Authorize.get_jwt_subject()
