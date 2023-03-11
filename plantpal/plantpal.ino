@@ -4,8 +4,8 @@
 #include "src/credentials.h"
 
 
-#define proto_ssid "ESPCONF"
-#define proto_password "esp12345"
+#define PROTO_SSID "ESPCONF"
+#define PROTO_PASSWORD "esp12345"
 
 
 IPAddress local_IP(192, 168, 1, 1);
@@ -30,7 +30,7 @@ void setup() {
         Serial.println(configReady ? "Ready" : "Failed!");
 
         Serial.print("Setting soft-AP ... ");
-        bool settingReady = WiFi.softAP(proto_ssid, proto_password);
+        bool settingReady = WiFi.softAP(PROTO_SSID, PROTO_PASSWORD);
         Serial.println(settingReady ? "Ready" : "Failed!");
 
         Serial.print("IP Address = ");
