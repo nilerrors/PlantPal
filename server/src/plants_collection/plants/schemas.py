@@ -30,7 +30,7 @@ class ChipID(str):
 
 class PlantGet(PlantBase):
     id: str
-    collection_id: str
+    collection_id: str = '$Plants'
 
 
 class PlantCreate(PlantBase):

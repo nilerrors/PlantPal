@@ -1,4 +1,5 @@
 from prisma.errors import UniqueViolationError as PrismaUniqueViolationError
+import pygal
 from src.prisma import prisma
 from src import auth, plants_collection
 from . import schemas
@@ -120,9 +121,34 @@ async def get_plant_irrigation_graph(user_email: str, plant_id: str, plant_colle
     })
 
     # User pygal for generating charts :-> pygal.org
-    map(lambda r: (r.at, r.water_amount), irrigation_records)
+    records = map(lambda r: {
+        'x': r.at.strftime('%Y-%m-%d %H:%M:%S'),
+        'y': r.water_amount
+    },
+    irrigation_records)
 
-    return ''
+    graph = Line(
+        width = 1200,
+        height = 600,
+        explicit_size = True,
+        style = pygal.style.Style(
+            background='transparent',
+            plot_background='transparent',
+            foreground='#555',
+            foreground_strong='#000',
+            foreground_subtle='#555',
+            opacity='.6',
+            opacity_hover='.9',
+            transition='400ms ease-in',
+            colors=('#E853A0', '#E8537A', '#E95355', '#E87653', '#E89B53')
+        )
+    )
+    graph.x_labels = [record['x'] for record in records]
+    graph.add(f'Water Amount of {plant.name}', [record['y'] for record in records])
+    graph.x_labels_major_count = 10
+    graph.show_minor_x_labels = False
+
+    return graph.render()
 
 
 async def get_plants(user_email: str, collection_id: str):

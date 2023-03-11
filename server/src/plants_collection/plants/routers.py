@@ -35,7 +35,7 @@ async def get_plant(plant: schemas.PlantGet, Authorize: AuthJWT = Depends()):
     Authorize.jwt_required()
     
     user_email = Authorize.get_jwt_subject()
-    plant = await crud.get_plant(user_email, plant.id, plant.collection_id)
+    plant = await crud.get_plant_times(user_email, plant.id, plant.collection_id)
 
     if plant is None:
         raise HTTPException(status.HTTP_404_NOT_FOUND, "Plant with given id not found")
@@ -48,7 +48,7 @@ async def get_plant(plant: schemas.PlantGet, Authorize: AuthJWT = Depends()):
     Authorize.jwt_required()
     
     user_email = Authorize.get_jwt_subject()
-    plant = await crud.get_plant(user_email, plant.id, plant.collection_id)
+    plant = await crud.get_plant_timestamps(user_email, plant.id, plant.collection_id)
 
     if plant is None:
         raise HTTPException(status.HTTP_404_NOT_FOUND, "Plant with given id not found")
@@ -61,7 +61,7 @@ async def get_plant(plant: schemas.PlantGet, Authorize: AuthJWT = Depends()):
     Authorize.jwt_required()
     
     user_email = Authorize.get_jwt_subject()
-    plant = await crud.get_plant(user_email, plant.id, plant.collection_id)
+    plant = await crud.get_plant_periodstamps(user_email, plant.id, plant.collection_id)
 
     if plant is None:
         raise HTTPException(status.HTTP_404_NOT_FOUND, "Plant with given id not found")
