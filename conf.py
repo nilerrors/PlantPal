@@ -5,17 +5,21 @@ import secrets
 
 
 if __name__ == '__main__':
-    CLIENT_PATH = os.curdir + '/client'
-    ESP32_PATH = os.curdir + '/plantpal'
-    SERVER_PATH = os.curdir + '/server'
-    IP_ADDRESS = socket.gethostbyname(socket.gethostname())
+    DEV = True
 
+    CLIENT_PATH = os.curdir + '/client'
+    ESP32_PATH  = os.curdir + '/plantpal'
+    SERVER_PATH = os.curdir + '/server'
+    IP_ADDRESS  = socket.gethostbyname(socket.gethostname())
+
+    # client folder
     with open(CLIENT_PATH + '\.env', 'w') as f:
         f.write(f'VITE_API_BASE_URL="http://{IP_ADDRESS}:8000"\n')
 
     os.system(f'cd {CLIENT_PATH} && yarn')
     print('cd client && yarn start')
 
+    # server folder
     with open(SERVER_PATH + '\.env', 'w') as f:
         text = f'AUTHJWT_SECRET_KEY="{secrets.token_hex()}"\n\n'
         text += 'MAIL_USERNAME="enayat.sabawoon@outlook.com"\n'
@@ -28,3 +32,6 @@ if __name__ == '__main__':
         f.write(text)
 
     os.system(f'cd {SERVER_PATH} && py -m venv venv && .\\venv\\Script\\Activate.ps1 && pip install -r deps.txt')
+
+    ## Prisma
+    os.system(f'cd {SERVER_PATH}/src/prisma && prisma generate && prisma migrate {"dev" if DEV else "prod"} --name=init')
