@@ -51,10 +51,6 @@ void setup() {
           credentials.writePlant(plant_id, water_amount);
         });
         server.begin();
-
-        while (!server.ended()) {
-            server.handleClient();
-        }
     }
     else {
         String ssid, pass;
@@ -79,10 +75,14 @@ void setup() {
 }
 
 void loop() {
-    String ssid, pass;
+    server.handleClient();
 
-    credentials.readWiFi(&ssid, &pass);
-    Serial.println(ssid.c_str());
-    Serial.println(pass.c_str());
-    delay(3000);
+    if (!credentials.wifiNotWritten()) {
+        String ssid, pass;
+
+        credentials.readWiFi(&ssid, &pass);
+        Serial.println(ssid.c_str());
+        Serial.println(pass.c_str());
+        delay(3000);
+    }
 }
