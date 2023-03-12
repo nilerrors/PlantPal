@@ -41,7 +41,7 @@ void setup() {
           credentials.writeWiFi(ssid, pass);
           Serial.println("Wifi is written");
         });
-        server.onPlantCreated([&](String payload) {
+        server.onPlantCreate([&](String payload) {
           StaticJsonDocument<512> doc;
           deserializeJson(doc, payload.c_str());
 

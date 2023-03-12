@@ -121,13 +121,15 @@ async def get_plant_irrigation_graph(user_email: str, plant_id: str, plant_colle
     })
 
     # User pygal for generating charts :-> pygal.org
-    records = map(lambda r: {
-        'x': r.at.strftime('%Y-%m-%d %H:%M:%S'),
-        'y': r.water_amount
-    },
-    irrigation_records)
+    records = list(map(
+        lambda r: {
+            'x': r.at.strftime('%Y-%m-%d %H:%M:%S'),
+            'y': r.water_amount
+        },
+        irrigation_records
+    ))
 
-    graph = Line(
+    graph = pygal.Line(
         width = 1200,
         height = 600,
         explicit_size = True,
@@ -143,12 +145,12 @@ async def get_plant_irrigation_graph(user_email: str, plant_id: str, plant_colle
             colors=('#E853A0', '#E8537A', '#E95355', '#E87653', '#E89B53')
         )
     )
-    graph.x_labels = [record['x'] for record in records]
-    graph.add(f'Water Amount of {plant.name}', [record['y'] for record in records])
+    graph.x_labels = list(map(lambda r: r['x'], records))
+    graph.add(f'Water Amount of {plant.name}', list(map(lambda r: r['y'], records)))
     graph.x_labels_major_count = 10
     graph.show_minor_x_labels = False
 
-    return graph.render()
+    return graph.render_data_uri()
 
 
 async def get_plants(user_email: str, collection_id: str):
