@@ -1,5 +1,6 @@
 #include <functional>
-#include <WebServer.h>
+// #include <AsyncTCP.h>
+#include <ESPAsyncWebServer.h>
 
 
 class ConfigServer {
@@ -10,17 +11,11 @@ private:
     WifiChangeHandler changeWifiCallback;
     PlantCreateHandler plantCreateCallback;
 
-    bool running = false;
-    WebServer* server;
-    void createServer();
-    void respond(int code, const char  *content_type, const char *response, const char *title);
+    AsyncWebServer server;
 public:
     ConfigServer();
     void begin();
     void onChangeWifi(WifiChangeHandler fn);
-    void onChangeWifi(PlantCreateHandler fn);
-    void handleClient();
-    void end();
-    bool ended();
+    void onPlantCreate(PlantCreateHandler fn);
 };
 

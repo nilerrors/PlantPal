@@ -1,4 +1,7 @@
 {
   "editor.indentSize": 2,
-  "editor.useTabStops": false
+  "editor.useTabStops": false,
+  "files.associations": {
+    "functional": "cpp"
+  }
 }

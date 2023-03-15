@@ -14,8 +14,8 @@ void Credentials::end() {
 
 void Credentials::readWiFi(String *ssid, String *pass) {
     begin();
-    *ssid = preferences.getString("ssid", "");
-    *pass = preferences.getString("pass", "");
+    *ssid = preferences.getString("ssid");
+    *pass = preferences.getString("pass");
     end();
 }
 
@@ -35,8 +35,8 @@ bool Credentials::wifiNotWritten() {
 
 void Credentials::readPlant(String *id, int32_t *water_amount) {
     begin();
-    *id = preferences.getString("plant_id", "");
-    *water_amount = preferences.getInt("water_amount", "");
+    *id = preferences.getString("plant_id");
+    *water_amount = preferences.getInt("water_amount");
     end();
 }
 

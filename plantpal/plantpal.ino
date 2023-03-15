@@ -20,45 +20,42 @@ Credentials credentials;
 void setup() {
     Serial.begin(115200);
 
-    bool startConfigServer = credentials.wifiNotWritten();
+    WiFi.mode(WIFI_AP_STA);
 
-    if (startConfigServer) {
-        WiFi.mode(WIFI_AP_STA);
+    Serial.print("Setting soft-AP configuration ... ");
+    bool configReady = WiFi.softAPConfig(local_IP, gateway, subnet);
+    Serial.println(configReady ? "Ready" : "Failed!");
 
-        Serial.print("Setting soft-AP configuration ... ");
-        bool configReady = WiFi.softAPConfig(local_IP, gateway, subnet);
-        Serial.println(configReady ? "Ready" : "Failed!");
+    Serial.print("Setting soft-AP ... ");
+    bool settingReady = WiFi.softAP(PROTO_SSID, PROTO_PASSWORD);
+    Serial.println(settingReady ? "Ready" : "Failed!");
 
-        Serial.print("Setting soft-AP ... ");
-        bool settingReady = WiFi.softAP(PROTO_SSID, PROTO_PASSWORD);
-        Serial.println(settingReady ? "Ready" : "Failed!");
+    Serial.print("IP Address = ");
+    Serial.println(WiFi.softAPIP());
 
-        Serial.print("IP Address = ");
-        Serial.println(WiFi.softAPIP());
+    Serial.print("Setting up Web Server ... ");
+    server.onChangeWifi([&](String ssid, String pass) {
+      credentials.writeWiFi(ssid, pass);
+      Serial.println("Wifi is written");
+    });
+    server.onPlantCreate([&](String payload) {
+      StaticJsonDocument<512> doc;
+      deserializeJson(doc, payload.c_str());
 
-        Serial.print("Setting up Web Server ... ");
-        server.onChangeWifi([&](String ssid, String pass) {
-          credentials.writeWiFi(ssid, pass);
-          Serial.println("Wifi is written");
-        });
-        server.onPlantCreate([&](String payload) {
-          StaticJsonDocument<512> doc;
-          deserializeJson(doc, payload.c_str());
+      String plant_id = doc["id"].as<String>();
+      int32_t water_amount = doc["water_amount"].as<signed int>();
 
-          String plant_id = doc["id"].as<String>();
-          int32_t water_amount = doc["water_amount"].as<signed int>();
+      credentials.writePlant(plant_id, water_amount);
+    });
+    server.begin();
 
-          credentials.writePlant(plant_id, water_amount);
-        });
-        server.begin();
-    }
-    else {
+    if (!credentials.wifiNotWritten()) {
         String ssid, pass;
         credentials.readWiFi(&ssid, &pass);
         WiFi.begin(ssid.c_str(), pass.c_str());
         Serial.print("Connecting to WiFi ");
         int times = 0;
-        while (!WiFi.status() != WL_CONNECTED) {
+        while (WiFi.status() != WL_CONNECTED) {
           times++;
           if (times > 20) { // 60000 -> 60sec
             Serial.println(" Could not connect");
@@ -75,14 +72,27 @@ void setup() {
 }
 
 void loop() {
-    server.handleClient();
+    if (credentials.wifiNotWritten()) {
+      Serial.println("Connect to Wifi-network:");
+      Serial.print("SSID: ");
+      Serial.println(PROTO_SSID);
+      Serial.print("Password: ");
+      Serial.println(PROTO_PASSWORD);
 
-    if (!credentials.wifiNotWritten()) {
-        String ssid, pass;
-
-        credentials.readWiFi(&ssid, &pass);
-        Serial.println(ssid.c_str());
-        Serial.println(pass.c_str());
-        delay(3000);
+      Serial.println("Browse to http://192.168.1.1/");
+      delay(10000);
     }
+    if (WiFi.status() != WL_CONNECTED) {
+      Serial.println("WiFi not connected\nTrying to reconnect");
+      WiFi.reconnect();
+      return;
+    }
+    
+    // Main Code
+    String ssid, pass;
+
+    credentials.readWiFi(&ssid, &pass);
+    Serial.println(ssid.c_str());
+    Serial.println(pass.c_str());
+    delay(3000);
 }
