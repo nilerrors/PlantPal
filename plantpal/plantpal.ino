@@ -1,4 +1,5 @@
 #include <WiFi.h>
+#include <DNSServer.h>
 #include <ArduinoJson.h>
 #include "src/server.h"
 #include "src/credentials.h"
@@ -6,13 +7,21 @@
 
 #define PROTO_SSID "ESPCONF"
 #define PROTO_PASSWORD "esp12345"
+#define HOSTNAME "PlantPal"
 
 
-IPAddress local_IP(192, 168, 1, 1);
-IPAddress gateway(192, 168, 1, 1);
+IPAddress local_IP(8, 8, 8, 8);
+IPAddress gateway = local_IP;
 IPAddress subnet(255, 255, 255, 0);
+const byte DNS_PORT = 53;
 
 
+#define DATA_REQUEST_DELAY 60 // -> seconds
+#define seconds() (millis()/1000)
+unsigned long lastTime = 0;
+
+
+DNSServer dns;
 ConfigServer server;
 Credentials credentials;
 
@@ -21,17 +30,15 @@ void setup() {
     Serial.begin(115200);
 
     WiFi.mode(WIFI_AP_STA);
-
-    Serial.print("Setting soft-AP configuration ... ");
-    bool configReady = WiFi.softAPConfig(local_IP, gateway, subnet);
-    Serial.println(configReady ? "Ready" : "Failed!");
-
-    Serial.print("Setting soft-AP ... ");
-    bool settingReady = WiFi.softAP(PROTO_SSID, PROTO_PASSWORD);
-    Serial.println(settingReady ? "Ready" : "Failed!");
+    WiFi.config(INADDR_NONE, INADDR_NONE, INADDR_NONE, INADDR_NONE);
+    WiFi.setHostname(HOSTNAME);
+    WiFi.softAPConfig(local_IP, gateway, subnet);
+    WiFi.softAP(PROTO_SSID, PROTO_PASSWORD);
 
     Serial.print("IP Address = ");
     Serial.println(WiFi.softAPIP());
+
+    dns.start(DNS_PORT, "*", WiFi.softAPIP());
 
     Serial.print("Setting up Web Server ... ");
     server.onChangeWifi([&](String ssid, String pass) {
@@ -47,7 +54,7 @@ void setup() {
 
       credentials.writePlant(plant_id, water_amount);
     });
-    server.begin();
+    server.start();
 
     if (!credentials.wifiNotWritten()) {
         String ssid, pass;
@@ -72,27 +79,34 @@ void setup() {
 }
 
 void loop() {
-    if (credentials.wifiNotWritten()) {
-      Serial.println("Connect to Wifi-network:");
-      Serial.print("SSID: ");
-      Serial.println(PROTO_SSID);
-      Serial.print("Password: ");
-      Serial.println(PROTO_PASSWORD);
+    dns.processNextRequest();
+    server.handleClient();
 
-      Serial.println("Browse to http://192.168.1.1/");
-      delay(10000);
+    if (credentials.wifiNotWritten()) {
+      return;
     }
     if (WiFi.status() != WL_CONNECTED) {
       Serial.println("WiFi not connected\nTrying to reconnect");
       WiFi.reconnect();
-      return;
+      int times = 0;
+        while (WiFi.status() != WL_CONNECTED) {
+          times++;
+          if (times > 30) {
+            Serial.println(" Could not connect");
+            credentials.writeWiFi("", "");
+            Serial.println("Wifi network credentials need to be updated.");
+            Serial.println("Restarting ESP");
+            ESP.restart();            
+          }
+          Serial.print(".");
+          delay(1000);
+        }
     }
-    
-    // Main Code
-    String ssid, pass;
 
-    credentials.readWiFi(&ssid, &pass);
-    Serial.println(ssid.c_str());
-    Serial.println(pass.c_str());
-    delay(3000);
+    // Main Code
+    if ((seconds() - lastTime) > DATA_REQUEST_DELAY) {
+      Serial.println("Hi");
+
+      lastTime = seconds();
+    }
 }

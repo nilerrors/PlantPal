@@ -1,21 +1,23 @@
 #include <functional>
-// #include <AsyncTCP.h>
-#include <ESPAsyncWebServer.h>
+#include <WebServer.h>
+
+
+typedef std::function<void(String ssid, String pass)> WifiChangeHandler;
+typedef std::function<void(String payload)> PlantCreateHandler;
 
 
 class ConfigServer {
 private:
-    typedef std::function<void(String ssid, String pass)> WifiChangeHandler;
-    typedef std::function<void(String payload)> PlantCreateHandler;
+    WebServer *server;
+
+    void response_base(int statusCode, String body, String title);
 
     WifiChangeHandler changeWifiCallback;
     PlantCreateHandler plantCreateCallback;
-
-    AsyncWebServer server;
 public:
     ConfigServer();
-    void begin();
+    void start();
+    void handleClient();
     void onChangeWifi(WifiChangeHandler fn);
     void onPlantCreate(PlantCreateHandler fn);
 };
-

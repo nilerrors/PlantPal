@@ -4,62 +4,52 @@
 #include "server.h"
 #include "credentials.h"
 
-
-const char* response_base(String body, String title) {
-    String res = "<!DOCTYPE html><html><head>\
-    <meta charset='UTF-8' />\
-    <meta http-equiv='X-UA-Compatible' content='IE=edge' />\
-    <meta name='viewport' content='width=device-width, initial-scale=1.0' />\
-    <title>" + title + "</title></head>\
-    <body>";
-    res += body;
-    res += "</body>";
-
-    return res.c_str();
-}
-
-
 ConfigServer::ConfigServer() {
-    AsyncWebServer s(80);
-    server = s;
+    server = new WebServer(80);
 
-    server.on("/", HTTP_GET, [&](AsyncWebServerRequest *req) {
-        String res = "<div id='root'><h2>WiFi Network Configuration</h2><form method='post' action='/change_wifi'><div><label for='ssid'>SSID: </label><select name='ssid'><option selected='true' disabled>WiFi Network</option>";
+    server->on("/", HTTP_GET, [&]() {
+        String res = "<h2>WiFi Network Configuration</h2><form method='post' action='/change_wifi'><div><label for='ssid'>SSID: </label><select name='ssid'><option selected='true' disabled>WiFi Network</option>";
         
         int n = WiFi.scanNetworks();
         for (int i = 0; i < n; i++) {
-            res += "<option value='" + WiFi.SSID(i); + "'>" + WiFi.SSID(i) + (WiFi.encryptionType(i) == WIFI_AUTH_OPEN ? "" : " {🔑}") + "</option>";
+            res += "<option value='" + WiFi.SSID(i) + "'>" + WiFi.SSID(i) + (WiFi.encryptionType(i) == WIFI_AUTH_OPEN ? "" : " {🔑}") + "</option>";
         }
 
-        res += "</select></div><div><label for='pass'>Password: </label><input type='password'name='pass' /></div><div><button type='submit'>Send</button></div></form></div>";
+        res += "</select></div><div><label for='pass'>Password: </label><input type='password'name='pass' /></div><div><button type='submit'>Send</button></div></form>";
 
-        req->send(200, "text/html", response_base(res.c_str(), "Change Wifi Configuration"));
+        response_base(200, res, "Change Wifi Configuration");
         Serial.println("Root");
     });
 
-    server.on("/create_plant", HTTP_POST, [&](AsyncWebServerRequest *req) {
-        if (!req->hasArg("email") || !req->hasArg("pass")) {
-            String res = "<h1>Bad Request</h1><hr><p>Data could not be validated</p>";
-            req->send(400, "text/html", res.c_str());
+    server->on("/generate_204", HTTP_GET, [&]() {
+        String res = "<a href='/'>Setup</a>";
+
+        response_base(200, res, "Change Wifi Configuration");
+        Serial.println("DNS Path");
+    });
+
+    server->on("/create_plant", HTTP_POST, [&]() {
+        if (!server->hasArg("email") || !server->hasArg("pass")) {
+            String res = "<h1>Bad serveruest</h1><hr><p>Data could not be validated</p>";
+            response_base(400, res, "400 Bad serveruest");
         }
         else {
             if (WiFi.status() == WL_CONNECTED) {
-                WiFiClient wifiClient;
                 HTTPClient http;
 
-                http.begin(wifiClient, "https://10.3.41.39:8000/plants_collection/plants/");
+                http.begin("https://10.3.41.39:8000/plants_collection/plants/");
 
-                String email = req->arg("email");
-                String password = req->arg("pass");
+                String email = server->arg("email");
+                String password = server->arg("pass");
 
                 uint64_t chipid = ESP.getEfuseMac();
                 char chipid_str[17];
                 sprintf(chipid_str, "%016llX", chipid);
 
                 http.addHeader("Content-Type", "application/json");
-                String httpRequestData = "{\"email\":\"" + email + "\",\"password\":\"" + password + "\",\"chip_id\":\"" + chipid_str + "\"}";
+                String httpserveruestData = "{\"email\":\"" + email + "\",\"password\":\"" + password + "\",\"chip_id\":\"" + chipid_str + "\"}";
 
-                int httpResponseCode = http.POST(httpRequestData);
+                int httpResponseCode = http.POST(httpserveruestData);
 
                 String payload = "";
 
@@ -67,13 +57,13 @@ ConfigServer::ConfigServer() {
                     payload = http.getString();
                     if (httpResponseCode == 200) {
                         String res = "<h1>Succesfully Created</h1><hr><p>Plant is added to account.</p>" + payload;
-                        req->send(200, "text/html", res.c_str());
+                        response_base(200, res, "Plant Created");
 
                         plantCreateCallback(payload);
                     }
                     else if (httpResponseCode == 401) {
                         String res = "<h1>Unauthorized</h1><hr><p>Account email and password do not correspond.</p>";
-                        req->send(401, "text/html", res.c_str());
+                        response_base(401, res, "401 Unauthorized");
                     }
                     else if (httpResponseCode == 409) {
 
@@ -82,25 +72,26 @@ ConfigServer::ConfigServer() {
                 }
                 else {
                     String res = "<h1>Network Error</h1><hr><p>Could not reach the Database server</p>";
-                    req->send(500, "text/html", res.c_str());
+                    response_base(500, res, "500 Internal Server Error");
                 }
                 
                 http.end();
             } else {
                 String res = "<h1>Network Error</h1><hr><p>Not connected to network</p>";
-                req->send(500, "text/html", res.c_str());
+                response_base(500, res, "500 Internal Server Error");
+                server->send(500, "text/html", res.c_str());
             }
         }
     });
 
-    server.on("/change_wifi", HTTP_POST, [&](AsyncWebServerRequest *req) {
-        if (!req->hasArg("ssid") || !req->hasArg("pass")) {
-            String res = "<h1>Bad Request</h1><hr><p>Data could not be validated</p>";
-            req->send(400, "text/html", res.c_str());
+    server->on("/change_wifi", HTTP_POST, [&]() {
+        if (!server->hasArg("ssid") || !server->hasArg("pass")) {
+            String res = "<h1>Bad serveruest</h1><hr><p>Data could not be validated</p>";
+            response_base(400, "<h1>Not Found</h1>", "400 Bad serveruest");
         }
         else {
-            String ssid = req->arg("ssid");
-            String pass = req->arg("pass");
+            String ssid = server->arg("ssid");
+            String pass = server->arg("pass");
 
             Serial.print(ssid);
             Serial.print(" :=: ");
@@ -112,7 +103,7 @@ ConfigServer::ConfigServer() {
             while (WiFi.status() != WL_CONNECTED) {
                 if (times > 10) {
                     String res = "<h1>Network Error</h1><h1><p>Could not connect to network</p>";
-                    req->send(500, "text/html", res.c_str());
+                    server->send(500, "text/html", res.c_str());
                     WiFi.disconnect();
                     return;
                 }
@@ -126,15 +117,27 @@ ConfigServer::ConfigServer() {
             changeWifiCallback(ssid, pass);
 
             String res = "<h3>Connection Succesful</h3><hr><p>Connected to network with SSID " + ssid + "</p><div id='root'><h2>WiFi Network Configuration</h2><form method='post' action='/create_plant'><div><label for='email'>Email: </label><input type='email' name='email'></div><div><label for='pass'>Password: </label><input type='password' name='pass' /></div><div><button type='submit'>Send</button></div></form></div>";
-            req->send(200, "text/html", response_base(res.c_str(), "Create Plant"));
+            response_base(200, res, "Create Plant");
         }
         Serial.println("Credentials Form");
     });
 
-    server.onNotFound([&](AsyncWebServerRequest *req) {
-        req->send(404, "text/html", response_base("<h1>Not Found</h1>", "404 Page Not Found"));
-        Serial.println("Not Found");
+    server->onNotFound([&]() {
+        response_base(404, "<h1>Not Found</h1>", "404 Page Not Found");
+        Serial.print("Not Found: ");
+        Serial.println(server->uri());
     });
+}
+
+void ConfigServer::response_base(int statusCode, String body, String title) {
+    String res = "<!DOCTYPE html><html><head>\
+    <meta charset='UTF-8' />\
+    <meta http-equiv='X-UA-Compatible' content='IE=edge' />\
+    <meta name='viewport' content='width=device-width, initial-scale=1.0' />\
+    <title>" + title + "</title></head>\
+    <body>" + body + "</body>";
+
+    server->send(statusCode, "text/html", res.c_str());
 }
 
 void ConfigServer::onChangeWifi(WifiChangeHandler fn) {
@@ -145,8 +148,11 @@ void ConfigServer::onPlantCreate(PlantCreateHandler fn) {
   plantCreateCallback = fn;
 }
 
-void ConfigServer::begin() {
-    server.begin();
+void ConfigServer::start() {
+    server->begin();
     Serial.println("Server running");
 }
 
+void ConfigServer::handleClient() {
+    server->handleClient();
+}
