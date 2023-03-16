@@ -5,8 +5,17 @@ import secrets
 
 
 if __name__ == '__main__':
+    argv = list(map(lambda x: x.strip(), sys.argv))
+
     EMAIL = "enayat.sabawoon@outlook.com"
     DEV = True
+    if "-p" in argv or "--prod" in argv:
+        DEV = False
+    if "-e" in argv or "--email" in argv:
+        index = argv.index("-e") if "-e" in argv else argv.index("--email")
+        if index + 1 > len(argv):
+            sys.exit("No email given")
+        EMAIL = argv[index+1]
 
     CLIENT_PATH = os.curdir + '/client'
     ESP32_PATH  = os.curdir + '/plantpal'
@@ -35,4 +44,4 @@ if __name__ == '__main__':
     os.system(f'cd {SERVER_PATH} && py -m venv venv && .\\venv\\Script\\Activate.ps1 && pip install -r deps.txt')
 
     ## Prisma
-    os.system(f'cd {SERVER_PATH} && PowerShell venv\Scripts\Activate.ps1 && cd src/prisma && prisma generate && prisma migrate {"dev" if DEV else "prod"} --name=init')
+    os.system(f'cd {SERVER_PATH} && PowerShell Set-ExecutionPolicy -Scope CurrentUser Unrestricted && PowerShell venv\Scripts\Activate.ps1 && cd src/prisma && prisma generate && prisma migrate {"dev" if DEV else "prod"} --name=init')
