@@ -5,6 +5,7 @@ import secrets
 
 
 if __name__ == '__main__':
+    EMAIL = "enayat.sabawoon@outlook.com"
     DEV = True
 
     CLIENT_PATH = os.curdir + '/client'
@@ -22,9 +23,9 @@ if __name__ == '__main__':
     # server folder
     with open(SERVER_PATH + '\.env', 'w') as f:
         text = f'AUTHJWT_SECRET_KEY="{secrets.token_hex()}"\n\n'
-        text += 'MAIL_USERNAME="enayat.sabawoon@outlook.com"\n'
+        text += f'MAIL_USERNAME="{EMAIL}"\n'
         text += 'MAIL_PASSWORD=""\n'
-        text += 'MAIL_FROM="enayat.sabawoon@outlook.com"\n'
+        text += f'MAIL_FROM="{EMAIL}"\n'
         text += 'MAIL_PORT=587\n'
         text += 'MAIL_SERVER=smtp.office365.com\n'
         text += 'MAIL_FROM_NAME="PlantPal"\n\n'
