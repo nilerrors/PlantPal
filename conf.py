@@ -34,4 +34,4 @@ if __name__ == '__main__':
     os.system(f'cd {SERVER_PATH} && py -m venv venv && .\\venv\\Script\\Activate.ps1 && pip install -r deps.txt')
 
     ## Prisma
-    os.system(f'cd {SERVER_PATH}/src/prisma && prisma generate && prisma migrate {"dev" if DEV else "prod"} --name=init')
+    os.system(f'cd {SERVER_PATH} && PowerShell venv\Scripts\Activate.ps1 && cd src/prisma && prisma generate && prisma migrate {"dev" if DEV else "prod"} --name=init')
