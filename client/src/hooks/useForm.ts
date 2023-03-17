@@ -1,6 +1,6 @@
 import { useState } from 'react'
 
-export const useForm = <T>(callback: any, initialState: T) => {
+export const useForm = <T>(callback: Function, initialState: T) => {
   const [values, setValues] = useState<T>(initialState)
 
   const onChange = (event: React.ChangeEvent<any>) => {

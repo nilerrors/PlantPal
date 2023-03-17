@@ -1,3 +1,10 @@
+export type FormT<T> = {
+  onChange: (event: React.ChangeEvent<any>) => void
+  onSubmit: (event: React.FormEvent<HTMLFormElement>) => Promise<void>
+  set: (_values: T) => void
+  values: T
+}
+
 export type IrrigationRecord = {
   id: string
   water_amount: number

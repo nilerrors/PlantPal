@@ -7,7 +7,7 @@ export function Signout() {
 
   useEffect(() => {
     logout()
-  })
+  }, [])
 
   return <Navigate to='/login' />
 }

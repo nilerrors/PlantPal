@@ -34,26 +34,29 @@ async def get_plant_by_chip_id(plant_id: str, chip_id: str):
     })
 
 
-async def get_plant(user_email: str, plant_id: str, plant_collection_name: str = "$Plants"):
+async def get_plant_by_id(user_email: str, plant_id: str):
     user = await auth.crud.get_user_by_email(user_email)
     if user is None:
         return None
 
-    plant_collection = await prisma.plantscollection.find_first(where={
-        'name': plant_collection_name,
-        'user_id': user.id
-    })
-
-    if plant_collection is None:
-        return None
-
     return await prisma.plant.find_first(where={
         'id': plant_id,
-        'collection_id': plant_collection.id,
+        'collection': {
+            'is': {
+                'user_id': user.id
+            }
+        }
     },
     include={
         'collection': True
     })
+
+
+async def get_plant(user_email: str, plant_id: str, plant_collection_name: str = "$Plants"):
+    plant = await get_plant_by_id(user_email, plant_id)
+    if plant is None or plant.collection is None or plant.collection.name != plant_collection_name:
+        return None
+    return plant
 
 
 async def get_plant_timestamps(user_email: str, plant_id: str, plant_collection_name: str = "$Plants"):
@@ -90,14 +93,16 @@ async def get_plant_times(user_email: str, plant_id: str, plant_collection_name:
         return None
 
     plant_data = await prisma.plant.find_first(where={
-        'id': plant_id,
-        'collection_id': plant_collection.id,
+        'id': plant.id,
+        'collection_id': plant.collection_id
     },
     include={
         'collection': True,
         'timestamps': plant.irrigation_type == 'time',
         'periodstamps': plant.irrigation_type == 'period',
     })
+    if plant_data is None:
+        return None
 
     if plant.irrigation_type == 'time':
         return {

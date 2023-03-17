@@ -30,6 +30,9 @@ export function Plants() {
             <Link to={`/plants/${p.id}`} key={p.id}>
               <ListGroup.Item
                 variant={p.name == '$Plants' ? 'primary' : 'secondary'}
+                style={{
+                  fontSize: p.name == '$Plants' ? '2vh' : undefined,
+                }}
               >
                 {p.name}
               </ListGroup.Item>

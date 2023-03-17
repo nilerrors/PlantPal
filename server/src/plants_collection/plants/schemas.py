@@ -57,6 +57,11 @@ class PlantIrrigation(PlantBase):
     chip_id: ChipID
     
 
+class PlantPackedResponse(PlantBase):
+    id: str
+    chip_id: ChipID
+    name: str
+
 class PlantResponse(PlantBase):
     id: str
     chip_id: ChipID

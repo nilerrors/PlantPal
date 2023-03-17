@@ -1,16 +1,9 @@
-import { Link, useNavigate } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 import { Container, Form, Row, Col, Card, Button } from 'react-bootstrap'
 import { useAuthentication } from '../contexts/AuthenticationContext'
 import { useState } from 'react'
 import { useForm } from '../hooks/useForm'
 import { validate as validateEmail } from 'email-validator'
-
-type SignupFormValues = {
-  firstName: string
-  lastName: string
-  email: string
-  password: string
-}
 
 export function Signup() {
   document.title = 'Signup'
@@ -23,45 +16,46 @@ export function Signup() {
 
   const { useApi } = useAuthentication()
 
-  const formValues: SignupFormValues = {
-    firstName: '',
-    lastName: '',
-    email: '',
-    password: '',
-  }
+  const form = useForm(
+    async () => {
+      setLoading(true)
 
-  const form = useForm(async () => {
-    setLoading(true)
-
-    // Validation
-    if (!validateEmail(form.values.email)) {
-      setError('E-mail must be valid')
-    } else if (form.values.password.length < 8) {
-      setError('Password must be at least 8 characters long')
-    } else {
-      try {
-        const response = await useApi('/auth/signup', {
-          method: 'POST',
-          body: {
-            first_name: form.values.firstName,
-            last_name: form.values.lastName,
-            email: form.values.email,
-            password: form.values.password,
-          },
-        })
-        const data = await response.json()
-        if (!response.ok) {
-          setError(data?.detail ?? data?.message ?? 'Error')
-        } else {
-          setMessage(data?.message ?? data?.detail ?? '')
+      // Validation
+      if (!validateEmail(form.values.email)) {
+        setError('E-mail must be valid')
+      } else if (form.values.password.length < 8) {
+        setError('Password must be at least 8 characters long')
+      } else {
+        try {
+          const response = await useApi('/auth/signup', {
+            method: 'POST',
+            body: {
+              first_name: form.values.firstName,
+              last_name: form.values.lastName,
+              email: form.values.email,
+              password: form.values.password,
+            },
+          })
+          const data = await response.json()
+          if (!response.ok) {
+            setError(data?.detail ?? data?.message ?? 'Error')
+          } else {
+            setMessage(data?.message ?? data?.detail ?? '')
+          }
+        } catch (error: any) {
+          setError(error?.message ?? error?.detail ?? 'Error')
         }
-      } catch (error: any) {
-        setError(error?.message ?? error?.detail ?? 'Error')
       }
-    }
 
-    setLoading(false)
-  }, formValues)
+      setLoading(false)
+    },
+    {
+      firstName: '',
+      lastName: '',
+      email: '',
+      password: '',
+    }
+  )
 
   return (
     <Container fluid className='user-select-none'>

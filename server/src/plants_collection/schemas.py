@@ -2,7 +2,7 @@ from typing import Any, List
 from pydantic import BaseModel
 import datetime
 
-from src.plants_collection.plants.schemas import PlantResponse
+from src.plants_collection.plants.schemas import PlantPackedResponse
 
 
 class PlantsCollectionBase(BaseModel):
@@ -21,4 +21,4 @@ class PlantsCollectionResponse(PlantsCollectionBase):
 
 
 class PlantsCollectionWithPlantsResponse(PlantsCollectionResponse):
-    plants: List[PlantResponse]
+    plants: List[PlantPackedResponse]
