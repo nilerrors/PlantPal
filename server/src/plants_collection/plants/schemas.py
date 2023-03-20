@@ -33,6 +33,11 @@ class PlantGet(PlantBase):
     collection_id: str = '$Plants'
 
 
+class PlantESPGet(PlantBase):
+    plant_id: str
+    chip_id: ChipID
+
+
 class PlantCreate(PlantBase):
     email: EmailStr
     password: str
@@ -98,6 +103,10 @@ class PeriodStamp(BaseModel):
 class PlantWithPeriodStampsResponse(PlantResponse):
     periodstamps: List[TimeStamp]
     
+
+class PlantWithIrrigationTimeResponse(PlantResponse):
+    irrigation_time: TimeStamp
+
 
 class PlantWithIrrigationStampsResponse(PlantResponse):
     stamps: List[TimeStamp]

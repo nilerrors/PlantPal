@@ -47,12 +47,12 @@ async def create_plants_collection(plants_collection: schemas.PlantsCollectionCr
     return created_plant
 
 
-@router.delete("/{plant_id}")
-async def delete_plant(plant_id: str, Authorize: AuthJWT = Depends()):
+@router.delete("/{plant_collection_id}")
+async def delete_plant(plant_collection_id: str, Authorize: AuthJWT = Depends()):
     Authorize.jwt_required()
     
     user_email = Authorize.get_jwt_subject()
-    plant_deleted = await crud.delete_plants_collection(user_email, plant_id)
+    plant_deleted = await crud.delete_plants_collection(user_email, plant_collection_id)
 
     if not plant_deleted:
         raise HTTPException(status.HTTP_404_NOT_FOUND, "Plants collection with given id not found")

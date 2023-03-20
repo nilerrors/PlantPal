@@ -30,6 +30,19 @@ async def get_plant(plant_id: str, Authorize: AuthJWT = Depends()):
     return plant_data
 
 
+@router.get('/{plant_id}/irrigation_time', response_model=schemas.PlantWithIrrigationStampsResponse)
+async def get_plant_times(plant: schemas.PlantESPGet, Authorize: AuthJWT = Depends()):
+    Authorize.jwt_required()
+    
+    user_email = Authorize.get_jwt_subject()
+    plant_data = await crud.get_plant_times(user_email, plant.id, plant.collection_id)
+
+    if plant_data is None:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "Plant with given id not found")
+
+    return plant_data
+
+
 @router.get('/{plant_id}/times', response_model=schemas.PlantWithIrrigationStampsResponse)
 async def get_plant_times(plant: schemas.PlantGet, Authorize: AuthJWT = Depends()):
     Authorize.jwt_required()
@@ -107,7 +120,7 @@ async def delete_plant(plant_id: str, Authorize: AuthJWT = Depends()):
     return {'message': 'Plant deleted'}
 
 
-@router.post("/{plant_id}/irrigate")
+@router.post("/irrigate")
 async def plant_irrigation(irrigation: schemas.PlantIrrigation):
     plant_irrigated = await crud.irrigate_plant(irrigation)
     if not plant_irrigated:

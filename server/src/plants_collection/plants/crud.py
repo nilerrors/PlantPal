@@ -87,6 +87,31 @@ async def get_plant_periodstamps(user_email: str, plant_id: str, plant_collectio
     })
 
 
+async def get_plant_irrigation_time(plant_id: str, chip_id):
+    plant = await get_plant_by_chip_id(plant_id, chip_id)
+
+    # Write a prisma query that takes the next irrigation time.
+    # Cancel out everything smaller than now
+        # Day -> today: wednesday; cancel out everything prior to it
+        # hour -> cancel everything prior to it
+        # minute -> cancel everything prior to it
+    # order by ascending
+    # take 1
+    irrigation_time = None
+    if plant.irrigation_type == 'time':
+        irrigation_time = await prisma.timestamps.find_one(where={
+            ''
+        })
+    else:
+        irrigation_time = await prisma.periodstamps.find_one(where={
+            ''
+        })
+    
+    return {
+        'irrigation_time': irrigation_time
+    }
+
+
 async def get_plant_times(user_email: str, plant_id: str, plant_collection_name: str = "$Plants"):
     plant = await get_plant(user_email, plant_id, plant_collection_name)
     if plant is None:
