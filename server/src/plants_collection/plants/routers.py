@@ -31,7 +31,17 @@ async def get_plant(plant_id: str, Authorize: AuthJWT = Depends()):
     return plant_data
 
 
-@router.get('/{plant_id}/today_next_irrigation_time', response_model=List[schemas.TimeStamp])
+@router.get('/should_irrigate_now', response_model=bool)
+async def get_should_irrigate_now(plant: schemas.PlantESPGet):
+    should_irrigate = await crud.get_should_irrigate_now(plant.plant_id, plant.chip_id)
+
+    if should_irrigate is None:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "No irrigations found for today")
+
+    return should_irrigate
+
+
+@router.get('/today_next_irrigation_time', response_model=List[schemas.TimeStamp])
 async def get_plant_today_next_time(plant: schemas.PlantESPGet):
     plant_data = await crud.get_plant_today_next_time(plant.plant_id, plant.chip_id)
 
@@ -41,7 +51,7 @@ async def get_plant_today_next_time(plant: schemas.PlantESPGet):
     return plant_data
 
 
-@router.get('/{plant_id}/today_irrigation_times', response_model=List[schemas.TimeStamp])
+@router.get('/today_irrigation_times', response_model=List[schemas.TimeStamp])
 async def get_plant_today_times(plant: schemas.PlantESPGet):
     plant_data = await crud.get_plant_today_times(plant.plant_id, plant.chip_id)
 
@@ -51,7 +61,7 @@ async def get_plant_today_times(plant: schemas.PlantESPGet):
     return plant_data
 
 
-@router.get('/{plant_id}/times', response_model=schemas.PlantWithIrrigationStampsResponse)
+@router.get('/times', response_model=schemas.PlantWithIrrigationStampsResponse)
 async def get_plant_times(plant: schemas.PlantGet, Authorize: AuthJWT = Depends()):
     Authorize.jwt_required()
     
@@ -64,7 +74,7 @@ async def get_plant_times(plant: schemas.PlantGet, Authorize: AuthJWT = Depends(
     return plant_data
 
 
-@router.get('/{plant_id}/timestamps', response_model=schemas.PlantWithTimeStampsResponse)
+@router.get('/timestamps', response_model=schemas.PlantWithTimeStampsResponse)
 async def get_plant_timestamps(plant: schemas.PlantGet, Authorize: AuthJWT = Depends()):
     Authorize.jwt_required()
     
@@ -77,7 +87,7 @@ async def get_plant_timestamps(plant: schemas.PlantGet, Authorize: AuthJWT = Dep
     return plant_data
 
 
-@router.get('/{plant_id}/periodstamps', response_model=schemas.PlantWithPeriodStampsResponse)
+@router.get('/periodstamps', response_model=schemas.PlantWithPeriodStampsResponse)
 async def get_plant_periodstamps(plant: schemas.PlantGet, Authorize: AuthJWT = Depends()):
     Authorize.jwt_required()
     
@@ -90,7 +100,7 @@ async def get_plant_periodstamps(plant: schemas.PlantGet, Authorize: AuthJWT = D
     return plant_data
 
 
-@router.get('/{plant_id}/irrigations_graph.svg')
+@router.get('/irrigations_graph.svg')
 async def get_plant_irrigations_graph(plant: schemas.PlantGet, Authorize: AuthJWT = Depends()):
     Authorize.jwt_required()
     

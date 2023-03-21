@@ -156,6 +156,14 @@ async def get_plant_today_next_time(plant_id: str, chip_id: str):
     return times[0]
 
 
+async def get_should_irrigate_now(plant_id: str, chip_id: str):
+    time = await get_plant_today_next_time(plant_id, chip_id)
+    if time is None:
+        return None
+    now = datetime.datetime.now()
+    return time.hour == now.hour and time.minute == now.minute
+
+
 async def get_plant_irrigation_graph(user_email: str, plant_id: str, plant_collection_name: str = "$Plants"):
     plant = await get_plant(user_email, plant_id, plant_collection_name)
     if plant is None:
