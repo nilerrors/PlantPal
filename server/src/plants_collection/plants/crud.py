@@ -157,11 +157,35 @@ async def get_plant_today_next_time(plant_id: str, chip_id: str):
 
 
 async def get_should_irrigate_now(plant_id: str, chip_id: str):
+    plant = await get_plant_by_chip_id(plant_id, chip_id)
+    if plant is None:
+        return None
     time = await get_plant_today_next_time(plant_id, chip_id)
     if time is None:
         return None
+    
+    moisture = await prisma.moisturepercentagerecord.find_first(where={
+        'plant': {
+            'is': {
+                'id': plant_id,
+                'chip_id': chip_id
+            }
+        }
+    },
+    order={
+        'at': 'desc'
+    })
+    
     now = datetime.datetime.now()
-    return time.hour == now.hour and time.minute == now.minute
+    threshold = plant.moisture_percentage_treshold
+    if moisture is None:
+        return time.hour == now.hour and time.minute == now.minute
+    elif plant.auto_irrigation and moisture.percentage <= threshold:
+        return True
+    elif moisture.percentage <= threshold:
+        return time.hour == now.hour and time.minute == now.minute
+
+    return False
 
 
 async def get_plant_irrigation_graph(user_email: str, plant_id: str, plant_collection_name: str = "$Plants"):
