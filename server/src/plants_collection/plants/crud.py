@@ -1,9 +1,9 @@
-from typing import List
+from typing import List, Literal, TypedDict
 from prisma.errors import UniqueViolationError as PrismaUniqueViolationError
 from prisma.models import Timestamp
 import pygal
 import datetime
-from src.utils.comparedatetime import compare_date
+from src.utils.comparedatetime import compare_date, filter_timestamps, filter_periodstamps
 from src.prisma import prisma
 from src import auth, plants_collection
 from . import schemas
@@ -127,22 +127,33 @@ async def get_plant_today_times(plant_id: str, chip_id: str):
     plant = await get_plant_by_chip_id(plant_id, chip_id)
     if plant is None or plant.collection is None:
         return None
-    
-    
-    plant_data = await get_plant_times(plant.collection.user_id, plant.id, plant.collection.name)
+
+    plant_data = await prisma.plant.find_first(where={
+        'id': plant.id,
+        'collection_id': plant.collection_id
+    },
+    include={
+        'collection': True,
+        'timestamps': filter_timestamps(plant.irrigation_type == 'time'),
+        'periodstamps': filter_periodstamps(plant.irrigation_type == 'period'),
+    })
     if plant_data is None:
         return None
     
-    times: List[Timestamp] | None = plant_data['times']
+
+    if plant.irrigation_type == 'time':
+        return plant_data.timestamps
+
+    return plant_data.periodstamps
+
+
+
+async def get_plant_today_next_time(plant_id: str, chip_id: str):
+    times = await get_plant_today_times(plant_id, chip_id)
     if times is None:
         return None
     
-    times = list(filter(lambda x: compare_date(x), times))
-    if len(times) == 0:
-        return None
-    
-    return times
-
+    return times[0]
 
 
 async def get_plant_irrigation_graph(user_email: str, plant_id: str, plant_collection_name: str = "$Plants"):

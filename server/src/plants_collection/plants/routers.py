@@ -1,3 +1,4 @@
+from typing import List
 from fastapi import APIRouter, Depends, HTTPException, status, Response
 from fastapi_jwt_auth import AuthJWT
 from . import crud, schemas
@@ -30,8 +31,18 @@ async def get_plant(plant_id: str, Authorize: AuthJWT = Depends()):
     return plant_data
 
 
-@router.get('/{plant_id}/today_irrigation_time', response_model=[schemas.TimeStamp])
-async def get_plant_today_time(plant: schemas.PlantESPGet):
+@router.get('/{plant_id}/today_next_irrigation_time', response_model=List[schemas.TimeStamp])
+async def get_plant_today_next_time(plant: schemas.PlantESPGet):
+    plant_data = await crud.get_plant_today_next_time(plant.plant_id, plant.chip_id)
+
+    if plant_data is None:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "Plant with given id not found")
+
+    return plant_data
+
+
+@router.get('/{plant_id}/today_irrigation_times', response_model=List[schemas.TimeStamp])
+async def get_plant_today_times(plant: schemas.PlantESPGet):
     plant_data = await crud.get_plant_today_times(plant.plant_id, plant.chip_id)
 
     if plant_data is None:
