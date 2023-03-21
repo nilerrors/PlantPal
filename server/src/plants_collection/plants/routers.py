@@ -30,12 +30,9 @@ async def get_plant(plant_id: str, Authorize: AuthJWT = Depends()):
     return plant_data
 
 
-@router.get('/{plant_id}/irrigation_time', response_model=schemas.PlantWithIrrigationStampsResponse)
-async def get_plant_times(plant: schemas.PlantESPGet, Authorize: AuthJWT = Depends()):
-    Authorize.jwt_required()
-    
-    user_email = Authorize.get_jwt_subject()
-    plant_data = await crud.get_plant_times(user_email, plant.id, plant.collection_id)
+@router.get('/{plant_id}/today_irrigation_time', response_model=[schemas.TimeStamp])
+async def get_plant_today_time(plant: schemas.PlantESPGet):
+    plant_data = await crud.get_plant_today_times(plant.plant_id, plant.chip_id)
 
     if plant_data is None:
         raise HTTPException(status.HTTP_404_NOT_FOUND, "Plant with given id not found")

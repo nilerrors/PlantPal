@@ -5,6 +5,19 @@
 #include "src/credentials.h"
 
 
+#define MOISTURE_SENSOR_PIN 18
+#define FLOW_METER_PIN      15
+#define WATER_PUMP_PIN      12
+
+
+int total_milli_liters = 0;
+volatile byte pulse_count;
+
+void IRAM_ATTR pulseCounter() {
+  pulse_count++;
+}
+
+
 #define PROTO_SSID "ESPCONF"
 #define PROTO_PASSWORD "esp12345"
 #define HOSTNAME "PlantPal"
@@ -76,6 +89,8 @@ void setup() {
         }
         Serial.println(" Connected");
     }
+
+    attachInterrupt(digitalPinToInterrupt(FLOW_METER_PIN), pulseCounter, FALLING);
 }
 
 void loop() {
@@ -101,6 +116,14 @@ void loop() {
           Serial.print(".");
           delay(1000);
         }
+    }
+
+    int moisture_analog = analogRead(MOISTURE_SENSOR_PIN);
+    int moisture_percentage = (100 - ((moisture_analog / 4095.00) * 100));
+
+    bool should_irrigate = false;
+    if (should_irrigate) {
+      
     }
 
     // Main Code

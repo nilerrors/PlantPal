@@ -1,5 +1,9 @@
+from typing import List
 from prisma.errors import UniqueViolationError as PrismaUniqueViolationError
+from prisma.models import Timestamp
 import pygal
+import datetime
+from src.utils.comparedatetime import compare_date
 from src.prisma import prisma
 from src import auth, plants_collection
 from . import schemas
@@ -31,6 +35,9 @@ async def get_plant_by_chip_id(plant_id: str, chip_id: str):
     return await prisma.plant.find_first(where={
         'id': plant_id,
         'chip_id': chip_id
+    },
+    include={
+        'collection': True
     })
 
 
@@ -87,31 +94,6 @@ async def get_plant_periodstamps(user_email: str, plant_id: str, plant_collectio
     })
 
 
-async def get_plant_irrigation_time(plant_id: str, chip_id):
-    plant = await get_plant_by_chip_id(plant_id, chip_id)
-
-    # Write a prisma query that takes the next irrigation time.
-    # Cancel out everything smaller than now
-        # Day -> today: wednesday; cancel out everything prior to it
-        # hour -> cancel everything prior to it
-        # minute -> cancel everything prior to it
-    # order by ascending
-    # take 1
-    irrigation_time = None
-    if plant.irrigation_type == 'time':
-        irrigation_time = await prisma.timestamps.find_one(where={
-            ''
-        })
-    else:
-        irrigation_time = await prisma.periodstamps.find_one(where={
-            ''
-        })
-    
-    return {
-        'irrigation_time': irrigation_time
-    }
-
-
 async def get_plant_times(user_email: str, plant_id: str, plant_collection_name: str = "$Plants"):
     plant = await get_plant(user_email, plant_id, plant_collection_name)
     if plant is None:
@@ -139,6 +121,28 @@ async def get_plant_times(user_email: str, plant_id: str, plant_collection_name:
         **plant_data.dict(),
         'times': plant_data.periodstamps
     }
+
+
+async def get_plant_today_times(plant_id: str, chip_id: str):
+    plant = await get_plant_by_chip_id(plant_id, chip_id)
+    if plant is None or plant.collection is None:
+        return None
+    
+    
+    plant_data = await get_plant_times(plant.collection.user_id, plant.id, plant.collection.name)
+    if plant_data is None:
+        return None
+    
+    times: List[Timestamp] | None = plant_data['times']
+    if times is None:
+        return None
+    
+    times = list(filter(lambda x: compare_date(x), times))
+    if len(times) == 0:
+        return None
+    
+    return times
+
 
 
 async def get_plant_irrigation_graph(user_email: str, plant_id: str, plant_collection_name: str = "$Plants"):
