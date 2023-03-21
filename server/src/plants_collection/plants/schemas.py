@@ -85,7 +85,6 @@ class TimeStamp(BaseModel):
     day_of_week: str
     hour: int
     minute: int
-    second: int
 
 
 class PlantWithTimeStampsResponse(PlantResponse):
@@ -97,7 +96,6 @@ class PeriodStamp(BaseModel):
     day_of_week: str
     hour: int
     minute: int
-    second: int
 
 
 class PlantWithPeriodStampsResponse(PlantResponse):

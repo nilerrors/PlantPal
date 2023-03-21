@@ -27,7 +27,6 @@ export type TimeStamp = {
   day_of_week: DayOfWeek
   hour: number
   minute: number
-  second: number
 }
 
 export type Plant = {

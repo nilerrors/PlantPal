@@ -102,7 +102,6 @@ model Timestamp {
   day_of_week DayOfWeek @default(everyday)
   hour        Int
   minute      Int
-  second      Int       @default(0)
 
   plant_id String
   plant    Plant  @relation(fields: [plant_id], references: [id])
@@ -116,7 +115,6 @@ model Periodstamp {
   day_of_week DayOfWeek @default(everyday)
   hour        Int
   minute      Int
-  second      Int       @default(0)
 
   plant_id String
   plant    Plant  @relation(fields: [plant_id], references: [id])
