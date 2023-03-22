@@ -19,7 +19,8 @@ export function PlantsCollectionOverview({ plantsCollection }: Props) {
           Updated At: {new Date(plantsCollection.updated_at).toLocaleString()}
         </h4>
       ) : null}
-      {plantsCollection.plants != undefined ? (
+      {plantsCollection.plants !== undefined &&
+      plantsCollection.plants.length !== 0 ? (
         <>
           <h4>Plants</h4>
           <Collapse in={true}>
@@ -32,7 +33,11 @@ export function PlantsCollectionOverview({ plantsCollection }: Props) {
             </ListGroup>
           </Collapse>
         </>
-      ) : null}
+      ) : (
+        <>
+          <h6>No Plants</h6>
+        </>
+      )}
     </>
   )
 }

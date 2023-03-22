@@ -59,15 +59,15 @@ async def get_plant_by_id(user_email: str, plant_id: str):
     })
 
 
-async def get_plant(user_email: str, plant_id: str, plant_collection_name: str = "$Plants"):
+async def get_plant(user_email: str, plant_id: str):
     plant = await get_plant_by_id(user_email, plant_id)
-    if plant is None or plant.collection is None or plant.collection.name != plant_collection_name:
+    if plant is None or plant.collection is None:
         return None
     return plant
 
 
-async def get_plant_timestamps(user_email: str, plant_id: str, plant_collection_name: str = "$Plants"):
-    plant = await get_plant(user_email, plant_id, plant_collection_name)
+async def get_plant_timestamps(user_email: str, plant_id: str):
+    plant = await get_plant_by_id(user_email, plant_id)
     if plant is None:
         return None
 
@@ -80,8 +80,8 @@ async def get_plant_timestamps(user_email: str, plant_id: str, plant_collection_
     })
 
 
-async def get_plant_periodstamps(user_email: str, plant_id: str, plant_collection_name: str = "$Plants"):
-    plant = await get_plant(user_email, plant_id, plant_collection_name)
+async def get_plant_periodstamps(user_email: str, plant_id: str):
+    plant = await get_plant_by_id(user_email, plant_id)
     if plant is None:
         return None
 
@@ -94,8 +94,8 @@ async def get_plant_periodstamps(user_email: str, plant_id: str, plant_collectio
     })
 
 
-async def get_plant_times(user_email: str, plant_id: str, plant_collection_name: str = "$Plants"):
-    plant = await get_plant(user_email, plant_id, plant_collection_name)
+async def get_plant_times(user_email: str, plant_id: str):
+    plant = await get_plant_by_id(user_email, plant_id)
     if plant is None:
         return None
 
@@ -188,8 +188,8 @@ async def get_should_irrigate_now(plant_id: str, chip_id: str):
     return False
 
 
-async def get_plant_irrigation_graph(user_email: str, plant_id: str, plant_collection_name: str = "$Plants"):
-    plant = await get_plant(user_email, plant_id, plant_collection_name)
+async def get_plant_irrigation_graph(user_email: str, plant_id: str):
+    plant = await get_plant_by_id(user_email, plant_id)
     if plant is None:
         return None
     
@@ -267,13 +267,30 @@ async def create_plant(plant: schemas.PlantCreate):
     return created_plant
 
 
-async def delete_plant(user_email: str, plant_id: str, plant_collection_name: str = "$Plants"):
-    plant = await get_plant(user_email, plant_id, plant_collection_name)
-    if plant is None:
+async def update_plant(user_email: str, plant_id: str, plant: schemas.PlantUpdate):
+    _plant = await get_plant_by_id(user_email, plant_id)
+    if _plant is None:
+        return None
+    
+    return await prisma.plant.update(data={
+        'name': plant.name,
+        'water_amount': plant.water_amount,
+        'auto_irrigation': plant.auto_irrigation,
+        'irrigation_type': plant.irrigation_type,
+        'moisture_percentage_treshold': plant.moisture_percentage_treshold,
+        'periodstamp_times_a_week': plant.periodstamp_times_a_week
+    },
+    where={
+        'id': _plant.id,
+    })
+
+async def delete_plant(user_email: str, plant_id: str):
+    db_plant = await get_plant_by_id(user_email, plant_id)
+    if db_plant is None:
         return False
     
     deleted_plant = await prisma.plant.delete(where={
-        'id': plant_id
+        'id': db_plant.id
     })
 
     return deleted_plant is not None

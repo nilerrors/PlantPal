@@ -1,5 +1,6 @@
 from typing import Any, List
 import datetime
+from prisma.enums import IrrigationType
 from pydantic import BaseModel, EmailStr, validator
 
 
@@ -47,12 +48,24 @@ class PlantCreate(PlantBase):
 class PlantUpdate(PlantBase):
     name: str = "New Plant"
     water_amount: int = 1000
+    auto_irrigation: bool = True
+    irrigation_type: IrrigationType = IrrigationType.period
+    moisture_percentage_treshold: int = 50
+    periodstamp_times_a_week: int = 0
 
     @validator('water_amount')
-    def validate_range(cls, value):
+    def validate_water_amount_range(cls, value):
         # Accepted range is: 0 -> 10 liters
         if value not in range(0, 10001):
             raise ValueError('value must be in range 0 to 10000')
+        
+        return value
+
+    @validator('moisture_percentage_treshold')
+    def validate_moisture_percentage_range(cls, value):
+        # Accepted range is: 0 -> 10 liters
+        if value not in range(0, 101):
+            raise ValueError('value must be in range 0 to 100')
         
         return value
 

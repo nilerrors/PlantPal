@@ -68,9 +68,17 @@ export function Signup() {
             >
               <Card.Body className='p-5 d-flex flex-column align-items-center mx-auto w-100'>
                 {message != null ? (
-                  <Form.Text className='small mb-3 pb-lg-2 text-success'>
-                    {message}
-                  </Form.Text>
+                  <>
+                    <Form.Text className='small mb-3 pb-lg-2 text-success'>
+                      {message}
+                    </Form.Text>
+                    <hr />
+                    <Form.Text className='mb-0'>
+                      <Link to='/verify' className='text-white-50 fw-bold'>
+                        Go to Verification Form
+                      </Link>
+                    </Form.Text>
+                  </>
                 ) : (
                   <>
                     {error != null && (

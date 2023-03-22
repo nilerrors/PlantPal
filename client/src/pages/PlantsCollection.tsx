@@ -8,6 +8,7 @@ import { PlantsCollection } from '../types'
 export function PlantsCollection() {
   const { id } = useParams()
   const { useApi } = useAuthentication()
+  const [openForm, setOpenForm] = useState(false)
   const [plantsCollection, setPlantsCollection] =
     useState<PlantsCollection | null>(null)
 
@@ -29,12 +30,14 @@ export function PlantsCollection() {
         <>
           <h3>
             {plantsCollection?.name}
-            {/* <Button
-              onClick={() => setOpenForm(!openForm)}
-              style={{ float: 'right' }}
-            >
-              {openForm ? 'Close Form' : 'Change'}
-            </Button> */}
+            {plantsCollection?.name !== '$Plants' ? (
+              <Button
+                onClick={() => setOpenForm(!openForm)}
+                style={{ float: 'right' }}
+              >
+                {openForm ? 'Close Form' : 'Change'}
+              </Button>
+            ) : null}
           </h3>
           <hr />
           <PlantsCollectionOverview plantsCollection={plantsCollection} />

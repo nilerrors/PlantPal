@@ -28,8 +28,10 @@ if __name__ == '__main__':
     IP_ADDRESS  = socket.gethostbyname(socket.gethostname())
 
 
+    PRISMA_COMMAND = f'cd {SERVER_PATH}/src/prisma && PowerShell rm -r -fo ./migrations && prisma generate && prisma migrate {"dev" if DEV else "prod"} --name={MIGRATION_NAME}'
+
     if "--prisma" in argv:
-        os.system(f'cd {SERVER_PATH}/src/prisma && prisma generate && prisma migrate {"dev" if DEV else "prod"} --name={MIGRATION_NAME}')
+        os.system(PRISMA_COMMAND)
         sys.exit()
 
     # client folder
@@ -51,7 +53,7 @@ if __name__ == '__main__':
         text += 'DATABASE_URL="postgresql://postgres:postgres@localhost:5432/management"\n'
         f.write(text)
 
-    os.system(f'cd {SERVER_PATH} && py -m venv venv && .\\venv\\Script\\Activate.ps1 && pip install -r deps.txt')
+    os.system(f'cd {SERVER_PATH} && py -m venv venv && pip install -r deps.txt')
 
     ## Prisma
-    os.system(f'cd {SERVER_PATH} && PowerShell venv\\Scripts\\Activate.ps1 && cd src/prisma && prisma generate && prisma migrate {"dev" if DEV else "prod"} --name={MIGRATION_NAME}')
+    os.system(f'cd {SERVER_PATH} && cd src/prisma && prisma generate && prisma migrate {"dev" if DEV else "prod"} --name={MIGRATION_NAME}')

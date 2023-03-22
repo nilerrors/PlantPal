@@ -18,8 +18,6 @@ function App() {
 
   const { loggedin, logout } = useAuthentication()
 
-  console.log(loggedin)
-
   return (
     <>
       {!loggedin ? (

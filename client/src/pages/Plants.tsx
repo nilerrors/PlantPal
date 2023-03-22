@@ -1,8 +1,17 @@
 import { useEffect, useState } from 'react'
-import { Link } from 'react-router-dom'
-import { Card, Collapse, Container, ListGroup } from 'react-bootstrap'
+import {
+  Button,
+  Card,
+  Collapse,
+  Container,
+  Form,
+  InputGroup,
+  ListGroup,
+} from 'react-bootstrap'
 import { useAuthentication } from '../contexts/AuthenticationContext'
 import { PlantsCollection } from '../types'
+import { PlantsCollectionsOverview } from '../components/Overview/PlantsCollectionsOverview'
+import { PlantsCollectionsAdd } from '../components/Forms/PlantsCollectionsAdd'
 
 export function Plants() {
   const [plantsCollectionOpen, setPlantsCollectionOpen] = useState(true)
@@ -20,25 +29,34 @@ export function Plants() {
       })
   }, [])
 
+  function addToPlantsCollection(collection: PlantsCollection) {
+    setPlantsCollections([...plantsCollections, collection])
+  }
+
   return (
     <Container className='bg-dark text-align-center'>
-      <h3>Plants Collections</h3>
+      <h3>
+        Plants Collections
+        <span>
+          <Button
+            onClick={() => setPlantsCollectionOpen(!plantsCollectionOpen)}
+            style={{ float: 'right' }}
+            className='mx-2'
+          >
+            {!plantsCollectionOpen ? 'Close Form' : 'Add'}
+          </Button>
+        </span>
+      </h3>
       <hr />
       <Collapse in={plantsCollectionOpen}>
-        <ListGroup className='list-group-flush'>
-          {plantsCollections.map((p) => (
-            <Link to={`/plants/${p.id}`} key={p.id}>
-              <ListGroup.Item
-                variant={p.name == '$Plants' ? 'primary' : 'secondary'}
-                style={{
-                  fontSize: p.name == '$Plants' ? '2vh' : undefined,
-                }}
-              >
-                {p.name}
-              </ListGroup.Item>
-            </Link>
-          ))}
-        </ListGroup>
+        <div>
+          <PlantsCollectionsOverview collections={plantsCollections} />
+        </div>
+      </Collapse>
+      <Collapse in={!plantsCollectionOpen}>
+        <div>
+          <PlantsCollectionsAdd addToCollection={addToPlantsCollection} />
+        </div>
       </Collapse>
     </Container>
   )

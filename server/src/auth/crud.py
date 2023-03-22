@@ -74,6 +74,9 @@ async def verify_user(verification_id: str):
     },
     where={
         'id': verification_id
+    },
+    include={
+        'user': True
     })
 
 

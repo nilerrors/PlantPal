@@ -79,6 +79,7 @@ export function EmailVerification() {
                   {loading ? 'Loading...' : 'Verify'}
                 </Button>
                 <Form.Text>OR</Form.Text>
+                <Form.Text>Resend Verification Mail</Form.Text>
                 {message == null ? (
                   <>
                     {error != null ? (

@@ -13,7 +13,7 @@ export function VerifyEmail() {
   const [isError, setIsError] = useState(false)
   const [message, setMessage] = useState('')
 
-  const { useApi } = useAuthentication()
+  const { useApi, login } = useAuthentication()
 
   if (id == undefined) {
     return <Navigate to='/' />
@@ -27,6 +27,10 @@ export function VerifyEmail() {
         return res.json()
       })
       .then((data) => {
+        if (data?.access_token !== undefined) {
+          login(data?.access_token)
+          return <Navigate to='/' />
+        }
         setMessage(data?.detail ?? data?.message ?? '')
       })
       .catch((error) => {

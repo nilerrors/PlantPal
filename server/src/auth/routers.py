@@ -44,14 +44,13 @@ async def signup(user: UserSignup):
 
 
 @router.post('/user/verify/{verification_id}')
-async def verify_user(verification_id: str):
+async def verify_user(verification_id: str, Authorize: AuthJWT = Depends()):
     verification_added = await crud.verify_user(verification_id)
-    if verification_added is None:
+    if verification_added is None or verification_added.user is None:
         raise HTTPException(status.HTTP_404_NOT_FOUND, f"No account found with verification id '{verification_id}'")
     
-    return {
-        'message': 'Account verified'
-    }
+    access_token = Authorize.create_access_token(subject=verification_added.user.email, expires_time=3600)
+    return {'access_token': access_token}
 
 
 @router.post("/user/resend_verification")

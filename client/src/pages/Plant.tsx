@@ -11,7 +11,14 @@ export function Plant() {
   const [plant, setPlant] = useState<Plant | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [openForm, setOpenForm] = useState(false)
-  const form = useForm<Plant | null>(async (e: Event) => {}, plant)
+  const form = useForm<Plant | null>(async (e: Event) => {
+    // Change Plant
+    if (plant == form.values) return
+
+    const res = await useApi('', {
+      method: '',
+    })
+  }, plant)
   const { id } = useParams()
   const { useApi } = useAuthentication()
 

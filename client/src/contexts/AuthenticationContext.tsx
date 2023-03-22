@@ -47,10 +47,14 @@ export function AuthenticationContextProvider(props: {
   children: JSX.Element[] | JSX.Element
 }) {
   const [token, setAndStoreToken] = useLocalStorage('managementAuthToken', '')
+  const [currentUserEmail, setCurrentUserEmail] = useState<null | string>(null)
+  const [lastCheck, setLastCheck] = useLocalStorage(
+    'managementAuthTokenCheck',
+    new Date()
+  )
   const [loggedin, setLoggedin] = useState(loggedIn())
 
   function login(access_token: string) {
-    console.log(access_token)
     if (access_token != undefined) setAndStoreToken(access_token)
   }
 
@@ -89,12 +93,34 @@ export function AuthenticationContextProvider(props: {
       headers.Authorization = `Bearer ${token}`
     }
 
-    return await fetch(baseURL + url, {
+    const res = await fetch(baseURL + url, {
       method: options?.method,
       headers,
       body: JSON.stringify(options?.body),
     })
+    if (
+      res.status === 422 &&
+      (await res.json())?.detail == 'Signature has expired'
+    ) {
+      logout()
+    }
+    return res
   }
+
+  useEffect(() => {
+    if (new Date().getTime() - lastCheck.getTime() > 600_000) {
+      useApi('/auth/user/current')
+        .then((res) => {
+          if (res.ok) return res.json()
+          else logout()
+        })
+        .then((data) => {
+          const email = jwtDecode<TokenType>(token).sub
+          if (email == undefined || data?.current_user !== email) logout()
+        })
+      setLastCheck(new Date())
+    }
+  }, [])
 
   useEffect(() => {
     setLoggedin(loggedIn())
