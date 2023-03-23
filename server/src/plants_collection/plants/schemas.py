@@ -89,6 +89,7 @@ class PlantResponse(PlantBase):
     updated_at: datetime.datetime
     auto_irrigation: bool
     irrigation_type: str
+    moisture_percentage_treshold: int = 50
     periodstamp_times_a_week: int = 0
     collection: Any = None
 

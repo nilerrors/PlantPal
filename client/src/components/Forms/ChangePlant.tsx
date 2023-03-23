@@ -79,14 +79,28 @@ export function ChangePlant({ plant, form }: Props) {
                 />
               </Form.Group>
               <Form.Group className='mb-4 mx-5 w-100'>
+                <Form.Control
+                  type='number'
+                  className='bg-dark text-white'
+                  placeholder='Moisture Percentage Threshold'
+                  size='lg'
+                  name='moisture_percentage_treshold'
+                  min={0}
+                  max={100}
+                  value={form.values?.moisture_percentage_treshold}
+                  onChange={form.onChange}
+                />
+              </Form.Group>
+              <Form.Group className='mb-4 mx-5 w-100'>
                 <Form.Select
                   name='irrigation_type'
+                  placeholder='Irrigation Type'
                   className='bg-dark text-white'
                   size='lg'
                   onChange={form.onChange}
                   value={form.values?.irrigation_type}
                 >
-                  <option>Irrigation Type</option>
+                  <option disabled={true}>Irrigation Type</option>
                   <option value='period'>Period</option>
                   <option value='time'>Time</option>
                 </Form.Select>
@@ -100,10 +114,11 @@ export function ChangePlant({ plant, form }: Props) {
               >
                 <Form.Control
                   type='number'
+                  placeholder='Amount of irrigations per week'
                   name='periodstamp_times_a_week'
                   className='bg-dark text-white'
                   min={0}
-                  max={10}
+                  max={20}
                   size='lg'
                   onChange={form.onChange}
                   value={form.values?.periodstamp_times_a_week}

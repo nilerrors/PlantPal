@@ -37,6 +37,7 @@ export type Plant = {
   created_at: Date
   updated_at: Date
   auto_irrigation: boolean
+  moisture_percentage_treshold: number
   periodstamp_times_a_week: number
   irrigation_type: string
   irrigations_record: IrrigationRecord[]

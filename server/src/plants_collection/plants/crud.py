@@ -230,6 +230,29 @@ async def get_plant_irrigation_graph(user_email: str, plant_id: str):
     return graph.render_data_uri()
 
 
+async def get_current_moisture(user_email: str, plant_id: str):
+    plant = await get_plant_by_id(user_email, plant_id)
+    if plant is None:
+        return False
+
+    return await prisma.moisturepercentagerecord.find_first(where={
+        'plant_id': plant.id
+    },
+    order={
+        'at': 'desc'
+    })
+
+
+async def register_current_moisture(percentage: int, plant: schemas.PlantESPGet):
+    _plant = await get_plant_by_chip_id(plant.plant_id, plant.chip_id)
+    if _plant is None and 0 < percentage > 100:
+        return None
+
+    return await prisma.moisturepercentagerecord.create(data={
+        'percentage': percentage
+    })
+
+
 async def get_plants(user_email: str, collection_id: str):
     user = await auth.crud.get_user_by_email(user_email)
     if user is None:
@@ -257,7 +280,7 @@ async def create_plant(plant: schemas.PlantCreate):
         return None
     
     try:
-        created_plant = await prisma.plant.create({
+        created_plant = await prisma.plant.create(data={
             'collection_id': standard_plant_collection.id,
             'chip_id': plant.chip_id
         })

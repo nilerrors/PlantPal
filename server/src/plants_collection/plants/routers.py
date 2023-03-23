@@ -31,14 +31,14 @@ async def get_plant(plant_id: str, Authorize: AuthJWT = Depends()):
     return plant_data
 
 
-@router.get('/should_irrigate_now', response_model=bool)
+@router.get('/should_irrigate_now')
 async def get_should_irrigate_now(plant: schemas.PlantESPGet):
     should_irrigate = await crud.get_should_irrigate_now(plant.plant_id, plant.chip_id)
 
     if should_irrigate is None:
         raise HTTPException(status.HTTP_404_NOT_FOUND, "No irrigations found for today")
 
-    return should_irrigate
+    return {"irrigate":should_irrigate}
 
 
 @router.get('/today_next_irrigation_time', response_model=List[schemas.TimeStamp])
@@ -113,6 +113,27 @@ async def get_plant_irrigations_graph(plant_id: str, Authorize: AuthJWT = Depend
     return Response(svg, media_type='image/svg+xml')
 
 
+@router.get('/{plant_id}/current_moisture')
+async def get_current_moisture(plant_id: str, Authorize: AuthJWT = Depends()):
+    Authorize.jwt_required()
+    
+    user_email = Authorize.get_jwt_subject()
+    current_moisture = await crud.get_current_moisture(user_email, plant_id)
+    if type(current_moisture) == bool and not current_moisture:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "Plant with given id not found")
+
+    return {"current_moisture":current_moisture}
+
+
+@router.post('/current_moisture/{percentage}')
+async def set_current_moisture(percentage: int, plant: schemas.PlantESPGet):
+    current_moisture = await crud.register_current_moisture(percentage, plant)
+    if current_moisture is None:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "Plant with given id not found")
+
+    return {"current_moisture":current_moisture}
+
+
 @router.post("/")
 async def create_plant(plant: schemas.PlantCreate):
     created_plant = await crud.create_plant(plant)
@@ -130,12 +151,12 @@ async def update_plant(plant_id: str, plant: schemas.PlantUpdate, Authorize: Aut
     Authorize.jwt_required()
     
     user_email = Authorize.get_jwt_subject()
-    plant_deleted = await crud.update_plant(user_email, plant_id, plant)
+    updated_plant = await crud.update_plant(user_email, plant_id, plant)
 
-    if not plant_deleted:
+    if not updated_plant:
         raise HTTPException(status.HTTP_404_NOT_FOUND, "Plant with given id not found")
 
-    return {'message': 'Plant deleted'}
+    return updated_plant
 
 
 @router.delete("/{plant_id}")

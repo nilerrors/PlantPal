@@ -13,11 +13,31 @@ export function Plant() {
   const [openForm, setOpenForm] = useState(false)
   const form = useForm<Plant | null>(async (e: Event) => {
     // Change Plant
-    if (plant == form.values) return
+    if (plant == undefined) return
+    if (form.values == plant) {
+      setOpenForm(false)
+      return
+    }
 
-    const res = await useApi('', {
-      method: '',
+    const res = await useApi(`/plants_collection/plants/${plant.id}`, {
+      method: 'PUT',
+      body: {
+        name: form.values?.name,
+        water_amount: form.values?.water_amount,
+        auto_irrigation: form.values?.auto_irrigation,
+        irrigation_type: form.values?.irrigation_type,
+        moisture_percentage_treshold: form.values?.moisture_percentage_treshold,
+        periodstamp_times_a_week: form.values?.periodstamp_times_a_week,
+      },
     })
+    const data = await res.json()
+    if (!res.ok) {
+      setError(data?.detail ?? data?.message ?? 'Error')
+      return
+    }
+    data.collection = undefined
+    setPlant({ ...plant, ...JSON.parse(JSON.stringify(data)) })
+    setOpenForm(false)
   }, plant)
   const { id } = useParams()
   const { useApi } = useAuthentication()
