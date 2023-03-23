@@ -1,0 +1,53 @@
+{
+  "Typescript React component": {
+    "scope": "typescriptreact",
+    "prefix": "rfc",
+    "body": [
+      "type Props = {",
+      "  ",
+      "}",
+      "",
+      "export function ${TM_FILENAME_BASE}({ $2 }: Props) {",
+      "  return (",
+      "    <>",
+      "     ${1:$TM_FILENAME_BASE}",
+      "    </>",
+      "  )",
+      "}",
+      ""
+    ]
+  },
+  "Typescript React context": {
+    "scope": "typescriptreact",
+    "prefix": "ctx",
+    "body": [
+      "import { createContext, useContext } from 'react'",
+      "",
+      "type $1 = {",
+      "  ",
+      "}",
+      "",
+      "export const $1Context = createContext<$1>({} as $1)",
+      "",
+      "export function use$1() {",
+      "  const context = useContext($1Context)",
+      "  if (context === undefined) {",
+      "    throw new Error('$1 Context used outside of provider')",
+      "  }",
+      "  return context",
+      "}",
+      "",
+      "export function $1ContextProvider(props: {children: JSX.Element[] | JSX.Element}) {",
+      "",
+      "const ${1/^(.)(.*)$/${1:/downcase}${2}/}: $1 = {}",
+      "",
+      "  return (",
+      "    <$1Context.Provider value={${1/^(.)(.*)$/${1:/downcase}${2}/}}>",
+      "      {props.children}",
+      "    </$1Context.Provider>",
+      "  )",
+      "}",
+      ""
+    ]
+  }
+}
