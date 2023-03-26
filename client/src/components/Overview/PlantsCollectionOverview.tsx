@@ -1,13 +1,20 @@
-import React from 'react'
 import { Collapse, ListGroup } from 'react-bootstrap'
-import { Link } from 'react-router-dom'
-import { PlantsCollection } from '../../types'
+import { Plant, PlantsCollection } from '../../types'
+import { ListItemRemoveButton } from '../ListItemRemoveButton'
+import { useAuthentication } from '../../contexts/AuthenticationContext'
 
 type Props = {
   plantsCollection: PlantsCollection
+  plants: Plant[]
+  removePlant: (plant_id: string) => void
 }
 
-export function PlantsCollectionOverview({ plantsCollection }: Props) {
+export function PlantsCollectionOverview({
+  plantsCollection,
+  plants,
+  removePlant,
+}: Props) {
+  const { useApi } = useAuthentication()
   return (
     <>
       <h4>Name: {plantsCollection.name}</h4>
@@ -19,16 +26,29 @@ export function PlantsCollectionOverview({ plantsCollection }: Props) {
           Updated At: {new Date(plantsCollection.updated_at).toLocaleString()}
         </h4>
       ) : null}
-      {plantsCollection.plants !== undefined &&
-      plantsCollection.plants.length !== 0 ? (
+      {plants != undefined && plants.length !== 0 ? (
         <>
           <h4>Plants</h4>
           <Collapse in={true}>
             <ListGroup className='list-group-flush'>
-              {plantsCollection.plants.map((plant) => (
-                <Link to={`/plant/${plant.id}`} key={plant.id}>
-                  <ListGroup.Item variant='dark'>{plant.name}</ListGroup.Item>
-                </Link>
+              {plants.map((plant) => (
+                <ListItemRemoveButton
+                  id={plant.id}
+                  to={`/plant/${plant.id}`}
+                  key={plant.id}
+                  name={plant.name}
+                  type='plant'
+                  onRemove={() => {
+                    useApi(`/plants_collection/plants/${plant.id}`, {
+                      method: 'DELETE',
+                    })
+                      .then((res) => res.json())
+                      .then((data) => {
+                        alert(data?.message ?? data?.detail ?? '')
+                      })
+                    removePlant(plant.id)
+                  }}
+                />
               ))}
             </ListGroup>
           </Collapse>

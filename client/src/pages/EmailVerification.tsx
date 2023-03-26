@@ -33,7 +33,6 @@ export function EmailVerification() {
         } else {
           setMessage(data.message)
         }
-        console.log(data)
       } catch (error: any) {
         setError(error?.message ?? error?.detail ?? 'Error')
       }

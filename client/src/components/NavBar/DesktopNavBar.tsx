@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Navbar, Nav, Container } from 'react-bootstrap'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
-import { useAuthentication } from '../contexts/AuthenticationContext'
+import { useAuthentication } from '../../contexts/AuthenticationContext'
 
 type URL = {
   path: string

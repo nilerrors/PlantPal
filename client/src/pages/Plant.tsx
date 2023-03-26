@@ -11,7 +11,7 @@ export function Plant() {
   const [plant, setPlant] = useState<Plant | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [openForm, setOpenForm] = useState(false)
-  const form = useForm<Plant | null>(async (e: Event) => {
+  const form = useForm<Plant | null>(async () => {
     // Change Plant
     if (plant == undefined) return
     if (form.values == plant) {
@@ -28,6 +28,7 @@ export function Plant() {
         irrigation_type: form.values?.irrigation_type,
         moisture_percentage_treshold: form.values?.moisture_percentage_treshold,
         periodstamp_times_a_week: form.values?.periodstamp_times_a_week,
+        collection_id: form.values?.collection_id,
       },
     })
     const data = await res.json()
@@ -35,7 +36,6 @@ export function Plant() {
       setError(data?.detail ?? data?.message ?? 'Error')
       return
     }
-    data.collection = undefined
     setPlant({ ...plant, ...JSON.parse(JSON.stringify(data)) })
     setOpenForm(false)
   }, plant)
@@ -58,8 +58,12 @@ export function Plant() {
         return res.json()
       })
       .then((data) => {
-        setPlant(data)
-        form.set(data)
+        const plant = {
+          ...data,
+          collection_id: data?.collection_id ?? undefined,
+        }
+        setPlant(plant)
+        form.set(plant)
       })
   }, [])
 

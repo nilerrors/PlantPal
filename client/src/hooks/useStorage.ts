@@ -27,23 +27,3 @@ export function useLocalStorage<T>(key: string, initialValue: T) {
   }
   return [storedValue, setValue] as const
 }
-
-// export function useStorage<T>(
-//   key: string,
-//   defaultValue: T,
-//   storage = localStorage
-// ): [T, Dispatch<SetStateAction<T>>] {
-//   const initialValue = storage.getItem(key)
-//     ? (JSON.parse(storage.getItem(key) ?? '') as T)
-//     : defaultValue
-
-//   const [value, setValue] = useState<T>(initialValue)
-
-//   const setValueAndStore = ((arg) => {
-//     const v = setValue(arg)
-//     storage.setItem(key, JSON.stringify(v))
-//     return v
-//   }) as typeof setValue
-
-//   return [value, setValueAndStore]
-// }

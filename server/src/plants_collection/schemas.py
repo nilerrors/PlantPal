@@ -2,7 +2,7 @@ from typing import Any, List
 from pydantic import BaseModel
 import datetime
 
-from src.plants_collection.plants.schemas import PlantPackedResponse
+from src.plants_collection.plants.schemas import PlantIdNameResponse
 
 
 class PlantsCollectionBase(BaseModel):
@@ -16,9 +16,10 @@ class PlantsCollectionCreate(PlantsCollectionBase):
 class PlantsCollectionResponse(PlantsCollectionBase):
     id: str
     name: str
+    count: int = 0
     created_at: datetime.datetime
     updated_at: datetime.datetime
 
 
 class PlantsCollectionWithPlantsResponse(PlantsCollectionResponse):
-    plants: List[PlantPackedResponse]
+    plants: List[PlantIdNameResponse]

@@ -52,6 +52,7 @@ class PlantUpdate(PlantBase):
     irrigation_type: IrrigationType = IrrigationType.period
     moisture_percentage_treshold: int = 50
     periodstamp_times_a_week: int = 0
+    collection_id: str | None = None
 
     @validator('water_amount')
     def validate_water_amount_range(cls, value):
@@ -80,6 +81,12 @@ class PlantPackedResponse(PlantBase):
     chip_id: ChipID
     name: str
 
+
+class PlantIdNameResponse(PlantBase):
+    id: str
+    name: str
+
+
 class PlantResponse(PlantBase):
     id: str
     chip_id: ChipID
@@ -92,6 +99,7 @@ class PlantResponse(PlantBase):
     moisture_percentage_treshold: int = 50
     periodstamp_times_a_week: int = 0
     collection: Any = None
+    collection_id: str | None = None
 
 
 class TimeStamp(BaseModel):

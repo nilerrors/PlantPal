@@ -44,7 +44,6 @@ export function Login() {
             login(data?.access_token ?? '')
             navigate('/', { replace: true })
           }
-          console.log(data)
         } catch (error: any) {
           setError(error?.message ?? error?.detail ?? 'Error')
         }

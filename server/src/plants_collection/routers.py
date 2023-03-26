@@ -1,3 +1,4 @@
+from typing import List
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi_jwt_auth import AuthJWT
 from . import plants, crud, schemas
@@ -8,7 +9,7 @@ router = APIRouter(prefix="/plants_collection")
 router.include_router(plants.router)
 
 
-@router.get('/')
+@router.get('/', response_model=List[schemas.PlantsCollectionResponse])
 async def get_plants_collections(Authorize: AuthJWT = Depends()):
     Authorize.jwt_required()
 
@@ -16,7 +17,7 @@ async def get_plants_collections(Authorize: AuthJWT = Depends()):
     user_email = Authorize.get_jwt_subject()
     user_plants = await crud.get_plants_collections(user_email)
 
-    return user_plants
+    return user_plants or []
 
 
 @router.get('/{plant_collection_id}', response_model=schemas.PlantsCollectionWithPlantsResponse)
@@ -32,7 +33,7 @@ async def get_plants_collection(plant_collection_id: str, Authorize: AuthJWT = D
     return plant_collection
 
 
-@router.post("/")
+@router.post("/", response_model=schemas.PlantsCollectionResponse)
 async def create_plants_collection(plants_collection: schemas.PlantsCollectionCreate, Authorize: AuthJWT = Depends()):
     Authorize.jwt_required()
 
@@ -40,7 +41,7 @@ async def create_plants_collection(plants_collection: schemas.PlantsCollectionCr
     created_plant = await crud.create_plants_collection(user_email, plants_collection)
 
     if type(created_plant) == bool and not created_plant:
-        raise HTTPException(status.HTTP_401_UNAUTHORIZED, "Name for plants collection is already used")
+        raise HTTPException(status.HTTP_409_CONFLICT, "Name for plants collection is already used")
     elif created_plant is None:
         raise HTTPException(status.HTTP_401_UNAUTHORIZED, "User email and password do not correspond")
 

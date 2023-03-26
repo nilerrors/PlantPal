@@ -294,6 +294,14 @@ async def update_plant(user_email: str, plant_id: str, plant: schemas.PlantUpdat
     _plant = await get_plant_by_id(user_email, plant_id)
     if _plant is None:
         return None
+
+    collection_id = plant.collection_id
+    if collection_id is None:
+        collection_id = _plant.collection_id
+    
+    collection = await get_plant_collection(user_email, collection_id)
+    if collection is None:
+        collection_id = _plant.collection_id
     
     return await prisma.plant.update(data={
         'name': plant.name,
@@ -301,10 +309,18 @@ async def update_plant(user_email: str, plant_id: str, plant: schemas.PlantUpdat
         'auto_irrigation': plant.auto_irrigation,
         'irrigation_type': plant.irrigation_type,
         'moisture_percentage_treshold': plant.moisture_percentage_treshold,
-        'periodstamp_times_a_week': plant.periodstamp_times_a_week
+        'periodstamp_times_a_week': plant.periodstamp_times_a_week,
+        'collection': {
+            'connect': {
+                'id': collection_id
+            }
+        }
     },
     where={
         'id': _plant.id,
+    },
+    include={
+        'collection': True
     })
 
 async def delete_plant(user_email: str, plant_id: str):

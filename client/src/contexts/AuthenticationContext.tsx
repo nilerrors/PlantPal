@@ -48,10 +48,7 @@ export function AuthenticationContextProvider(props: {
 }) {
   const [token, setAndStoreToken] = useLocalStorage('managementAuthToken', '')
   const [currentUserEmail, setCurrentUserEmail] = useState<null | string>(null)
-  const [lastCheck, setLastCheck] = useLocalStorage(
-    'managementAuthTokenCheck',
-    new Date()
-  )
+  const [lastCheck, setLastCheck] = useState(new Date())
   const [loggedin, setLoggedin] = useState(loggedIn())
 
   function login(access_token: string) {

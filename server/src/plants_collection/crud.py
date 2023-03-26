@@ -3,14 +3,27 @@ from src import auth
 from . import schemas
 
 
+async def get_plants_count_by_collection_id(collection_id: str):
+    return await prisma.plant.count(where={
+        'collection_id': collection_id
+    }) or 0
+
+
 async def get_plants_collections(user_email: str):
     user = await auth.crud.get_user_by_email(user_email)
     if user is None:
         return None
 
-    return await prisma.plantscollection.find_many(where={
-        'user_id': user.id
+    collections = await prisma.plantscollection.find_many(where={
+        'user_id': user.id,
     })
+    if collections is None:
+        return []
+    
+    return [({
+        **c.dict(),
+        'count': await get_plants_count_by_collection_id(c.id)
+    }) for c in collections]
 
 
 async def get_plants_collection(user_email: str, plants_collection_id: str):
@@ -37,7 +50,8 @@ async def create_plants_collection(user_email: str, plants_collection: schemas.P
         return False
 
     return await prisma.plantscollection.create({
-        'name': plants_collection.name
+        'name': plants_collection.name,
+        'user_id': user.id
     })
 
 async def delete_plants_collection(user_email: str, plants_collection_id: str):

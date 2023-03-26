@@ -1,37 +1,16 @@
 import { useEffect, useState } from 'react'
-import {
-  Button,
-  Card,
-  Collapse,
-  Container,
-  Form,
-  InputGroup,
-  ListGroup,
-} from 'react-bootstrap'
-import { useAuthentication } from '../contexts/AuthenticationContext'
-import { PlantsCollection } from '../types'
+import { Button, Collapse, Container } from 'react-bootstrap'
 import { PlantsCollectionsOverview } from '../components/Overview/PlantsCollectionsOverview'
 import { PlantsCollectionsAdd } from '../components/Forms/PlantsCollectionsAdd'
+import { usePlantsCollections } from '../contexts/PlantsCollectionsContext'
 
 export function Plants() {
   const [plantsCollectionOpen, setPlantsCollectionOpen] = useState(true)
-  const [plantsCollections, setPlantsCollections] = useState<
-    PlantsCollection[]
-  >([])
-
-  const { useApi } = useAuthentication()
+  const { refetch, add } = usePlantsCollections()
 
   useEffect(() => {
-    useApi('/plants_collection/')
-      .then((res) => res.json())
-      .then((data) => {
-        setPlantsCollections(data)
-      })
+    refetch()
   }, [])
-
-  function addToPlantsCollection(collection: PlantsCollection) {
-    setPlantsCollections([...plantsCollections, collection])
-  }
 
   return (
     <Container className='bg-dark text-align-center'>
@@ -50,12 +29,15 @@ export function Plants() {
       <hr />
       <Collapse in={plantsCollectionOpen}>
         <div>
-          <PlantsCollectionsOverview collections={plantsCollections} />
+          <PlantsCollectionsOverview />
         </div>
       </Collapse>
       <Collapse in={!plantsCollectionOpen}>
         <div>
-          <PlantsCollectionsAdd addToCollection={addToPlantsCollection} />
+          <PlantsCollectionsAdd
+            addToCollection={add}
+            setFormClose={() => setPlantsCollectionOpen(true)}
+          />
         </div>
       </Collapse>
     </Container>

@@ -10,6 +10,7 @@ import {
   Card,
   Col,
 } from 'react-bootstrap'
+import { usePlantsCollections } from '../../contexts/PlantsCollectionsContext'
 
 type Props = {
   plant: Plant
@@ -19,6 +20,8 @@ type Props = {
 export function ChangePlant({ plant, form }: Props) {
   const [error, setError] = useState<string | null>(null)
   const navigate = useNavigate()
+
+  const { collections, refetch } = usePlantsCollections()
 
   function handleChangeStamps(
     e: MouseEvent<HTMLButtonElement, MouseEvent> | MouseEvent,
@@ -53,6 +56,7 @@ export function ChangePlant({ plant, form }: Props) {
                   placeholder='Name'
                   size='lg'
                   name='name'
+                  required={true}
                   value={form.values?.name}
                   onChange={form.onChange}
                 />
@@ -66,6 +70,7 @@ export function ChangePlant({ plant, form }: Props) {
                   name='water_amount'
                   min={100}
                   max={5000}
+                  required={true}
                   value={form.values?.water_amount}
                   onChange={form.onChange}
                 />
@@ -87,6 +92,7 @@ export function ChangePlant({ plant, form }: Props) {
                   name='moisture_percentage_treshold'
                   min={0}
                   max={100}
+                  required={true}
                   value={form.values?.moisture_percentage_treshold}
                   onChange={form.onChange}
                 />
@@ -98,7 +104,8 @@ export function ChangePlant({ plant, form }: Props) {
                   className='bg-dark text-white'
                   size='lg'
                   onChange={form.onChange}
-                  value={form.values?.irrigation_type}
+                  required={true}
+                  value={form.values?.irrigation_type ?? 'period'}
                 >
                   <option disabled={true}>Irrigation Type</option>
                   <option value='period'>Period</option>
@@ -121,8 +128,28 @@ export function ChangePlant({ plant, form }: Props) {
                   max={20}
                   size='lg'
                   onChange={form.onChange}
+                  required={true}
                   value={form.values?.periodstamp_times_a_week}
                 />
+              </Form.Group>
+              <Form.Group className='mb-4 mx-5 w-100'>
+                <Form.Select
+                  name='collection_id'
+                  placeholder='Collection'
+                  className='bg-dark text-white'
+                  size='lg'
+                  onChange={form.onChange}
+                  onClick={() => refetch()}
+                  value={form.values?.collection_id}
+                  required={true}
+                >
+                  <option disabled={true}>Plants Collection</option>
+                  {collections.map((c) => (
+                    <option key={c.id} value={c.id}>
+                      {c.name}
+                    </option>
+                  ))}
+                </Form.Select>
               </Form.Group>
               <Form.Text className='mb-4 mx-5'>
                 <Button
