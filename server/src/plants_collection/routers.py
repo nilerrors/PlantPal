@@ -48,6 +48,20 @@ async def create_plants_collection(plants_collection: schemas.PlantsCollectionCr
     return created_plant
 
 
+@router.put('/{plant_collection_id}', response_model=schemas.PlantsCollectionResponse)
+async def update_plants_collection(plant_collection_id: str, plant_collection: schemas.plantsCollectionUpdate, Authorize: AuthJWT = Depends()):
+    Authorize.jwt_required()
+    user_email = Authorize.get_jwt_subject()
+
+    updated_plant = await crud.update_plants_collection(user_email, plant_collection_id, plant_collection)
+    if type(updated_plant) == bool and not updated_plant:
+        raise HTTPException(status.HTTP_409_CONFLICT, "Name for plants collection is already used")
+    elif updated_plant is None:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "Plants collection with given id not found")
+
+    return updated_plant
+
+
 @router.delete("/{plant_collection_id}")
 async def delete_plant(plant_collection_id: str, Authorize: AuthJWT = Depends()):
     Authorize.jwt_required()

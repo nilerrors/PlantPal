@@ -1,8 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException, status
-from sqlalchemy.orm import Session
 from fastapi_jwt_auth import AuthJWT
 from src.utils.send_email import send_email_async
-from .schemas import UserLogin, UserSignup, UserRemove, UserResendVerification
 from . import crud, schemas
 
 
@@ -10,7 +8,7 @@ router = APIRouter(prefix='/auth')
 
 
 @router.post('/login')
-async def login(user: UserLogin, Authorize: AuthJWT = Depends()):
+async def login(user: schemas.UserLogin, Authorize: AuthJWT = Depends()):
     auth_user = await crud.authenticate_user(user)
     if not auth_user:
         raise HTTPException(status.HTTP_404_NOT_FOUND, 'Email does not correspond with the password')
@@ -24,7 +22,7 @@ async def login(user: UserLogin, Authorize: AuthJWT = Depends()):
 
 
 @router.post('/signup', status_code=status.HTTP_201_CREATED)
-async def signup(user: UserSignup):
+async def signup(user: schemas.UserSignup):
     created_user = await crud.create_user(user)
     if created_user is None:
         raise HTTPException(status.HTTP_409_CONFLICT, f"User with email-address '{user.email}' already exists.")
@@ -54,7 +52,7 @@ async def verify_user(verification_id: str, Authorize: AuthJWT = Depends()):
 
 
 @router.post("/user/resend_verification")
-async def resend_verification(user: UserResendVerification):
+async def resend_verification(user: schemas.UserResendVerification):
     db_user = await crud.get_user_by_email(user.email)
     if db_user is None or db_user.verification is None:
         raise HTTPException(status.HTTP_404_NOT_FOUND, f"User with email-address '{user.email}' does not exist")
@@ -101,8 +99,47 @@ async def user(Authorize: AuthJWT = Depends()):
     }
 
 
+@router.put('/user', response_model=schemas.UpdatedUserResponse)
+async def update_user(user: schemas.UserUpdate, Authorize: AuthJWT = Depends()):
+    Authorize.jwt_required()
+
+    user_email = Authorize.get_jwt_subject()
+    if user.email != user_email:
+        raise HTTPException(status.HTTP_401_UNAUTHORIZED, 'Unauthorized to update account')
+    updated = await crud.update_user(user)
+    if updated is None:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, 'User with given email not found')
+    
+    return {
+        "user": updated,
+        "access_token": Authorize.create_access_token(subject=updated.email, expires_time=3600)
+    }
+
+
+@router.put('/user/password', response_model=schemas.UpdatedUserResponse)
+async def update_user_password(user: schemas.UserUpdatePassword, Authorize: AuthJWT = Depends()):
+    Authorize.jwt_required()
+
+    user_email = Authorize.get_jwt_subject()
+    if user.email != user_email:
+        raise HTTPException(status.HTTP_401_UNAUTHORIZED, 'Unauthorized to update account')
+    updated = await crud.update_user_password(user)
+    if updated is None:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, 'User with given email not found')
+    
+    return {
+        "user": updated,
+        "access_token": Authorize.create_access_token(subject=updated.email, expires_time=3600)
+    }
+
+
 @router.delete('/user')
-async def delete_user(user: UserRemove):
+async def delete_user(user: schemas.UserRemove, Authorize: AuthJWT = Depends()):
+    Authorize.jwt_required()
+
+    user_email = Authorize.get_jwt_subject()
+    if user.email != user_email:
+        raise HTTPException(status.HTTP_401_UNAUTHORIZED, 'Unauthorized to delete account')
     deleted = await crud.remove_user(user)
     if not deleted:
         raise HTTPException(status.HTTP_404_NOT_FOUND, 'Email and password do not correspond')

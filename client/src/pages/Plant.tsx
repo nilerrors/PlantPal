@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Button, Container, Collapse } from 'react-bootstrap'
 import { Link, Navigate, useParams } from 'react-router-dom'
-import { ChangePlant } from '../components/Forms/ChangePlant'
+import { ChangePlant } from '../components/Forms/Plants/ChangePlant'
 import { PlantOverview } from '../components/Overview/PlantOverview'
 import { useAuthentication } from '../contexts/AuthenticationContext'
 import { useForm } from '../hooks/useForm'

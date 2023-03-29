@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Button, Collapse, Container } from 'react-bootstrap'
 import { PlantsCollectionsOverview } from '../components/Overview/PlantsCollectionsOverview'
-import { PlantsCollectionsAdd } from '../components/Forms/PlantsCollectionsAdd'
+import { PlantsCollectionsAdd } from '../components/Forms/Plants/PlantsCollectionsAdd'
 import { usePlantsCollections } from '../contexts/PlantsCollectionsContext'
 
 export function Plants() {

@@ -59,6 +59,23 @@ export function EmailVerification() {
                     size='lg'
                     name='verification-code'
                     onChange={(e) => setVerficationCode(e.target.value)}
+                    onPaste={() => {
+                      if (verificationCode.trim() == '') {
+                        setError('No verification code given')
+                        return
+                      }
+                      navigate(`/verify/${verificationCode}`)
+                      return
+                    }}
+                    onKeyDown={(e) => {
+                      if (e.key != 'Enter') return
+                      if (verificationCode.trim() == '') {
+                        setError('No verification code given')
+                        return
+                      }
+                      navigate(`/verify/${verificationCode}`)
+                      return
+                    }}
                   />
                 </Form.Group>
                 <Button

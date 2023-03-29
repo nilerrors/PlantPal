@@ -28,7 +28,7 @@ export function PlantsCollectionsContextProvider(props: {
   const [collections, setCollections] = useState<PlantsCollection[]>([])
   const [count, setCount] = useState<number>(0)
 
-  const { useApi } = useAuthentication()
+  const { useApi, loggedin } = useAuthentication()
 
   async function refetch() {
     const res = await useApi('/plants_collection/')
@@ -54,6 +54,7 @@ export function PlantsCollectionsContextProvider(props: {
   }
 
   useEffect(() => {
+    if (!loggedin) return
     refetch()
   }, [])
 

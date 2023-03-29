@@ -27,7 +27,7 @@ class UserResponse(UserBase):
     id: str
     first_name: str
     last_name: str
-    verified: bool
+    verified: bool = True
     created_at: datetime.datetime
     updated_at: datetime.datetime
 
@@ -35,6 +35,11 @@ class UserResponse(UserBase):
 class UserUpdate(UserBase):
     first_name: str
     last_name: str
+
+
+class UpdatedUserResponse(BaseModel):
+    access_token: str
+    user: UserResponse
 
 
 class UserUpdatePassword(UserBase):

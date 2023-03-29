@@ -103,6 +103,24 @@ async def update_user(user: schemas.UserUpdate):
     return updated_user
 
 
+async def update_user_password(user: schemas.UserUpdatePassword):
+    _user = await get_user_by_email_password(user.email, user.previous_password)
+    if _user is None:
+        return None
+    updated_user = await prisma.user.update(data={
+        'email': _user.email,
+        'password': hasher.get_password_hash(user.new_password)
+    },
+    where={
+        'email': user.email
+    },
+    include={
+        'verification': True
+    })
+
+    return updated_user
+
+
 async def remove_user(user: schemas.UserRemove):
     delete_user = await get_user_by_email_password(user.email, user.password)
     if delete_user is None:

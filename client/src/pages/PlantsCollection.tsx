@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Button, Collapse, Container } from 'react-bootstrap'
 import { Navigate, useNavigate, useParams } from 'react-router-dom'
-import { ChangePlantsCollection } from '../components/Forms/ChangePlantsCollection'
+import { ChangePlantsCollection } from '../components/Forms/Plants/ChangePlantsCollection'
 import { PlantsCollectionOverview } from '../components/Overview/PlantsCollectionOverview'
 import { useAuthentication } from '../contexts/AuthenticationContext'
 import { usePlantsCollections } from '../contexts/PlantsCollectionsContext'
@@ -13,9 +13,23 @@ export function PlantsCollection() {
   const { useApi } = useAuthentication()
   const { remove } = usePlantsCollections()
   const navigate = useNavigate()
-  const form = useForm(async () => {}, {
-    name: '',
-  })
+  const form = useForm(
+    async () => {
+      const res = await useApi(`/plants_collection/${id}`, {
+        method: 'PUT',
+        body: {
+          name: form.values.name,
+        },
+      })
+      const data = await res.json()
+      if (!res.ok) return
+      setPlantsCollection(data)
+      setOpenForm(false)
+    },
+    {
+      name: '',
+    }
+  )
 
   const [openForm, setOpenForm] = useState(false)
   const [plantsCollection, setPlantsCollection] =

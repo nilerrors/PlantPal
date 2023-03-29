@@ -1,6 +1,7 @@
 import { createContext, useState, useContext, useEffect } from 'react'
 import { useLocalStorage } from '../hooks/useStorage'
 import jwtDecode from 'jwt-decode'
+import { User } from '../types'
 
 const baseURL = import.meta.env.VITE_API_BASE_URL
 
@@ -16,6 +17,7 @@ type TokenType = {
 
 type Authentication = {
   token: string
+  user: User | null
   login: (access_token: string) => void
   logout: () => void
   loggedin: boolean
@@ -27,6 +29,7 @@ type Authentication = {
       initHeaders?: any
     }
   ) => Promise<Response>
+  getCurrentUser: () => Promise<void>
 }
 
 export const AuthenticationContext = createContext<Authentication>(
@@ -47,8 +50,8 @@ export function AuthenticationContextProvider(props: {
   children: JSX.Element[] | JSX.Element
 }) {
   const [token, setAndStoreToken] = useLocalStorage('managementAuthToken', '')
-  const [currentUserEmail, setCurrentUserEmail] = useState<null | string>(null)
-  const [lastCheck, setLastCheck] = useState(new Date())
+  const [user, setUser] = useState<null | User>(null)
+  const [lastCheck, setLastCheck] = useState<Date | null>()
   const [loggedin, setLoggedin] = useState(loggedIn())
 
   function login(access_token: string) {
@@ -104,35 +107,59 @@ export function AuthenticationContextProvider(props: {
     return res
   }
 
+  async function checkCurrentUser() {
+    useApi('/auth/user/current')
+      .then((res) => {
+        if (res.ok) return res.json()
+        else logout()
+      })
+      .then((data) => {
+        const email = jwtDecode<TokenType>(token).sub
+        if (email == undefined || data?.current_user !== email) logout()
+      })
+    setLastCheck(new Date())
+  }
+
+  async function getCurrentUser() {
+    useApi('/auth/user')
+      .then((res) => {
+        if (res.ok) return res.json()
+        else logout()
+      })
+      .then((data) => {
+        setUser(data)
+      })
+    setLastCheck(new Date())
+  }
+
   useEffect(() => {
-    if (new Date().getTime() - lastCheck.getTime() > 600_000) {
-      useApi('/auth/user/current')
-        .then((res) => {
-          if (res.ok) return res.json()
-          else logout()
-        })
-        .then((data) => {
-          const email = jwtDecode<TokenType>(token).sub
-          if (email == undefined || data?.current_user !== email) logout()
-        })
-      setLastCheck(new Date())
-    }
+    if (!loggedin) return
+    getCurrentUser()
+  }, [])
+
+  useEffect(() => {
+    setInterval(() => {
+      if (!loggedin) return
+      checkCurrentUser()
+    }, 60_000)
   }, [])
 
   useEffect(() => {
     setLoggedin(loggedIn())
   }, [token])
 
-  const user = {
-    token,
-    login,
-    logout,
-    loggedin,
-    useApi,
-  }
-
   return (
-    <AuthenticationContext.Provider value={user}>
+    <AuthenticationContext.Provider
+      value={{
+        token,
+        login,
+        logout,
+        getCurrentUser,
+        user,
+        loggedin,
+        useApi,
+      }}
+    >
       {props.children}
     </AuthenticationContext.Provider>
   )

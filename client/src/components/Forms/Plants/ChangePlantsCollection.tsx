@@ -1,5 +1,5 @@
 import { Form, Button, Row, Card, Col } from 'react-bootstrap'
-import { FormT } from '../../types'
+import { FormT } from '../../../types'
 
 type Props = {
   form: FormT<any>

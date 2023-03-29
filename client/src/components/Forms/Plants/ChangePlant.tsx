@@ -1,16 +1,7 @@
-import { MouseEvent, useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { FormT, Plant } from '../../types'
-import {
-  Form,
-  Button,
-  Container,
-  InputGroup,
-  Row,
-  Card,
-  Col,
-} from 'react-bootstrap'
-import { usePlantsCollections } from '../../contexts/PlantsCollectionsContext'
+import { FormT, Plant } from '../../../types'
+import { Form, Button, Row, Card, Col } from 'react-bootstrap'
+import { usePlantsCollections } from '../../../contexts/PlantsCollectionsContext'
 
 type Props = {
   plant: Plant

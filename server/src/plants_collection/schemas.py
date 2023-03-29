@@ -13,6 +13,10 @@ class PlantsCollectionCreate(PlantsCollectionBase):
     name: str
 
 
+class plantsCollectionUpdate(PlantsCollectionBase):
+    name: str
+
+
 class PlantsCollectionResponse(PlantsCollectionBase):
     id: str
     name: str
