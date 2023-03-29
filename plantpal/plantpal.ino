@@ -30,7 +30,6 @@ const byte DNS_PORT = 53;
 
 
 #define DATA_REQUEST_DELAY 60 // -> seconds
-#define seconds() (millis()/1000)
 unsigned long lastTime = 0;
 
 
@@ -127,9 +126,9 @@ void loop() {
     }
 
     // Main Code
-    if ((seconds() - lastTime) > DATA_REQUEST_DELAY) {
+    if ((millis() - lastTime) > DATA_REQUEST_DELAY) {
       Serial.println("Hi");
 
-      lastTime = seconds();
+      lastTime = millis();
     }
 }
