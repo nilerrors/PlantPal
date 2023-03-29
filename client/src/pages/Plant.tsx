@@ -65,6 +65,7 @@ export function Plant() {
         setPlant(plant)
         form.set(plant)
       })
+    document.title = `${plant?.name}`
   }, [])
 
   return (

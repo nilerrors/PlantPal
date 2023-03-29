@@ -18,22 +18,9 @@ type Props = {
 }
 
 export function ChangePlant({ plant, form }: Props) {
-  const [error, setError] = useState<string | null>(null)
   const navigate = useNavigate()
 
   const { collections, refetch } = usePlantsCollections()
-
-  function handleChangeStamps(
-    e: MouseEvent<HTMLButtonElement, MouseEvent> | MouseEvent,
-    url: string
-  ) {
-    e.preventDefault()
-    if (form.values != plant) {
-      alert('Plant data has been changed. Save the data before continuing.')
-      return
-    }
-    navigate(url)
-  }
 
   return (
     <Form onSubmit={form.onSubmit}>
@@ -44,11 +31,6 @@ export function ChangePlant({ plant, form }: Props) {
             style={{ borderRadius: '1rem', maxWidth: '700px' }}
           >
             <Card.Body className='p-5 d-flex flex-column align-items-center mx-auto w-100'>
-              {error != null && (
-                <Form.Text className='small mb-3 pb-lg-2 text-danger'>
-                  {error}
-                </Form.Text>
-              )}
               <Form.Group className='mb-4 mx-5 w-100'>
                 <Form.Control
                   type='text'
@@ -155,16 +137,19 @@ export function ChangePlant({ plant, form }: Props) {
                 <Button
                   className='mx-1'
                   variant='link'
-                  onClick={(e) => handleChangeStamps(e, './timestamps')}
+                  onClick={(e) => {
+                    e.preventDefault()
+                    if (
+                      form.values != plant &&
+                      confirm(
+                        'Plant data has been changed. Are you sure you want to continue?'
+                      )
+                    ) {
+                      navigate('./timestamps')
+                    }
+                  }}
                 >
                   Change Timestamps
-                </Button>
-                <Button
-                  className='mx-1'
-                  variant='link'
-                  onClick={(e) => handleChangeStamps(e, './periodstamps')}
-                >
-                  Change Periodstamps
                 </Button>
               </Form.Text>
               <Button
@@ -174,8 +159,7 @@ export function ChangePlant({ plant, form }: Props) {
                 size='lg'
                 variant='primary'
               >
-                Change
-                {/* {loading ? 'Loading...' : 'Sign Up'} */}
+                {form.loading ? 'Loading...' : 'Change'}
               </Button>
             </Card.Body>
           </Card>

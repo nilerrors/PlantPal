@@ -3,6 +3,7 @@ export type FormT<T> = {
   onSubmit: (event: React.FormEvent<HTMLFormElement>) => Promise<void>
   set: (_values: T) => void
   values: T
+  loading: boolean
 }
 
 export type IrrigationRecord = {
@@ -51,6 +52,16 @@ export type PlantsCollection = {
   id: string
   name: string
   count: number
+  created_at: Date
+  updated_at: Date
+}
+
+export type User = {
+  id: string
+  email: string
+  first_name: string
+  last_name: string
+  verified: boolean
   created_at: Date
   updated_at: Date
 }

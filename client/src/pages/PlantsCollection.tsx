@@ -5,6 +5,7 @@ import { ChangePlantsCollection } from '../components/Forms/ChangePlantsCollecti
 import { PlantsCollectionOverview } from '../components/Overview/PlantsCollectionOverview'
 import { useAuthentication } from '../contexts/AuthenticationContext'
 import { usePlantsCollections } from '../contexts/PlantsCollectionsContext'
+import { useForm } from '../hooks/useForm'
 import { Plant, PlantsCollection } from '../types'
 
 export function PlantsCollection() {
@@ -12,6 +13,9 @@ export function PlantsCollection() {
   const { useApi } = useAuthentication()
   const { remove } = usePlantsCollections()
   const navigate = useNavigate()
+  const form = useForm(async () => {}, {
+    name: '',
+  })
 
   const [openForm, setOpenForm] = useState(false)
   const [plantsCollection, setPlantsCollection] =
@@ -29,6 +33,7 @@ export function PlantsCollection() {
         setPlantsCollection(data)
         setPlants(data?.plants ?? [])
       })
+    document.title = `${plantsCollection?.name}`
   }, [])
 
   return (
@@ -79,10 +84,7 @@ export function PlantsCollection() {
           </Collapse>
           <Collapse in={openForm}>
             <div>
-              <ChangePlantsCollection
-                collection={plantsCollection}
-                setFormClose={() => setOpenForm(false)}
-              />
+              <ChangePlantsCollection form={form} />
             </div>
           </Collapse>
         </>

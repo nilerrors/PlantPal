@@ -5,6 +5,7 @@ import { PlantsCollectionsAdd } from '../components/Forms/PlantsCollectionsAdd'
 import { usePlantsCollections } from '../contexts/PlantsCollectionsContext'
 
 export function Plants() {
+  document.title = 'Plants'
   const [plantsCollectionOpen, setPlantsCollectionOpen] = useState(true)
   const { refetch, add } = usePlantsCollections()
 

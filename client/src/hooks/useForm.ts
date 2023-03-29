@@ -1,7 +1,8 @@
 import { useState } from 'react'
 
-export const useForm = <T>(callback: Function, initialState: T) => {
+export const useForm = <T>(callback: CallableFunction, initialState: T) => {
   const [values, setValues] = useState<T>(initialState)
+  const [loading, setLoading] = useState(false)
 
   const onChange = (event: React.ChangeEvent<any>) => {
     if (values == null) return
@@ -20,7 +21,9 @@ export const useForm = <T>(callback: Function, initialState: T) => {
 
   const onSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
+    setLoading(true)
     await callback()
+    setLoading(false)
   }
 
   const set = (_values: T) => {
@@ -32,5 +35,6 @@ export const useForm = <T>(callback: Function, initialState: T) => {
     onSubmit,
     set,
     values,
+    loading,
   }
 }

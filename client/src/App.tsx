@@ -14,7 +14,7 @@ import { Signup } from './pages/Signup'
 import { VerifyEmail } from './pages/VerifyEmail'
 
 function App() {
-  document.title = 'Management'
+  document.title = 'PlantPal'
 
   const { loggedin, logout } = useAuthentication()
 
