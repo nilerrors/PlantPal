@@ -11,6 +11,7 @@ import { Settings } from './pages/Settings'
 import { SetupTutorial } from './pages/SetupTutorial'
 import { Signout } from './pages/Signout'
 import { Signup } from './pages/Signup'
+import { Timestamps } from './pages/Timestamps'
 import { VerifyEmail } from './pages/VerifyEmail'
 
 function App() {
@@ -38,6 +39,7 @@ function App() {
               <Route path='/plants' element={<Plants />} />
               <Route path='/plants/:id' element={<PlantsCollection />} />
               <Route path='/plant/:id' element={<Plant />} />
+              <Route path='/plant/:id/timestamps' element={<Timestamps />} />
               <Route path='/settings' element={<Settings />} />
               <Route path='/signout' element={<Signout />} />
               <Route path='*' element={<Navigate to='/' />} />

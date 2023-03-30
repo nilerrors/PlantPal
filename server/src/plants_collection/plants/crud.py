@@ -1,9 +1,9 @@
-from typing import List, Literal, TypedDict
+import random
 from prisma.errors import UniqueViolationError as PrismaUniqueViolationError
-from prisma.models import Timestamp
 import pygal
 import datetime
-from src.utils.comparedatetime import compare_date, filter_timestamps, filter_periodstamps
+from src.utils.comparedatetime import filter_timestamps, filter_periodstamps
+from src.utils.minutes_to_weektime import minutes_to_weektime
 from src.prisma import prisma
 from src import auth, plants_collection
 from . import schemas
@@ -302,6 +302,29 @@ async def update_plant(user_email: str, plant_id: str, plant: schemas.PlantUpdat
     collection = await get_plant_collection(user_email, collection_id)
     if collection is None:
         collection_id = _plant.collection_id
+    
+    # Update periodstamp
+    if plant.periodstamp_times_a_week != _plant.periodstamp_times_a_week:
+        await prisma.periodstamp.delete_many(where={
+            'plant_id': _plant.id
+        })
+        if plant.periodstamp_times_a_week != 0:
+            WEEK_IN_MINUTES = 10_080
+            irrigation_delay = WEEK_IN_MINUTES // plant.periodstamp_times_a_week
+            periods = [
+                minutes_to_weektime(
+                    ((irrigation_delay * m) + random.randint(0, 10)) if irrigation_delay * m < WEEK_IN_MINUTES else WEEK_IN_MINUTES
+                ) for m in range(plant.periodstamp_times_a_week)
+            ]
+            await prisma.periodstamp.create_many(data=[
+                {
+                    'day_of_week': p.weekday,
+                    'hour': p.hour,
+                    'minute': p.minute
+                }
+                for p in periods if p is not None
+            ])
+        
     
     return await prisma.plant.update(data={
         'name': plant.name,

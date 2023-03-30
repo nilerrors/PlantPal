@@ -13,5 +13,5 @@ if ($Args[0] -eq "client") {
     yarn start
 } else {
     .\venv\Scripts\Activate.ps1
-    uvicorn src:app --reload --host 0.0.0.0
+    uvicorn src:app --reload --host 0.0.0.0 --ssl-keyfile .\key.pem --ssl-certfile .\cert.pem
 }

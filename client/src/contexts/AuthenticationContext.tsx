@@ -146,6 +146,7 @@ export function AuthenticationContextProvider(props: {
 
   useEffect(() => {
     setLoggedin(loggedIn())
+    getCurrentUser()
   }, [token])
 
   return (

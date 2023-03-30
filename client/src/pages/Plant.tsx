@@ -9,6 +9,8 @@ import { Plant } from '../types'
 
 export function Plant() {
   const [plant, setPlant] = useState<Plant | null>(null)
+  document.title =
+    plant != null ? `${plant?.name} in ${plant?.collection?.name}` : 'Plant'
   const [error, setError] = useState<string | null>(null)
   const [openForm, setOpenForm] = useState(false)
   const form = useForm<Plant | null>(async () => {
@@ -65,7 +67,6 @@ export function Plant() {
         setPlant(plant)
         form.set(plant)
       })
-    document.title = `${plant?.name}`
   }, [])
 
   return (

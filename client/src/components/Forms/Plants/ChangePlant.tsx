@@ -130,14 +130,15 @@ export function ChangePlant({ plant, form }: Props) {
                   variant='link'
                   onClick={(e) => {
                     e.preventDefault()
-                    if (
-                      form.values != plant &&
-                      confirm(
-                        'Plant data has been changed. Are you sure you want to continue?'
+                    if (form.values != plant) {
+                      if (
+                        !confirm(
+                          'Plant data has been changed. Are you sure you want to continue?'
+                        )
                       )
-                    ) {
-                      navigate('./timestamps')
+                        return
                     }
+                    navigate(`/plant/${plant.id}/timestamps`, { replace: true })
                   }}
                 >
                   Change Timestamps

@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { Button, Collapse, Container } from 'react-bootstrap'
 import { ChangeUser } from '../components/Forms/User/ChangeUser'
 import { UserAccountForm } from '../components/Forms/User/UserAccount'
+import { UserOverview } from '../components/Overview/UserOverview'
 import { useAuthentication } from '../contexts/AuthenticationContext'
 import { User } from '../types'
 
@@ -28,7 +29,7 @@ export function Settings() {
           <hr />
           <Collapse in={!openForm}>
             <div>
-              <pre>{JSON.stringify(user, undefined, 2)}</pre>
+              <UserOverview user={user} />
             </div>
           </Collapse>
           <Collapse in={openForm}>

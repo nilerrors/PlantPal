@@ -32,6 +32,7 @@ export function PlantsCollectionsAdd({ addToCollection, setFormClose }: Props) {
         setError(data?.detail ?? data?.message ?? 'Error')
         return
       }
+      form.set({ name: '' })
       setLoading(false)
       addToCollection(data)
       setFormClose()
