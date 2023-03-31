@@ -46,13 +46,28 @@ export function Timestamps({}: Props) {
           {'<'} Back
         </Button>{' '}
         Timestamps
+        <Button
+          onClick={() => undefined}
+          style={{ float: 'right' }}
+          variant='danger'
+        >
+          Remove All
+        </Button>
       </h3>
       <hr />
       <TimestampsOverview
+        plant_id={id}
         timestamps={timestamps}
-        remove={(timestamp_id) => {}}
+        remove={(timestamp_id) => {
+          setTimestamps(timestamps.filter((t) => t.id != timestamp_id))
+        }}
       />
-      <TimestampAdd plant_id={id} add={(timestamp) => {}} />
+      <TimestampAdd
+        plant_id={id}
+        add={(timestamp) => {
+          setTimestamps([...timestamps, timestamp])
+        }}
+      />
     </Container>
   )
 }

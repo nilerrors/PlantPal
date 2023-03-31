@@ -4,7 +4,11 @@ export const useForm = <T>(callback: CallableFunction, initialState: T) => {
   const [values, setValues] = useState<T>(initialState)
   const [loading, setLoading] = useState(false)
 
-  const onChange = (event: React.ChangeEvent<any>) => {
+  const onChange = (
+    event: React.ChangeEvent<
+      HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
+    >
+  ) => {
     if (values == null) return
 
     if (!Object.keys(values).includes(event.target.name)) {

@@ -8,12 +8,12 @@ import { useForm } from '../hooks/useForm'
 import { Plant } from '../types'
 
 export function Plant() {
-  const [plant, setPlant] = useState<Plant | null>(null)
+  const [plant, setPlant] = useState<Plant>({} as Plant)
   document.title =
     plant != null ? `${plant?.name} in ${plant?.collection?.name}` : 'Plant'
   const [error, setError] = useState<string | null>(null)
   const [openForm, setOpenForm] = useState(false)
-  const form = useForm<Plant | null>(async () => {
+  const form = useForm<Plant>(async () => {
     // Change Plant
     if (plant == undefined) return
     if (form.values == plant) {
@@ -39,6 +39,7 @@ export function Plant() {
       return
     }
     setPlant({ ...plant, ...JSON.parse(JSON.stringify(data)) })
+    form.set({ ...form.values, ...JSON.parse(JSON.stringify(data)) })
     setOpenForm(false)
   }, plant)
   const { id } = useParams()
@@ -71,7 +72,7 @@ export function Plant() {
 
   return (
     <Container className='bg-dark text-align-center'>
-      {plant != null && (
+      {JSON.stringify(plant) != JSON.stringify({}) && (
         <>
           <h3>
             '{plant?.name}' in{' '}
@@ -83,6 +84,14 @@ export function Plant() {
               style={{ float: 'right' }}
             >
               {openForm ? 'Close Form' : 'Change'}
+            </Button>
+            <Button style={{ float: 'right' }} className='mx-2'>
+              <Link
+                to={`/plant/${plant.id}/timestamps`}
+                className='text-white text-underline-hover'
+              >
+                Timestamps
+              </Link>
             </Button>
           </h3>
           <hr />

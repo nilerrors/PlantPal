@@ -80,6 +80,48 @@ async def get_plant_timestamps(user_email: str, plant_id: str):
     })
 
 
+async def add_plant_timestamp(user_email: str, plant_id: str, timestamp: schemas.TimeStampAdd):
+    plant = await get_plant_by_id(user_email, plant_id)
+    if plant is None:
+        return None
+    
+    if await prisma.timestamp.find_first(where={
+        'day_of_week': timestamp.day_of_week,
+        'hour': timestamp.hour,
+        'minute': timestamp.minute,
+        'plant_id': plant.id
+    }) is not None:
+        return "already exists"
+
+    return await prisma.timestamp.create(data={
+        'day_of_week': timestamp.day_of_week,
+        'hour': timestamp.hour,
+        'minute': timestamp.minute,
+        'plant_id': plant.id
+    })
+
+
+async def remove_plant_all_timestamps(user_email: str, plant_id: str):
+    plant = await get_plant_by_id(user_email, plant_id)
+    if plant is None:
+        return None
+
+    return await prisma.timestamp.delete_many(where={
+        'plant_id': plant.id
+    })
+
+
+async def remove_plant_timestamp(user_email: str, plant_id: str, timestamp_id: str):
+    plant = await get_plant_by_id(user_email, plant_id)
+    if plant is None:
+        return None
+
+    return await prisma.timestamp.delete_many(where={
+        'id': timestamp_id,
+        'plant_id': plant_id
+    })
+
+
 async def get_plant_periodstamps(user_email: str, plant_id: str):
     plant = await get_plant_by_id(user_email, plant_id)
     if plant is None:

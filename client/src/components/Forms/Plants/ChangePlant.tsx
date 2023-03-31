@@ -5,7 +5,7 @@ import { usePlantsCollections } from '../../../contexts/PlantsCollectionsContext
 
 type Props = {
   plant: Plant
-  form: FormT<any>
+  form: FormT<Plant>
 }
 
 export function ChangePlant({ plant, form }: Props) {
@@ -130,7 +130,9 @@ export function ChangePlant({ plant, form }: Props) {
                   variant='link'
                   onClick={(e) => {
                     e.preventDefault()
-                    if (form.values != plant) {
+                    console.log(form.values)
+                    console.log(plant)
+                    if (JSON.stringify(form.values) != JSON.stringify(plant)) {
                       if (
                         !confirm(
                           'Plant data has been changed. Are you sure you want to continue?'

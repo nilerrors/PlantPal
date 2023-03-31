@@ -87,6 +87,47 @@ async def get_plant_timestamps(plant_id: str, Authorize: AuthJWT = Depends()):
     return plant_data
 
 
+@router.post('/{plant_id}/timestamps', response_model=schemas.TimeStamp)
+async def add_plant_timestamp(plant_id: str, timestamp: schemas.TimeStampAdd, Authorize: AuthJWT = Depends()):
+    Authorize.jwt_required()
+    
+    user_email = Authorize.get_jwt_subject()
+    plant_data = await crud.add_plant_timestamp(user_email, plant_id, timestamp)
+
+    if type(plant_data) == str and plant_data == 'already exists':
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "Timestamp already exists")
+    if plant_data is None:
+        raise HTTPException(status.HTTP_409_CONFLICT, "Plant with given id not found")
+
+    return plant_data
+
+
+@router.delete('/{plant_id}/timestamps')
+async def remove_plant_all_timestamps(plant_id: str, timestamp_id: str, Authorize: AuthJWT = Depends()):
+    Authorize.jwt_required()
+    
+    user_email = Authorize.get_jwt_subject()
+    plant_data = await crud.remove_plant_all_timestamps(user_email, plant_id)
+
+    if plant_data is None:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "Plant with given id not found")
+
+    return {'message': 'Successfully deleted'}
+
+
+@router.delete('/{plant_id}/timestamps/{timestamp_id}')
+async def remove_plant_timestamp(plant_id: str, timestamp_id: str, Authorize: AuthJWT = Depends()):
+    Authorize.jwt_required()
+    
+    user_email = Authorize.get_jwt_subject()
+    plant_data = await crud.remove_plant_timestamp(user_email, plant_id, timestamp_id)
+
+    if plant_data is None:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "Plant with given id not found")
+
+    return {'message': 'Successfully deleted'}
+
+
 @router.get('/{plant_id}/periodstamps', response_model=schemas.PlantWithPeriodStampsResponse)
 async def get_plant_periodstamps(plant_id: str, Authorize: AuthJWT = Depends()):
     Authorize.jwt_required()
@@ -146,7 +187,7 @@ async def create_plant(plant: schemas.PlantCreate):
     return created_plant.dict()
 
 
-@router.put("/{plant_id}")
+@router.put("/{plant_id}", response_model=schemas.PlantResponse)
 async def update_plant(plant_id: str, plant: schemas.PlantUpdate, Authorize: AuthJWT = Depends()):
     Authorize.jwt_required()
     

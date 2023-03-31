@@ -1,6 +1,6 @@
 from typing import Any, List
 import datetime
-from prisma.enums import IrrigationType
+from prisma.enums import DayOfWeek, IrrigationType
 from pydantic import BaseModel, EmailStr, validator
 
 
@@ -64,7 +64,6 @@ class PlantUpdate(PlantBase):
 
     @validator('moisture_percentage_treshold')
     def validate_moisture_percentage_range(cls, value):
-        # Accepted range is: 0 -> 10 liters
         if value not in range(0, 101):
             raise ValueError('value must be in range 0 to 100')
         
@@ -74,7 +73,7 @@ class PlantUpdate(PlantBase):
 class PlantIrrigation(PlantBase):
     plant_id: str
     chip_id: ChipID
-    
+
 
 class PlantPackedResponse(PlantBase):
     id: str
@@ -104,9 +103,29 @@ class PlantResponse(PlantBase):
 
 class TimeStamp(BaseModel):
     id: str
-    day_of_week: str
+    day_of_week: DayOfWeek
     hour: int
     minute: int
+
+
+class TimeStampAdd(BaseModel):
+    day_of_week: DayOfWeek
+    hour: int
+    minute: int
+
+    @validator('hour')
+    def validate_hour(cls, value):
+        if value not in range(0, 24):
+            raise ValueError('Hour must be in range(0, 24)')
+
+        return value
+    
+    @validator('hour')
+    def validate_minute(cls, value):
+        if value not in range(0, 60):
+            raise ValueError('Hour must be in range(0, 60)')
+
+        return value
 
 
 class PlantWithTimeStampsResponse(PlantResponse):

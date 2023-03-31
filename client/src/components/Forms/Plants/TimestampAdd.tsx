@@ -17,14 +17,17 @@ export function TimestampAdd({ plant_id, add }: Props) {
     async () => {
       setLoading(true)
 
-      const res = await useApi('/plants_collection/', {
-        method: 'POST',
-        body: {
-          day_of_week: form.values.day_of_week,
-          hour: form.values.hour,
-          minute: form.values.minute,
-        },
-      })
+      const res = await useApi(
+        `/plants_collection/plants/${plant_id}/timestamps`,
+        {
+          method: 'POST',
+          body: {
+            day_of_week: form.values.day_of_week,
+            hour: form.values.hour,
+            minute: form.values.minute,
+          },
+        }
+      )
       const data = await res.json()
       if (!res.ok) {
         setError(data?.detail ?? data?.message ?? 'Error')
@@ -86,6 +89,14 @@ export function TimestampAdd({ plant_id, add }: Props) {
                     min={0}
                     value={form.values?.hour}
                     onChange={form.onChange}
+                    onInput={(e: any) => {
+                      if (e.target.value > 23) {
+                        e.target.value = 23
+                      }
+                      if (e.target.value < 0) {
+                        e.target.value = 0
+                      }
+                    }}
                   />
                   <Form.Control
                     type='number'
@@ -97,6 +108,14 @@ export function TimestampAdd({ plant_id, add }: Props) {
                     min={0}
                     value={form.values?.minute}
                     onChange={form.onChange}
+                    onInput={(e: any) => {
+                      if (e.target.value > 59) {
+                        e.target.value = 59
+                      }
+                      if (e.target.value < 0) {
+                        e.target.value = 0
+                      }
+                    }}
                   />
                 </InputGroup>
               </Form.Group>

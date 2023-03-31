@@ -4,7 +4,7 @@ import { Plant } from '../types'
 
 type Props = {
   id: string
-  to: string
+  to?: string
   name: string
   nameAddition?: string
   isPrimary?: boolean
@@ -23,16 +23,29 @@ export function ListItemRemoveButton({
 }: Props) {
   return (
     <InputGroup className={`${isPrimary ? '' : 'mt-3'} input-group-btn`}>
-      <Link to={to} className='form-control text-underline-hover p-0'>
-        <ListGroup.Item
-          variant={isPrimary ? 'primary' : 'secondary'}
-          style={{
-            fontSize: isPrimary ? 'large' : undefined,
-          }}
-        >
-          {name} {nameAddition != undefined ? <>({nameAddition})</> : null}
-        </ListGroup.Item>
-      </Link>
+      {to != undefined ? (
+        <Link to={to} className='form-control text-underline-hover p-0'>
+          <ListGroup.Item
+            variant={isPrimary ? 'primary' : 'secondary'}
+            style={{
+              fontSize: isPrimary ? 'large' : undefined,
+            }}
+          >
+            {name} {nameAddition != undefined ? <>({nameAddition})</> : null}
+          </ListGroup.Item>
+        </Link>
+      ) : (
+        <span className='form-control p-0'>
+          <ListGroup.Item
+            variant={isPrimary ? 'primary' : 'secondary'}
+            style={{
+              fontSize: isPrimary ? 'large' : undefined,
+            }}
+          >
+            {name} {nameAddition != undefined ? <>({nameAddition})</> : null}
+          </ListGroup.Item>
+        </span>
+      )}
       {!isPrimary ? (
         <Button
           onClick={async () => {
