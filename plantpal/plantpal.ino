@@ -92,6 +92,11 @@ void loop() {
       return;
     }
     if (WiFi.status() != WL_CONNECTED) {
+      // Add functionality to ensure
+      // that if the issue precedes,
+      // the plant still gets irrigated
+
+
       Serial.println("WiFi not connected\nTrying to reconnect");
       WiFi.reconnect();
       int times = 0;
@@ -109,6 +114,12 @@ void loop() {
         }
     }
 
+    // Get plant configuration data
+    // every 5 minutes or custom
+
+    // Get data about irrigation
+    // every 30 seconds
+
     if ((millis() - last_time) > INTERVAL) {
         /*
         * moisture_sensor
@@ -123,7 +134,8 @@ void loop() {
         Serial.print(moisture_percentage);
         Serial.println("%");
 
-
+        // Check if plant should be irrigated
+        // based on the data from irrigation
         if (moisture_percentage < IRRIGATION_THRESHOLD_PERCENTAGE) {
             // start pomp
             Serial.println("Start pomp");
@@ -136,7 +148,7 @@ void loop() {
         */
         if (flow_meter.running) {
             uint8_t pulse_count = flow_meter.pulses_count;
-            float flow_rate = ((1000.0 / (millis() - flow_meter.last_running)) * pulse_count) / CALBRATION_FACTOR;
+            float flow_rate = ((1000.0 / (millis() - flow_meter.last_running)) * pulse_count) / CALIBRATION_FACTOR;
             Serial.print("Flow Rate: ");
             Serial.println(flow_rate);
             flow_meter.last_running = millis();
