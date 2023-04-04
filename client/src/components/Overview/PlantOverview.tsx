@@ -3,6 +3,8 @@ import { Plant } from '../../types'
 import { waterAmountToLiter } from '../../utils/waterAmountToLiter'
 import { useAuthentication } from '../../contexts/AuthenticationContext'
 import { useLocation } from 'react-router-dom'
+import { IrrigationsGraph } from '../Graphs/IrrigationsGraph'
+import { MoisturePercentageGraph } from '../Graphs/MoisturePercentageGraph'
 
 type Props = {
   plant: Plant
@@ -22,7 +24,7 @@ export function PlantOverview({ plant }: Props) {
       )
       if (!res.ok) return
       const data = await res.json()
-      setCurrentMoisturePercentage(data?.current_moisture ?? null)
+      setCurrentMoisturePercentage(data?.current_moisture?.percentage ?? null)
     }
     current_moisture()
     const fetchCurrentMoisture = setInterval(current_moisture, 3000)
@@ -30,34 +32,41 @@ export function PlantOverview({ plant }: Props) {
   }, [])
 
   return (
-    <div style={{ display: 'flex' }}>
-      <div style={{ width: '50%' }}>
-        <h4>Name: {plant.name}</h4>
-        <h4>Water Amount: {waterAmountToLiter(plant.water_amount)}</h4>
-        <h4>ESP Chip ID: {plant.chip_id.toUpperCase()}</h4>
-        <h4>Created At: {new Date(plant.created_at).toLocaleString()}</h4>
-        {plant.created_at != plant.updated_at ? (
-          <h4>Updated At: {new Date(plant.updated_at).toLocaleString()}</h4>
-        ) : null}
-        <h4>
-          Auto-irrigation is turned {plant.auto_irrigation ? 'on' : 'off'}.
-        </h4>
-        <h4>Moisture Threshold: {plant.moisture_percentage_treshold}%</h4>
-        <h4>Irrigation Type: {plant.irrigation_type}</h4>
-        {plant.irrigation_type == 'period' ? (
+    <>
+      <div style={{ display: 'flex' }}>
+        <div style={{ width: '50%' }}>
+          <h4>Name: {plant.name}</h4>
+          <h4>Water Amount: {waterAmountToLiter(plant.water_amount)}</h4>
+          <h4>ESP Chip ID: {plant.chip_id.toUpperCase()}</h4>
+          <h4>Created At: {new Date(plant.created_at).toLocaleString()}</h4>
+          {plant.created_at != plant.updated_at ? (
+            <h4>Updated At: {new Date(plant.updated_at).toLocaleString()}</h4>
+          ) : null}
           <h4>
-            Amount of irrigations per week: {plant.periodstamp_times_a_week}{' '}
-            times
+            Auto-irrigation is turned {plant.auto_irrigation ? 'on' : 'off'}.
           </h4>
-        ) : null}
+          <h4>Moisture Threshold: {plant.moisture_percentage_treshold}%</h4>
+          <h4>Irrigation Type: {plant.irrigation_type}</h4>
+          {plant.irrigation_type == 'period' ? (
+            <h4>
+              Amount of irrigations per week: {plant.periodstamp_times_a_week}{' '}
+              times
+            </h4>
+          ) : null}
+        </div>
+        <div style={{ width: '50%' }}>
+          {currentMoisturePercentage != null ? (
+            <h4>
+              Current Moisture Percentage:{' '}
+              <div>{currentMoisturePercentage.toString()}</div>
+            </h4>
+          ) : null}
+        </div>
       </div>
-      <div style={{ width: '50%' }}>
-        {currentMoisturePercentage != null ? (
-          <h4>
-            Current Moisture Percentage: {currentMoisturePercentage.toString()}
-          </h4>
-        ) : null}
+      <div>
+        <IrrigationsGraph plant_id={plant.id} />
+        <MoisturePercentageGraph plant_id={plant.id} />
       </div>
-    </div>
+    </>
   )
 }

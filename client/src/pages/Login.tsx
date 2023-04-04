@@ -42,7 +42,7 @@ export function Login() {
             setError(data.detail)
           } else {
             login(data?.access_token ?? '')
-            navigate('/', { replace: true })
+            navigate(0)
           }
         } catch (error: any) {
           setError(error?.message ?? error?.detail ?? 'Error')

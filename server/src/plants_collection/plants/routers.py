@@ -2,6 +2,7 @@ from typing import List
 from fastapi import APIRouter, Depends, HTTPException, status, Response
 from fastapi_jwt_auth import AuthJWT
 from . import crud, schemas
+from src.utils.graph_period import GraphPeriod
 
 
 router = APIRouter(prefix="/plants")
@@ -154,6 +155,19 @@ async def get_plant_irrigations_graph(plant_id: str, Authorize: AuthJWT = Depend
     return Response(svg, media_type='image/svg+xml')
 
 
+@router.get('/{plant_id}/moisture_percentage_graph.svg')
+async def get_moisture_percentage_graph(plant_id: str, p: GraphPeriod = GraphPeriod.all_time, Authorize: AuthJWT = Depends()):
+    Authorize.jwt_required()
+
+    user_email = Authorize.get_jwt_subject()
+    svg = await crud.get_moisture_percentage_graph(user_email, plant_id, p)
+
+    if svg is None:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "Plant with given id not found")
+
+    return Response(svg, media_type='image/svg+xml')
+
+
 @router.get('/{plant_id}/current_moisture')
 async def get_current_moisture(plant_id: str, Authorize: AuthJWT = Depends()):
     Authorize.jwt_required()
@@ -166,8 +180,22 @@ async def get_current_moisture(plant_id: str, Authorize: AuthJWT = Depends()):
     return {"current_moisture":current_moisture}
 
 
+@router.get('/{plant_id}/current_moisture_chart.svg')
+async def get_current_moisture_chart(plant_id: str, Authorize: AuthJWT = Depends()):
+    Authorize.jwt_required()
+    
+    user_email = Authorize.get_jwt_subject()
+    current_moisture = await crud.get_current_moisture_chart(user_email, plant_id)
+    if type(current_moisture) == bool and not current_moisture:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "Plant with given id not found")
+
+    return {"current_moisture":current_moisture}
+
+
 @router.post('/current_moisture/{percentage}')
 async def set_current_moisture(percentage: int, plant: schemas.PlantESPGet):
+    if not (0 < percentage < 100):
+        raise HTTPException(status.HTTP_400_BAD_REQUEST, "Percentage should be in range(0, 100)")
     current_moisture = await crud.register_current_moisture(percentage, plant)
     if current_moisture is None:
         raise HTTPException(status.HTTP_404_NOT_FOUND, "Plant with given id not found")

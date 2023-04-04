@@ -2,11 +2,25 @@ import random
 from prisma.errors import UniqueViolationError as PrismaUniqueViolationError
 import pygal
 import datetime
+from src.utils.graph_period import GraphPeriod
 from src.utils.comparedatetime import filter_timestamps, filter_periodstamps
 from src.utils.minutes_to_weektime import minutes_to_weektime
 from src.prisma import prisma
 from src import auth, plants_collection
 from . import schemas
+
+
+charts_style = pygal.style.Style(
+    background='transparent',
+    plot_background='transparent',
+    foreground='#bbb',
+    foreground_strong='#fff',
+    foreground_subtle='#bbb',
+    opacity='.4',
+    opacity_hover='.9',
+    transition='400ms ease-in',
+    colors=('#E853A0', '#E8537A', '#E95355', '#E87653', '#E89B53')
+)
 
 
 async def get_plant_collection(user_email: str, plant_collection_id: str):
@@ -239,7 +253,6 @@ async def get_plant_irrigation_graph(user_email: str, plant_id: str):
         'plant_id': plant.id
     })
 
-    # User pygal for generating charts :-> pygal.org
     records = list(map(
         lambda r: {
             'x': r.at.strftime('%Y-%m-%d %H:%M:%S'),
@@ -249,27 +262,56 @@ async def get_plant_irrigation_graph(user_email: str, plant_id: str):
     ))
 
     graph = pygal.Line(
-        width = 1200,
+        title="Irrigations",
+        width = 1000,
         height = 600,
+        show_legend=False,
         explicit_size = True,
-        style = pygal.style.Style(
-            background='transparent',
-            plot_background='transparent',
-            foreground='#555',
-            foreground_strong='#000',
-            foreground_subtle='#555',
-            opacity='.6',
-            opacity_hover='.9',
-            transition='400ms ease-in',
-            colors=('#E853A0', '#E8537A', '#E95355', '#E87653', '#E89B53')
-        )
+        style = charts_style,
     )
     graph.x_labels = list(map(lambda r: r['x'], records))
-    graph.add(f'Water Amount of {plant.name}', list(map(lambda r: r['y'], records)))
+    graph.add(f'Irrigations', list(map(lambda r: r['y'], records)))
     graph.x_labels_major_count = 10
     graph.show_minor_x_labels = False
 
-    return graph.render_data_uri()
+    return graph.render()
+
+
+async def get_moisture_percentage_graph(user_email: str, plant_id: str, graph_period: GraphPeriod):
+    plant = await get_plant_by_id(user_email, plant_id)
+    if plant is None:
+        return None
+    
+    moisture_record = await prisma.moisturepercentagerecord.find_many(where={
+        'plant_id': plant.id
+    })
+
+    time_format = '%Y-%m-%d %H:%M:%S'
+    if graph_period in (GraphPeriod.past_hour, GraphPeriod.past_12_hours, GraphPeriod.past_day):
+        time_format = '%H:%M:%S'
+
+    records = list(map(
+        lambda r: {
+            'x': r.at.strftime(time_format),
+            'y': r.percentage
+        },
+        moisture_record
+    ))
+
+    graph = pygal.Line(
+        title="Moisture Percentage",
+        width = 1000,
+        height = 600,
+        show_legend=False,
+        explicit_size = True,
+        style = charts_style,
+    )
+    graph.x_labels = list(map(lambda r: r['x'], records))
+    graph.add(f'Moisture Percentage', list(map(lambda r: r['y'], records)))
+    graph.x_labels_major_count = 10
+    graph.show_minor_x_labels = False
+
+    return graph.render()
 
 
 async def get_current_moisture(user_email: str, plant_id: str):
@@ -285,12 +327,32 @@ async def get_current_moisture(user_email: str, plant_id: str):
     })
 
 
+async def get_current_moisture_chart(user_email: str, plant_id: str):
+    plant = await get_plant_by_id(user_email, plant_id)
+    if plant is None:
+        return False
+
+    moisture_record = await prisma.moisturepercentagerecord.find_first(where={
+        'plant_id': plant.id
+    },
+    order={
+        'at': 'desc'
+    })
+
+    if moisture_record is None:
+        return None
+    
+    donut = pygal.Pie(inner_radius=0.4)
+
+
+
 async def register_current_moisture(percentage: int, plant: schemas.PlantESPGet):
     _plant = await get_plant_by_chip_id(plant.plant_id, plant.chip_id)
-    if _plant is None and 0 < percentage > 100:
+    if _plant is None:
         return None
 
     return await prisma.moisturepercentagerecord.create(data={
+        'plant_id': _plant.id,
         'percentage': percentage
     })
 

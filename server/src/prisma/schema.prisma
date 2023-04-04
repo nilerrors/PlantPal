@@ -71,7 +71,7 @@ model MoisturePercentageRecord {
   percentage Int
   at         DateTime @default(now())
 
-  plant_id String @unique
+  plant_id String
   plant    Plant  @relation(fields: [plant_id], references: [id], onDelete: Cascade)
 }
 
@@ -80,7 +80,7 @@ model IrrigationRecord {
   water_amount Int      @default(1000)
   at           DateTime @default(now())
 
-  plant_id String @unique
+  plant_id String
   plant    Plant  @relation(fields: [plant_id], references: [id], onDelete: Cascade)
 }
 

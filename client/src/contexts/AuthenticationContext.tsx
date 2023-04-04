@@ -2,6 +2,7 @@ import { createContext, useState, useContext, useEffect } from 'react'
 import { useLocalStorage } from '../hooks/useStorage'
 import jwtDecode from 'jwt-decode'
 import { User } from '../types'
+import { useNavigate } from 'react-router-dom'
 
 const baseURL = import.meta.env.VITE_API_BASE_URL
 
@@ -121,15 +122,17 @@ export function AuthenticationContextProvider(props: {
   }
 
   async function getCurrentUser() {
-    useApi('/auth/user')
-      .then((res) => {
-        if (res.ok) return res.json()
-        else logout()
-      })
-      .then((data) => {
-        setUser(data)
-      })
-    setLastCheck(new Date())
+    if (loggedIn()) {
+      useApi('/auth/user')
+        .then((res) => {
+          if (res.ok) return res.json()
+          else logout()
+        })
+        .then((data) => {
+          setUser(data)
+        })
+      setLastCheck(new Date())
+    }
   }
 
   useEffect(() => {
