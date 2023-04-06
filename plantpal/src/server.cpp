@@ -21,13 +21,6 @@ ConfigServer::ConfigServer() {
         Serial.println("Root");
     });
 
-    server->on("/generate_204", HTTP_GET, [&]() {
-        String res = "<a href='/'>Setup</a>";
-
-        response_base(200, res, "Change Wifi Configuration");
-        Serial.println("DNS Path");
-    });
-
     server->on("/create_plant", HTTP_POST, [&]() {
         if (!server->hasArg("email") || !server->hasArg("pass")) {
             String res = "<h1>Bad serveruest</h1><hr><p>Data could not be validated</p>";
