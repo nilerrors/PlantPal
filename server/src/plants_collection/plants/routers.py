@@ -32,7 +32,17 @@ async def get_plant(plant_id: str, Authorize: AuthJWT = Depends()):
     return plant_data
 
 
-@router.get('/should_irrigate_now')
+@router.post('/espget', response_model=schemas.PlantResponse)
+async def get_plant_esp(plant: schemas.PlantESPGet):
+    plant_data = await crud.get_plant_by_chip_id(plant.plant_id, plant.chip_id)
+
+    if plant_data is None:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "Plant with given id not found")
+
+    return plant_data
+
+
+@router.post('/should_irrigate_now')
 async def get_should_irrigate_now(plant: schemas.PlantESPGet):
     should_irrigate = await crud.get_should_irrigate_now(plant.plant_id, plant.chip_id)
 
@@ -42,7 +52,7 @@ async def get_should_irrigate_now(plant: schemas.PlantESPGet):
     return {"irrigate":should_irrigate}
 
 
-@router.get('/today_next_irrigation_time', response_model=List[schemas.TimeStamp])
+@router.post('/today_next_irrigation_time', response_model=List[schemas.TimeStamp])
 async def get_plant_today_next_time(plant: schemas.PlantESPGet):
     plant_data = await crud.get_plant_today_next_time(plant.plant_id, plant.chip_id)
 
@@ -52,7 +62,7 @@ async def get_plant_today_next_time(plant: schemas.PlantESPGet):
     return plant_data
 
 
-@router.get('/today_irrigation_times', response_model=List[schemas.TimeStamp])
+@router.post('/today_irrigation_times', response_model=List[schemas.TimeStamp])
 async def get_plant_today_times(plant: schemas.PlantESPGet):
     plant_data = await crud.get_plant_today_times(plant.plant_id, plant.chip_id)
 

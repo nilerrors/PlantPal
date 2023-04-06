@@ -1,6 +1,13 @@
 #include <Arduino.h>
 #include <Preferences.h>
 
+char* chip_id() {
+  uint64_t chipid = ESP.getEfuseMac();
+  char chipid_str[17];
+  sprintf(chipid_str, "%016llX", chipid);
+  return chipid_str;
+}
+
 
 class Credentials {
 private:
@@ -10,10 +17,8 @@ public:
   void begin();
   void end();
 
+  bool setupDone();
+  bool wifiNotWritten();
   void readWiFi(String *ssid, String *pass);
   void writeWiFi(String ssid, String pass);
-  bool wifiNotWritten();
-
-  void readPlant(String *id, int32_t *water_amount);
-  void writePlant(String id, int32_t water_amount);
 };
