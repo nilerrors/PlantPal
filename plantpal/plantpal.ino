@@ -1,5 +1,4 @@
 #include <WiFi.h>
-#include <DNSServer.h>
 #include <ArduinoJson.h>
 #include "src/server.h"
 #include "src/credentials.h"
@@ -20,10 +19,8 @@ unsigned long last_time = 0;
 IPAddress local_IP(8, 8, 8, 8);
 IPAddress gateway = local_IP;
 IPAddress subnet(255, 255, 255, 0);
-const byte DNS_PORT = 53;
 
 
-DNSServer dns;
 ConfigServer server;
 Credentials credentials;
 
@@ -39,8 +36,6 @@ void setup() {
 
     Serial.print("IP Address = ");
     Serial.println(WiFi.softAPIP());
-
-    dns.start(DNS_PORT, "*", WiFi.softAPIP());
 
     Serial.print("Setting up Web Server ... ");
     server.onChangeWifi([&](String ssid, String pass) {
@@ -85,7 +80,6 @@ void setup() {
 }
 
 void loop() {
-    dns.processNextRequest();
     server.handleClient();
 
     if (credentials.wifiNotWritten()) {
