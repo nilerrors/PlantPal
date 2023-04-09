@@ -1,3 +1,4 @@
+#include <ArduinoJson.h>
 #include "consts.h"
 #include "plant.h"
 
@@ -14,10 +15,19 @@ bool Plant::fetch() {
     Serial.println('Plant not created');
     return false;
   }
-  String url = String(SERVER_URL) + '/plants_collection/plants/';
+  String url = String(SERVER_URL) + '/plants_collection/plants/espget';
+  String data = String("{\"plant_id\":\"") + this->ID() + "\",\"chip_id\":\"" + chip_id() + "\"";
   _http.begin(url.c_str());
 
-  int status_code = 200;
+  int status_code = _http.GET();
+  if (status_code != 200) {
+    return false;
+  }
+
+  // parse json
+  String payload = _http.getString();
+
+  return true;
 };
 
 bool Plant::shouldIrrigate() {
