@@ -13,6 +13,7 @@ import { Signout } from './pages/Signout'
 import { Signup } from './pages/Signup'
 import { Timestamps } from './pages/Timestamps'
 import { VerifyEmail } from './pages/VerifyEmail'
+import { Periodstamps } from './pages/Periodstamps'
 
 function App() {
   document.title = 'PlantPal'
@@ -40,6 +41,10 @@ function App() {
               <Route path='/plants/:id' element={<PlantsCollection />} />
               <Route path='/plant/:id' element={<Plant />} />
               <Route path='/plant/:id/timestamps' element={<Timestamps />} />
+              <Route
+                path='/plant/:id/periodstamps'
+                element={<Periodstamps />}
+              />
               <Route path='/settings' element={<Settings />} />
               <Route path='/signout' element={<Signout />} />
               <Route path='*' element={<Navigate to='/' />} />

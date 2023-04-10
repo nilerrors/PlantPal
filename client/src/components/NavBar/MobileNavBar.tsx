@@ -5,6 +5,7 @@ import { Link } from 'react-router-dom'
 type URL = {
   path: string
   title: string
+  danger?: boolean
 }
 
 type MobileNavBarProps = {
@@ -28,7 +29,9 @@ export function MobileNavBar({ urls }: MobileNavBarProps) {
               <Nav.Item key={url.title}>
                 <Link
                   to={url.path}
-                  className='text-white mx-2 text-underline-hover'
+                  className={`${
+                    url.danger ? 'text-warning' : 'text-white'
+                  } mx-2 text-underline-hover`}
                   onClick={() => setShow(false)}
                 >
                   {url.title}

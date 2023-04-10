@@ -36,6 +36,8 @@ export function PlantsCollection() {
     useState<PlantsCollection | null>(null)
   const [plants, setPlants] = useState<Plant[]>([])
 
+  document.title = `${plantsCollection?.name}`
+
   if (id === undefined) {
     return <Navigate to='/' />
   }
@@ -47,7 +49,6 @@ export function PlantsCollection() {
         setPlantsCollection(data)
         setPlants(data?.plants ?? [])
       })
-    document.title = `${plantsCollection?.name}`
   }, [])
 
   return (

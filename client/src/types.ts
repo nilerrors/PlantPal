@@ -30,6 +30,8 @@ export type TimeStamp = {
   minute: number
 }
 
+export type PeriodStamp = TimeStamp
+
 export type Plant = {
   id: string
   chip_id: string

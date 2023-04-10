@@ -12,7 +12,6 @@ router = APIRouter(prefix="/plants")
 async def get_plants(collection_id: str, Authorize: AuthJWT = Depends()):
     Authorize.jwt_required()
 
-    print(Authorize.get_jwt_subject())
     user_email = Authorize.get_jwt_subject()
     user_plants = await crud.get_plants(user_email, collection_id)
 

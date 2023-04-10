@@ -13,41 +13,28 @@ uvicorn api:app --reload --host 0.0.0.0 --ssl-keyfile .\key.pem --ssl-certfile .
 ```Powershell
 py -m venv venv
 .\venv\Scripts\Activate.ps1
-pip install -r deps.txt
+pip install -r requirements.txt
 ```
 
 ### .env
 
-```
-#
-# api
-#
-
-HOST='localhost'
-PORT=8000
-SSL_CERTFILE='./cert.pem'
-SSL_KEYFILE='./key.pem'
-
-```
-
-```
-#
-# api_v1
-#
+```sh
+AUTHJWT_SECRET_KEY=""
 
 MAIL_USERNAME=""
 MAIL_PASSWORD=""
 MAIL_FROM=""
 MAIL_PORT=587
 MAIL_SERVER=smtp.office365.com
-MAIL_FROM_NAME=""
+MAIL_FROM_NAME="PlantPal"
 
-# Database
-DB_USER='postgres'
-DB_PASS='postgres'
-DB_SERVER='localhost:5432'
-DB_NAME='management'
+DATABASE_URL="postgresql://postgres:postgres@localhost:5432/plantpal"
+```
 
+in `./src/prisma/.env`
+
+```sh
+DATABASE_URL="postgresql://postgres:postgres@localhost:5432/plantpal"
 ```
 
 ### Database

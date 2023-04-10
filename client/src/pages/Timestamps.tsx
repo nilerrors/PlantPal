@@ -6,9 +6,7 @@ import { TimestampsOverview } from '../components/Overview/TimestampsOverview'
 import { useAuthentication } from '../contexts/AuthenticationContext'
 import { TimeStamp } from '../types'
 
-type Props = {}
-
-export function Timestamps({}: Props) {
+export function Timestamps() {
   document.title = 'Timestamps'
   const { id } = useParams()
   const { useApi } = useAuthentication()
@@ -17,7 +15,7 @@ export function Timestamps({}: Props) {
 
   if (id == undefined) {
     navigate('/plants')
-    return
+    return null
   }
 
   useEffect(() => {

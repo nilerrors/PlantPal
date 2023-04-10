@@ -13,7 +13,6 @@ router.include_router(plants.router)
 async def get_plants_collections(Authorize: AuthJWT = Depends()):
     Authorize.jwt_required()
 
-    print(Authorize.get_jwt_subject())
     user_email = Authorize.get_jwt_subject()
     user_plants = await crud.get_plants_collections(user_email)
 

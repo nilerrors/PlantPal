@@ -85,40 +85,49 @@ export function AuthenticationContextProvider(props: {
       body: undefined,
       method: 'GET',
     }
-  ) {
+  ): Promise<Response> {
     const headers: any = {
       'Content-Type': 'application/json',
       ...options.initHeaders,
     }
-    if (token != '') {
+    if (token) {
       headers.Authorization = `Bearer ${token}`
     }
-
-    const res = await fetch(baseURL + url, {
-      method: options?.method,
-      headers,
-      body: JSON.stringify(options?.body),
-    })
-    if (
-      res.status === 422 &&
-      (await res.json())?.detail == 'Signature has expired'
-    ) {
-      logout()
+    try {
+      const res = await fetch(baseURL + url, {
+        method: options?.method,
+        headers,
+        body: JSON.stringify(options?.body),
+      })
+      if (
+        res.status === 422 &&
+        (await res.json())?.detail == 'Signature has expired'
+      ) {
+        logout()
+      }
+      return res
+    } catch (err: any) {
+      if (err.toString() == 'TypeError: Failed to fetch') {
+        logout()
+        return Promise.reject(err)
+      }
     }
-    return res
+    return new Response()
   }
 
   async function checkCurrentUser() {
-    useApi('/auth/user/current')
-      .then((res) => {
-        if (res.ok) return res.json()
-        else logout()
-      })
-      .then((data) => {
-        const email = jwtDecode<TokenType>(token).sub
-        if (email == undefined || data?.current_user !== email) logout()
-      })
-    setLastCheck(new Date())
+    if (loggedIn()) {
+      useApi('/auth/user/current')
+        .then((res) => {
+          if (res.ok) return res.json()
+          else logout()
+        })
+        .then((data) => {
+          const email = jwtDecode<TokenType>(token).sub
+          if (email == undefined || data?.current_user !== email) logout()
+        })
+      setLastCheck(new Date())
+    }
   }
 
   async function getCurrentUser() {
@@ -141,10 +150,11 @@ export function AuthenticationContextProvider(props: {
   }, [])
 
   useEffect(() => {
-    setInterval(() => {
+    const checkUser = setInterval(() => {
       if (!loggedin) return
       checkCurrentUser()
     }, 60_000)
+    return () => clearInterval(checkUser)
   }, [])
 
   useEffect(() => {

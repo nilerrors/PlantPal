@@ -107,7 +107,7 @@ async def add_plant_timestamp(user_email: str, plant_id: str, timestamp: schemas
     }) is not None:
         return "already exists"
 
-    return await prisma.timestamp.create(data={
+    return await prisma.timestamp.create({
         'day_of_week': timestamp.day_of_week,
         'hour': timestamp.hour,
         'minute': timestamp.minute,
@@ -373,7 +373,6 @@ async def get_plants(user_email: str, collection_id: str):
 
 
 async def create_plant(plant: schemas.PlantCreate):
-    print(plant.dict())
     user = await auth.crud.get_user_by_email_password(plant.email, plant.password)
     if user is None:
         return None
@@ -422,6 +421,7 @@ async def update_plant(user_email: str, plant_id: str, plant: schemas.PlantUpdat
             ]
             await prisma.periodstamp.create_many(data=[
                 {
+                    'plant_id': _plant.id,
                     'day_of_week': p.weekday,
                     'hour': p.hour,
                     'minute': p.minute

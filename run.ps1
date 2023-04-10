@@ -11,7 +11,7 @@ Set-Location $Args[0]
 
 if ($Args[0] -eq "client") {
     yarn start
-} else {
+} elseif ($Args[0] -eq "server") {
     .\venv\Scripts\Activate.ps1
     uvicorn src:app --reload --host 0.0.0.0 --ssl-keyfile .\key.pem --ssl-certfile .\cert.pem
 }

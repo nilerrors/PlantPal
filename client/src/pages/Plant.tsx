@@ -93,6 +93,14 @@ export function Plant() {
                 Timestamps
               </Link>
             </Button>
+            <Button style={{ float: 'right' }}>
+              <Link
+                to={`/plant/${plant.id}/periodstamps`}
+                className='text-white text-underline-hover'
+              >
+                Periodstamps
+              </Link>
+            </Button>
           </h3>
           <hr />
           {error != null ? (

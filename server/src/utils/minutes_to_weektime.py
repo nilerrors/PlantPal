@@ -22,7 +22,6 @@ def minutes_to_weektime(minutes: int):
     '''
     day = math.floor(minutes / 1440)
     if day > 6:
-        print(minutes)
         return None
     hour = (minutes - (DAY_IN_MINUTES * day)) // HOUR_IN_MINUTES
     minute = (minutes - (DAY_IN_MINUTES * day) - (HOUR_IN_MINUTES * hour))

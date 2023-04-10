@@ -6,6 +6,7 @@ import { useAuthentication } from '../../contexts/AuthenticationContext'
 type URL = {
   path: string
   title: string
+  danger?: boolean
 }
 
 type DesktopNavBarProps = {
@@ -13,10 +14,7 @@ type DesktopNavBarProps = {
 }
 
 export function DesktopNavBar({ urls }: DesktopNavBarProps) {
-  const location = useLocation()
   const [show, setShow] = useState<boolean>()
-  const { logout } = useAuthentication()
-  const navigate = useNavigate()
 
   return (
     <>
@@ -30,7 +28,9 @@ export function DesktopNavBar({ urls }: DesktopNavBarProps) {
             <Nav.Item key={url.title} className='my-lg-0'>
               <Link
                 to={url.path}
-                className='text-white mx-2 text-underline-hover px-2'
+                className={`${
+                  url.danger ? 'text-warning' : 'text-white'
+                } mx-2 text-underline-hover px-2`}
                 onClick={() => setShow(false)}
               >
                 {url.title}
@@ -38,17 +38,6 @@ export function DesktopNavBar({ urls }: DesktopNavBarProps) {
             </Nav.Item>
           ))}
         </Nav>
-        {/* <Nav>
-        <Nav.Item key={url.title}>
-            <Link
-              to={url.path}
-              className='text-white mx-2 text-underline-hover'
-              onClick={() => setShow(false)}
-            >
-              {url.title}
-            </Link>
-          </Nav.Item>
-        </Nav> */}
       </Navbar.Collapse>
     </>
   )
