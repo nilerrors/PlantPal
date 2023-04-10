@@ -3,5 +3,6 @@
   "editor.useTabStops": false,
   "files.associations": {
     "functional": "cpp"
-  }
+  },
+  "editor.formatOnSave": true
 }
