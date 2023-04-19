@@ -1,8 +1,5 @@
-import { useEffect, useState } from 'react'
-import { Card, Collapse, Container, ListGroup } from 'react-bootstrap'
+import { Container } from 'react-bootstrap'
 import { Link } from 'react-router-dom'
-import { useAuthentication } from '../contexts/AuthenticationContext'
-import type { PlantsCollection } from '../types'
 
 export function Home() {
   document.title = 'PlantPal'

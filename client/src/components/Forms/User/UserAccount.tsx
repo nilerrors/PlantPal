@@ -1,5 +1,6 @@
 import { useState } from 'react'
-import { Button, Card, Col, Collapse, Row } from 'react-bootstrap'
+import { Card, Col, Collapse, Row } from 'react-bootstrap'
+import { Button } from '../../Button'
 import { User } from '../../../types'
 import { ChangeUser } from './ChangeUser'
 import { ChangeUserPassword } from './ChangeUserPassword'

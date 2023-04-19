@@ -2,7 +2,6 @@ import { createContext, useState, useContext, useEffect } from 'react'
 import { useLocalStorage } from '../hooks/useStorage'
 import jwtDecode from 'jwt-decode'
 import { User } from '../types'
-import { useNavigate } from 'react-router-dom'
 
 const baseURL = import.meta.env.VITE_API_BASE_URL
 
@@ -99,17 +98,21 @@ export function AuthenticationContextProvider(props: {
         headers,
         body: JSON.stringify(options?.body),
       })
-      const data = await res.json()
-      if (res.status === 422 && data?.detail == 'Signature has expired') {
-        logout()
+      if (res.headers.get('Content-Type') == 'application/json') {
+        const data = await res.json()
+        if (res.status === 422 && data?.detail == 'Signature has expired') {
+          logout()
+        }
+        return { res, data }
       }
-      return { res, data }
+      return { res, data: undefined }
     } catch (err: any) {
       if (err.toString() == 'TypeError: Failed to fetch') {
         return Promise.reject(err)
+      } else {
+        return Promise.reject(err)
       }
     }
-    return { res: new Response(), data: undefined }
   }
 
   async function checkCurrentUser() {

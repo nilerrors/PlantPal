@@ -1,8 +1,7 @@
 import { useEffect, useState } from 'react'
-import { Button, Container, ListGroup } from 'react-bootstrap'
+import { Container, ListGroup } from 'react-bootstrap'
+import { Button } from '../components/Button'
 import { useNavigate, useParams } from 'react-router-dom'
-import { TimestampAdd } from '../components/Forms/Plants/TimestampAdd'
-import { TimestampsOverview } from '../components/Overview/TimestampsOverview'
 import { useAuthentication } from '../contexts/AuthenticationContext'
 import { PeriodStamp } from '../types'
 
@@ -28,9 +27,9 @@ export function Periodstamps() {
 
   useEffect(() => {
     useApi(`/plants_collection/plants/${id}/periodstamps`)
-      .then((res) => {
+      .then(({ res, data }) => {
         if (!res.ok) return
-        return res.json()
+        return data
       })
       .then((data) => {
         if (data?.periodstamps != undefined) {

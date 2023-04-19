@@ -1,11 +1,13 @@
 import { useEffect, useState } from 'react'
-import { Button, Container, Collapse } from 'react-bootstrap'
+import { Container, Collapse } from 'react-bootstrap'
+import { Button } from '../components/Button'
 import { Link, Navigate, useParams } from 'react-router-dom'
 import { ChangePlant } from '../components/Forms/Plants/ChangePlant'
 import { PlantOverview } from '../components/Overview/PlantOverview'
 import { useAuthentication } from '../contexts/AuthenticationContext'
 import { useForm } from '../hooks/useForm'
 import { Plant } from '../types'
+import { PlantGraphs } from '../components/Graphs/PlantGraphs'
 
 export function Plant() {
   const [plant, setPlant] = useState<Plant>({} as Plant)
@@ -57,7 +59,7 @@ export function Plant() {
       })
       .then((data) => {
         setPlant(data ?? plant)
-        form.set(plant)
+        form.set(data ?? plant)
       })
   }, [])
 
@@ -65,30 +67,53 @@ export function Plant() {
     <Container className='bg-dark text-align-center'>
       {JSON.stringify(plant) != JSON.stringify({}) && (
         <>
-          <h3>
-            {plant?.name}
-            <Button
-              onClick={() => setOpenForm(!openForm)}
-              style={{ float: 'right' }}
+          <h3 style={{ display: window.innerWidth < 600 ? 'flex' : undefined }}>
+            <span
+              style={{
+                width:
+                  window.innerWidth < 600
+                    ? `${(window.innerWidth / 600) * 100}%`
+                    : undefined,
+              }}
             >
-              {openForm ? 'Close Form' : 'Change'}
-            </Button>
-            <Button style={{ float: 'right' }} className='mx-2'>
-              <Link
-                to={`/plant/${plant.id}/timestamps`}
-                className='text-white text-underline-hover'
+              {plant?.name}
+            </span>
+            <span style={{ float: 'right' }}>
+              <span
+                style={{
+                  display: window.innerWidth > 770 ? 'none' : undefined,
+                }}
               >
-                Timestamps
-              </Link>
-            </Button>
-            <Button style={{ float: 'right' }}>
-              <Link
-                to={`/plant/${plant.id}/periodstamps`}
-                className='text-white text-underline-hover'
+                <Button
+                  onClick={() => setOpenForm(!openForm)}
+                  style={{ float: 'right' }}
+                >
+                  {openForm ? 'Close Form' : 'Change'}
+                </Button>
+              </span>
+              <Button
+                style={{ float: 'right' }}
+                className={`mx-${window.innerWidth < 600 ? 1 : 2}`}
               >
-                Periodstamps
-              </Link>
-            </Button>
+                <Link
+                  to={`/plants/${plant.id}/timestamps`}
+                  className='text-white text-underline-hover'
+                >
+                  Timestamps
+                </Link>
+              </Button>
+              <Button
+                style={{ float: 'right' }}
+                className={`mt-${window.innerWidth < 600 ? '1' : undefined}`}
+              >
+                <Link
+                  to={`/plants/${plant.id}/periodstamps`}
+                  className='text-white text-underline-hover'
+                >
+                  Periodstamps
+                </Link>
+              </Button>
+            </span>
           </h3>
           <hr />
           {error != null ? (
@@ -97,7 +122,29 @@ export function Plant() {
             <>
               <Collapse in={!openForm}>
                 <div>
-                  <PlantOverview plant={plant} />
+                  <div
+                    style={{
+                      display: window.innerWidth > 770 ? 'flex' : undefined,
+                    }}
+                  >
+                    <div
+                      style={{
+                        width: window.innerWidth > 770 ? '40%' : undefined,
+                      }}
+                    >
+                      <PlantOverview plant={plant} />
+                    </div>
+                    {window.innerWidth > 770 ? (
+                      <div
+                        style={{
+                          width: '50%',
+                        }}
+                      >
+                        <ChangePlant plant={plant} form={form} />
+                      </div>
+                    ) : null}
+                  </div>
+                  <PlantGraphs id={plant.id} />
                 </div>
               </Collapse>
               <Collapse in={openForm}>

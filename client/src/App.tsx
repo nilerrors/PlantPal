@@ -17,7 +17,7 @@ import { Periodstamps } from './pages/Periodstamps'
 function App() {
   document.title = 'PlantPal'
 
-  const { loggedin, logout } = useAuthentication()
+  const { loggedin } = useAuthentication()
 
   return (
     <>

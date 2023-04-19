@@ -2,7 +2,7 @@ import { Navbar, Container } from 'react-bootstrap'
 
 import { MobileNavBar } from './MobileNavBar'
 import { DesktopNavBar } from './DesktopNavBar'
-import { Link, useLocation, useNavigate } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 
 export function NavBar() {
   const navigate = useNavigate()
@@ -19,13 +19,12 @@ export function NavBar() {
     {
       path: '/signout',
       title: 'Sign out',
-      danger: true,
     },
   ]
 
   return (
     <Navbar
-      bg='primary'
+      bg='success'
       variant='dark'
       className='user-select-none fixed-top'
       expand='lg'
@@ -38,7 +37,9 @@ export function NavBar() {
             navigate(0)
           }}
         >
-          <Navbar.Brand className='text-warning'>PlantPal</Navbar.Brand>
+          <Navbar.Brand className='text-dark text-underline-hover'>
+            PlantPal
+          </Navbar.Brand>
         </Link>
         {window.innerWidth < 600 ? (
           <MobileNavBar urls={urls} />

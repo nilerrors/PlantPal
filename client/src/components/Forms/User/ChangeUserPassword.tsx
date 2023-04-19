@@ -2,7 +2,8 @@ import { useState } from 'react'
 import { useAuthentication } from '../../../contexts/AuthenticationContext'
 import { useForm } from '../../../hooks/useForm'
 import { User } from '../../../types'
-import { Form, Button, Row, Card, Col } from 'react-bootstrap'
+import { Form, Row, Card, Col } from 'react-bootstrap'
+import { Button } from '../../Button'
 
 type Props = {
   user: User
@@ -15,7 +16,7 @@ export function ChangeUserPassword({ user, closeForm }: Props) {
 
   const form = useForm(
     async () => {
-      const res = await useApi('/auth/user/password', {
+      const { res, data } = await useApi('/auth/user/password', {
         method: 'PUT',
         body: {
           email: form.values.email,
@@ -23,7 +24,6 @@ export function ChangeUserPassword({ user, closeForm }: Props) {
           new_password: form.values.new_password,
         },
       })
-      const data = await res.json()
       if (!res.ok) {
         setError(data?.detail ?? data?.message ?? 'Error')
         return

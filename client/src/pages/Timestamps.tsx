@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
-import { Button, Container } from 'react-bootstrap'
+import { Container } from 'react-bootstrap'
+import { Button } from '../components/Button'
 import { useNavigate, useParams } from 'react-router-dom'
 import { TimestampAdd } from '../components/Forms/Plants/TimestampAdd'
 import { TimestampsOverview } from '../components/Overview/TimestampsOverview'
@@ -19,10 +20,10 @@ export function Timestamps() {
   }
 
   useEffect(() => {
-    useApi(`/plants_collection/plants/${id}/timestamps`)
-      .then((res) => {
+    useApi(`/plants/${id}/timestamps`)
+      .then(({ res, data }) => {
         if (!res.ok) return
-        return res.json()
+        return data
       })
       .then((data) => {
         if (data?.timestamps != undefined) {

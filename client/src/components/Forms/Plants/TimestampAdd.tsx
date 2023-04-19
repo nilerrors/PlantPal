@@ -1,5 +1,6 @@
 import { useState } from 'react'
-import { Form, Card, Col, Row, Button, InputGroup } from 'react-bootstrap'
+import { Form, Card, Col, Row, InputGroup } from 'react-bootstrap'
+import { Button } from '../../Button'
 import { useAuthentication } from '../../../contexts/AuthenticationContext'
 import { useForm } from '../../../hooks/useForm'
 import { DayOfWeek, TimeStamp } from '../../../types'
@@ -13,29 +14,27 @@ export function TimestampAdd({ plant_id, add }: Props) {
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
   const { useApi } = useAuthentication()
+
   const form = useForm(
     async () => {
       setLoading(true)
 
-      const res = await useApi(
-        `/plants_collection/plants/${plant_id}/timestamps`,
-        {
-          method: 'POST',
-          body: {
-            day_of_week: form.values.day_of_week,
-            hour: form.values.hour,
-            minute: form.values.minute,
-          },
-        }
-      )
-      const data = await res.json()
+      const { res, data } = await useApi(`plants/${plant_id}/timestamps`, {
+        method: 'POST',
+        body: {
+          day_of_week: form.values.day_of_week,
+          hour: form.values.hour,
+          minute: form.values.minute,
+        },
+      })
       if (!res.ok) {
         setError(data?.detail ?? data?.message ?? 'Error')
+        setLoading(false)
         return
       }
       form.set({ day_of_week: DayOfWeek.everyday, hour: 0, minute: 0 })
       setLoading(false)
-      add(data)
+      if (data) add(data)
     },
     {
       day_of_week: DayOfWeek.everyday,
@@ -58,8 +57,8 @@ export function TimestampAdd({ plant_id, add }: Props) {
                   {error}
                 </Form.Text>
               )}
-              <Form.Group className='mb-4 mx-5'>
-                <InputGroup>
+              <Form.Group className='mb-4 mx-1'>
+                <InputGroup size={window.innerWidth < 600 ? 'sm' : undefined}>
                   <Form.Select
                     name='day_of_week'
                     placeholder='Day Of Week'

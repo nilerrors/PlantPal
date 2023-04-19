@@ -1,12 +1,10 @@
 import { useState } from 'react'
-import { Navbar, Nav, Container } from 'react-bootstrap'
-import { Link, useLocation, useNavigate } from 'react-router-dom'
-import { useAuthentication } from '../../contexts/AuthenticationContext'
+import { Navbar, Nav } from 'react-bootstrap'
+import { Link } from 'react-router-dom'
 
 type URL = {
   path: string
   title: string
-  danger?: boolean
 }
 
 type DesktopNavBarProps = {
@@ -21,6 +19,7 @@ export function DesktopNavBar({ urls }: DesktopNavBarProps) {
       <Navbar.Toggle
         aria-controls='desktopNavbar'
         onClick={() => setShow(true)}
+        style={{ borderColor: 'black' }}
       />
       <Navbar.Collapse id='desktopNavbar' appear={show}>
         <Nav className='overflow-hidden ms-auto'>
@@ -28,9 +27,7 @@ export function DesktopNavBar({ urls }: DesktopNavBarProps) {
             <Nav.Item key={url.title} className='my-lg-0'>
               <Link
                 to={url.path}
-                className={`${
-                  url.danger ? 'text-warning' : 'text-white'
-                } mx-2 text-underline-hover px-2`}
+                className={`text-white mx-2 text-underline-hover px-2`}
                 onClick={() => setShow(false)}
               >
                 {url.title}

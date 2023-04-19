@@ -1,7 +1,7 @@
 import { useNavigate } from 'react-router-dom'
 import { FormT, Plant } from '../../../types'
-import { Form, Button, Row, Card, Col } from 'react-bootstrap'
-import { usePlantsCollections } from '../../../contexts/PlantsCollectionsContext'
+import { Form, Row, Card, Col } from 'react-bootstrap'
+import { Button } from '../../Button'
 
 type Props = {
   plant: Plant
@@ -105,49 +105,6 @@ export function ChangePlant({ plant, form }: Props) {
                   value={form.values?.periodstamp_times_a_week}
                 />
               </Form.Group>
-              {/* <Form.Group className='mb-4 mx-5 w-100'>
-                <Form.Select
-                  name='collection_id'
-                  placeholder='Collection'
-                  className='bg-dark text-white'
-                  size='lg'
-                  onChange={form.onChange}
-                  onClick={() => refetch()}
-                  value={form.values?.collection_id}
-                  required={true}
-                >
-                  <option disabled={true}>Plants Collection</option>
-                  {collections.map((c) => (
-                    <option key={c.id} value={c.id}>
-                      {c.name}
-                    </option>
-                  ))}
-                </Form.Select>
-              </Form.Group> */}
-              <Form.Text className='mb-4 mx-5'>
-                <Button
-                  className='mx-1'
-                  variant='link'
-                  onClick={(e) => {
-                    e.preventDefault()
-                    console.log(form.values)
-                    console.log(plant)
-                    if (JSON.stringify(form.values) != JSON.stringify(plant)) {
-                      if (
-                        !confirm(
-                          'Plant data has been changed. Are you sure you want to continue?'
-                        )
-                      )
-                        return
-                    }
-                    navigate(`/plants/${plant.id}/timestamps`, {
-                      replace: true,
-                    })
-                  }}
-                >
-                  Change Timestamps
-                </Button>
-              </Form.Text>
               <Button
                 type='submit'
                 className='mx-2 px-5'

@@ -14,7 +14,6 @@ export function PlantsOverview({ plants, removePlant }: Props) {
     <>
       {plants != undefined && plants.length !== 0 ? (
         <>
-          <h4>Plants</h4>
           <Collapse in={true}>
             <ListGroup className='list-group-flush'>
               {plants.map((plant) => (

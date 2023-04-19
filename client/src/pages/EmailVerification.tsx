@@ -1,5 +1,6 @@
 import { useState } from 'react'
-import { Container, Form, Row, Col, Card, Button, Alert } from 'react-bootstrap'
+import { Container, Form, Row, Col, Card, Alert } from 'react-bootstrap'
+import { Button } from '../components/Button'
 import { Link, Navigate, useNavigate } from 'react-router-dom'
 import { useAuthentication } from '../contexts/AuthenticationContext'
 import { useForm } from '../hooks/useForm'
@@ -23,12 +24,11 @@ export function EmailVerification() {
     async () => {
       setLoading(true)
       try {
-        const response = await useApi('/auth/user/resend_verification', {
+        const { res, data } = await useApi('/auth/user/resend_verification', {
           method: 'POST',
           body: form.values,
         })
-        const data = await response.json()
-        if (!response.ok) {
+        if (!res.ok) {
           setError(data.detail)
         } else {
           setMessage(data.message)

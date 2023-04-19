@@ -236,7 +236,7 @@ async def get_plant_irrigation_graph(user_email: str, plant_id: str):
         irrigation_records
     ))
 
-    graph = pygal.Line(
+    graph = pygal.Bar(
         title="Irrigations",
         width = 1000,
         height = 600,
@@ -245,6 +245,7 @@ async def get_plant_irrigation_graph(user_email: str, plant_id: str):
         style = charts_style,
     )
     graph.x_labels = list(map(lambda r: r['x'], records))
+    graph.y_labels = list(range(0, 101, 5))
     graph.add(f'Irrigations', list(map(lambda r: r['y'], records)))
     graph.x_labels_major_count = 10
     graph.show_minor_x_labels = False
@@ -273,7 +274,7 @@ async def get_moisture_percentage_graph(user_email: str, plant_id: str, graph_pe
         moisture_record
     ))
 
-    graph = pygal.Line(
+    graph = pygal.Bar(
         title="Moisture Percentage",
         width = 1000,
         height = 600,
@@ -282,6 +283,7 @@ async def get_moisture_percentage_graph(user_email: str, plant_id: str, graph_pe
         style = charts_style,
     )
     graph.x_labels = list(map(lambda r: r['x'], records))
+    graph.y_labels = list(range(0, 101, 5))
     graph.add(f'Moisture Percentage', list(map(lambda r: r['y'], records)))
     graph.x_labels_major_count = 10
     graph.show_minor_x_labels = False

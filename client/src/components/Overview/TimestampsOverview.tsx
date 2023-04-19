@@ -42,7 +42,7 @@ export function TimestampsOverview({ plant_id, timestamps, remove }: Props) {
                     method: 'DELETE',
                   }
                 )
-                  .then((res) => res.json())
+                  .then(({ res, data }) => data)
                   .then((data) => {
                     alert(data?.message ?? data?.detail ?? '')
                   })

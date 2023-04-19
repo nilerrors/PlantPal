@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom'
-import { Container, Form, Row, Col, Card, Button } from 'react-bootstrap'
+import { Container, Form, Row, Col, Card } from 'react-bootstrap'
+import { Button } from '../components/Button'
 import { useAuthentication } from '../contexts/AuthenticationContext'
 import { useState } from 'react'
 import { useForm } from '../hooks/useForm'
@@ -27,7 +28,7 @@ export function Signup() {
         setError('Password must be at least 8 characters long')
       } else {
         try {
-          const response = await useApi('/auth/signup', {
+          const { res, data } = await useApi('/auth/signup', {
             method: 'POST',
             body: {
               first_name: form.values.firstName,
@@ -36,8 +37,7 @@ export function Signup() {
               password: form.values.password,
             },
           })
-          const data = await response.json()
-          if (!response.ok) {
+          if (!res.ok) {
             setError(data?.detail ?? data?.message ?? 'Error')
           } else {
             setMessage(data?.message ?? data?.detail ?? '')

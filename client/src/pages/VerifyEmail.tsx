@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Alert, Badge, Container } from 'react-bootstrap'
-import { Link, Navigate, useNavigate, useParams } from 'react-router-dom'
+import { Link, Navigate, useParams } from 'react-router-dom'
 import { useAuthentication } from '../contexts/AuthenticationContext'
 
 export function VerifyEmail() {
@@ -22,9 +22,9 @@ export function VerifyEmail() {
   useEffect(() => {
     setLoading(true)
     useApi(`/auth/user/verify/${id}`, { method: 'POST' })
-      .then((res) => {
+      .then(({ res, data }) => {
         setIsError(!res.ok)
-        return res.json()
+        return data
       })
       .then((data) => {
         if (data?.access_token !== undefined) {

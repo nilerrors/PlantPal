@@ -2,7 +2,8 @@ import { useState } from 'react'
 import { useAuthentication } from '../../../contexts/AuthenticationContext'
 import { useForm } from '../../../hooks/useForm'
 import { User } from '../../../types'
-import { Form, Button, Row, Card, Col } from 'react-bootstrap'
+import { Form, Row, Card, Col } from 'react-bootstrap'
+import { Button } from '../../Button'
 
 type Props = {
   user: User
@@ -16,14 +17,13 @@ export function RemoveUser({ user, closeForm }: Props) {
   const form = useForm(
     async () => {
       if (!confirm('Are you sure you want to delete your account?')) return
-      const res = await useApi('/auth/user', {
+      const { res, data } = await useApi('/auth/user', {
         method: 'DELETE',
         body: {
           email: form.values.email,
           password: form.values.password,
         },
       })
-      const data = await res.json()
       if (!res.ok) {
         setError(data?.detail ?? data?.message ?? 'Error')
         return
