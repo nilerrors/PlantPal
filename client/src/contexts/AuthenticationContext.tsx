@@ -29,7 +29,7 @@ type Authentication = {
       method?: string
       initHeaders?: any
     }
-  ) => Promise<Response>
+  ) => Promise<{ res: Response; data: any }>
   getCurrentUser: () => Promise<void>
 }
 
@@ -85,7 +85,7 @@ export function AuthenticationContextProvider(props: {
       body: undefined,
       method: 'GET',
     }
-  ): Promise<Response> {
+  ) {
     const headers: any = {
       'Content-Type': 'application/json',
       ...options.initHeaders,
@@ -99,27 +99,24 @@ export function AuthenticationContextProvider(props: {
         headers,
         body: JSON.stringify(options?.body),
       })
-      if (
-        res.status === 422 &&
-        (await res.json())?.detail == 'Signature has expired'
-      ) {
+      const data = await res.json()
+      if (res.status === 422 && data?.detail == 'Signature has expired') {
         logout()
       }
-      return res
+      return { res, data }
     } catch (err: any) {
       if (err.toString() == 'TypeError: Failed to fetch') {
-        logout()
         return Promise.reject(err)
       }
     }
-    return new Response()
+    return { res: new Response(), data: undefined }
   }
 
   async function checkCurrentUser() {
     if (loggedIn()) {
       useApi('/auth/user/current')
-        .then((res) => {
-          if (res.ok) return res.json()
+        .then(({ res, data }) => {
+          if (res.ok) return data
           else logout()
         })
         .then((data) => {
@@ -133,8 +130,8 @@ export function AuthenticationContextProvider(props: {
   async function getCurrentUser() {
     if (loggedIn()) {
       useApi('/auth/user')
-        .then((res) => {
-          if (res.ok) return res.json()
+        .then(({ res, data }) => {
+          if (res.ok) return data
           else logout()
         })
         .then((data) => {

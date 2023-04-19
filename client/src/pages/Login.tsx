@@ -33,12 +33,11 @@ export function Login() {
         setError('Password must be at least 8 characters long')
       } else {
         try {
-          const response = await useApi('/auth/login', {
+          const { res, data } = await useApi('/auth/login', {
             method: 'POST',
             body: form.values,
           })
-          const data = await response.json()
-          if (!response.ok) {
+          if (!res.ok) {
             setError(data.detail)
           } else {
             login(data?.access_token ?? '')

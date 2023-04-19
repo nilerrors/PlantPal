@@ -1,43 +1,35 @@
 import { useEffect, useState } from 'react'
-import { Button, Collapse, Container } from 'react-bootstrap'
-import { PlantsCollectionsOverview } from '../components/Overview/PlantsCollectionsOverview'
-import { PlantsCollectionsAdd } from '../components/Forms/Plants/PlantsCollectionsAdd'
-import { usePlantsCollections } from '../contexts/PlantsCollectionsContext'
+import { Collapse, Container } from 'react-bootstrap'
+import { PlantsOverview } from '../components/Overview/PlantsOverview'
+import { useAuthentication } from '../contexts/AuthenticationContext'
+import { Plant } from '../types'
 
 export function Plants() {
   document.title = 'Plants'
-  const [plantsCollectionOpen, setPlantsCollectionOpen] = useState(true)
-  const { refetch, add } = usePlantsCollections()
+  const [plants, setPlants] = useState<Plant[]>([])
+
+  const { useApi } = useAuthentication()
 
   useEffect(() => {
-    refetch()
+    useApi('/plants/', { method: 'GET' })
+      .then(({ res, data }) => data)
+      .then((data) => {
+        setPlants(data ?? [])
+        console.log('')
+      })
   }, [])
 
   return (
     <Container className='bg-dark text-align-center'>
-      <h3>
-        Plants Collections
-        <span>
-          <Button
-            onClick={() => setPlantsCollectionOpen(!plantsCollectionOpen)}
-            style={{ float: 'right' }}
-            className='mx-2'
-          >
-            {!plantsCollectionOpen ? 'Close Form' : 'Add'}
-          </Button>
-        </span>
-      </h3>
+      <h3>Plants</h3>
       <hr />
-      <Collapse in={plantsCollectionOpen}>
+      <Collapse in={true}>
         <div>
-          <PlantsCollectionsOverview />
-        </div>
-      </Collapse>
-      <Collapse in={!plantsCollectionOpen}>
-        <div>
-          <PlantsCollectionsAdd
-            addToCollection={add}
-            setFormClose={() => setPlantsCollectionOpen(true)}
+          <PlantsOverview
+            plants={plants}
+            removePlant={(id) =>
+              setPlants((plants) => plants.filter((p) => p.id != id))
+            }
           />
         </div>
       </Collapse>

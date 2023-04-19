@@ -17,7 +17,7 @@ model User {
   created_at         DateTime           @default(now())
   updated_at         DateTime           @updatedAt
   verification       Verification?
-  plants_collections PlantsCollection[]
+  plants       Plant[]
 }
 
 model Verification {
@@ -26,17 +26,6 @@ model Verification {
   verified_at DateTime @updatedAt
 
   user_id String @unique
-  user    User   @relation(fields: [user_id], references: [id], onDelete: Cascade)
-}
-
-model PlantsCollection {
-  id         String   @id @default(cuid())
-  name       String   @db.VarChar(255)
-  created_at DateTime @default(now())
-  updated_at DateTime @updatedAt
-  plants     Plant[]
-
-  user_id String
   user    User   @relation(fields: [user_id], references: [id], onDelete: Cascade)
 }
 
@@ -62,8 +51,8 @@ model Plant {
   periodstamp_times_a_week     Int                        @default(0)
   periodstamps                 Periodstamp[]
 
-  collection_id String
-  collection    PlantsCollection @relation(fields: [collection_id], references: [id], onDelete: Cascade)
+  user_id String
+  user    User   @relation(fields: [user_id], references: [id], onDelete: Cascade)
 }
 
 model MoisturePercentageRecord {

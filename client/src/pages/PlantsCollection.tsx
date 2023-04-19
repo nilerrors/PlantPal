@@ -2,11 +2,11 @@ import { useEffect, useState } from 'react'
 import { Button, Collapse, Container } from 'react-bootstrap'
 import { Navigate, useNavigate, useParams } from 'react-router-dom'
 import { ChangePlantsCollection } from '../components/Forms/Plants/ChangePlantsCollection'
-import { PlantsCollectionOverview } from '../components/Overview/PlantsCollectionOverview'
+import { PlantsCollectionOverview } from '../components/Overview/PlantsOverview'
 import { useAuthentication } from '../contexts/AuthenticationContext'
 import { usePlantsCollections } from '../contexts/PlantsCollectionsContext'
 import { useForm } from '../hooks/useForm'
-import { Plant, PlantsCollection } from '../types'
+import { Plant } from '../types'
 
 export function PlantsCollection() {
   const { id } = useParams()

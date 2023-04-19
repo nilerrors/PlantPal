@@ -48,12 +48,6 @@ async def create_user(user: schemas.UserSignup) -> dict | None:
         'password': hasher.get_password_hash(user.password)
     })
 
-    # Standard Collection of plants
-    await prisma.plantscollection.create(data={
-        'name': '$Plants',
-        'user_id': created_user.id
-    })
-
     verification = await prisma.verification.create(data={
         'user_id': created_user.id
     })

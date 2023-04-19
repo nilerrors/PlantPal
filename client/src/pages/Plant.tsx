@@ -9,8 +9,7 @@ import { Plant } from '../types'
 
 export function Plant() {
   const [plant, setPlant] = useState<Plant>({} as Plant)
-  document.title =
-    plant != null ? `${plant?.name} in ${plant?.collection?.name}` : 'Plant'
+  document.title = plant != null ? plant?.name : 'Plant'
   const [error, setError] = useState<string | null>(null)
   const [openForm, setOpenForm] = useState(false)
   const form = useForm<Plant>(async () => {
@@ -21,7 +20,7 @@ export function Plant() {
       return
     }
 
-    const res = await useApi(`/plants_collection/plants/${plant.id}`, {
+    const { res, data } = await useApi(`/plants/${plant.id}`, {
       method: 'PUT',
       body: {
         name: form.values?.name,
@@ -30,10 +29,8 @@ export function Plant() {
         irrigation_type: form.values?.irrigation_type,
         moisture_percentage_treshold: form.values?.moisture_percentage_treshold,
         periodstamp_times_a_week: form.values?.periodstamp_times_a_week,
-        collection_id: form.values?.collection_id,
       },
     })
-    const data = await res.json()
     if (!res.ok) {
       setError(data?.detail ?? data?.message ?? 'Error')
       return
@@ -50,22 +47,16 @@ export function Plant() {
   }
 
   useEffect(() => {
-    useApi(`/plants_collection/plants/${id}`)
-      .then((res) => {
+    useApi(`/plants/${id}`)
+      .then(({ res, data }) => {
         if (!res.ok) {
-          res
-            .json()
-            .then((data) => setError(data?.detail ?? data?.message ?? 'Error'))
+          setError(data?.detail ?? data?.message ?? 'Error')
           return
         }
-        return res.json()
+        return data
       })
       .then((data) => {
-        const plant = {
-          ...data,
-          collection_id: data?.collection_id ?? undefined,
-        }
-        setPlant(plant)
+        setPlant(data ?? plant)
         form.set(plant)
       })
   }, [])
@@ -75,10 +66,7 @@ export function Plant() {
       {JSON.stringify(plant) != JSON.stringify({}) && (
         <>
           <h3>
-            '{plant?.name}' in{' '}
-            <Link to={`/plants/${plant.collection?.id}`}>
-              {plant?.collection?.name}
-            </Link>
+            {plant?.name}
             <Button
               onClick={() => setOpenForm(!openForm)}
               style={{ float: 'right' }}

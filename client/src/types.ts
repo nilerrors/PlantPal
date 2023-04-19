@@ -45,17 +45,6 @@ export type Plant = {
   irrigation_type: string
   irrigations_record: IrrigationRecord[]
   timestamps: TimeStamp[]
-
-  collection?: PlantsCollection
-  collection_id?: string
-}
-
-export type PlantsCollection = {
-  id: string
-  name: string
-  count: number
-  created_at: Date
-  updated_at: Date
 }
 
 export type User = {

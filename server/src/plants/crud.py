@@ -2,11 +2,12 @@ import random
 from prisma.errors import UniqueViolationError as PrismaUniqueViolationError
 import pygal
 import datetime
+from src.auth.crud import get_user_by_email
 from src.utils.graph_period import GraphPeriod
 from src.utils.comparedatetime import filter_timestamps, filter_periodstamps
 from src.utils.minutes_to_weektime import minutes_to_weektime
 from src.prisma import prisma
-from src import auth, plants_collection
+from src import auth
 from . import schemas
 
 
@@ -23,35 +24,13 @@ charts_style = pygal.style.Style(
 )
 
 
-async def get_plant_collection(user_email: str, plant_collection_id: str):
-    user = await auth.crud.get_user_by_email(user_email)
-    if user is None:
-        return None
-
-    return await prisma.plantscollection.find_first(where={
-        'id': plant_collection_id,
-        'user_id': user.id
-    })
-
-
-async def get_plant_collection_by_name(user_email: str, plant_collection_name: str = "$Plants"):
-    user = await auth.crud.get_user_by_email(user_email)
-    if user is None:
-        return None
-
-    return await prisma.plantscollection.find_first(where={
-        'name': plant_collection_name,
-        'user_id': user.id
-    })
-
-
 async def get_plant_by_chip_id(plant_id: str, chip_id: str):
     return await prisma.plant.find_first(where={
         'id': plant_id,
         'chip_id': chip_id
     },
     include={
-        'collection': True
+        'user': True
     })
 
 
@@ -62,20 +41,16 @@ async def get_plant_by_id(user_email: str, plant_id: str):
 
     return await prisma.plant.find_first(where={
         'id': plant_id,
-        'collection': {
-            'is': {
-                'user_id': user.id
-            }
-        }
+        'user_id': user.id
     },
     include={
-        'collection': True
+        'user': True
     })
 
 
 async def get_plant(user_email: str, plant_id: str):
     plant = await get_plant_by_id(user_email, plant_id)
-    if plant is None or plant.collection is None:
+    if plant is None or plant.user is None:
         return None
     return plant
 
@@ -89,7 +64,7 @@ async def get_plant_timestamps(user_email: str, plant_id: str):
         'id': plant.id,
     },
     include={
-        'collection': True,
+        'user': True,
         'timestamps': True
     })
 
@@ -145,7 +120,7 @@ async def get_plant_periodstamps(user_email: str, plant_id: str):
         'id': plant.id,
     },
     include={
-        'collection': True,
+        'user': True,
         'periodstamps': True
     })
 
@@ -157,10 +132,10 @@ async def get_plant_times(user_email: str, plant_id: str):
 
     plant_data = await prisma.plant.find_first(where={
         'id': plant.id,
-        'collection_id': plant.collection_id
+        'user_id': plant.user_id
     },
     include={
-        'collection': True,
+        'user': True,
         'timestamps': plant.irrigation_type == 'time',
         'periodstamps': plant.irrigation_type == 'period',
     })
@@ -181,15 +156,15 @@ async def get_plant_times(user_email: str, plant_id: str):
 
 async def get_plant_today_times(plant_id: str, chip_id: str):
     plant = await get_plant_by_chip_id(plant_id, chip_id)
-    if plant is None or plant.collection is None:
+    if plant is None or plant.user is None:
         return None
 
     plant_data = await prisma.plant.find_first(where={
         'id': plant.id,
-        'collection_id': plant.collection_id
+        'user_id': plant.user_id
     },
     include={
-        'collection': True,
+        'user': True,
         'timestamps': filter_timestamps(plant.irrigation_type == 'time'),
         'periodstamps': filter_periodstamps(plant.irrigation_type == 'period'),
     })
@@ -357,18 +332,13 @@ async def register_current_moisture(percentage: int, plant: schemas.PlantESPGet)
     })
 
 
-async def get_plants(user_email: str, collection_id: str):
+async def get_plants(user_email: str):
     user = await auth.crud.get_user_by_email(user_email)
     if user is None:
         return None
 
-    collection = await plants_collection.crud.get_plants_collection(user_email, collection_id)
-
-    if collection is None:
-        return None
-
     return await prisma.plant.find_many(where={
-        'collection_id': collection.id,
+        'user_id': user.id,
     })
 
 
@@ -376,15 +346,10 @@ async def create_plant(plant: schemas.PlantCreate):
     user = await auth.crud.get_user_by_email_password(plant.email, plant.password)
     if user is None:
         return None
-
-    standard_plant_collection = await get_plant_collection_by_name(user.email, "$Plants")
-
-    if standard_plant_collection is None:
-        return None
     
     try:
         created_plant = await prisma.plant.create(data={
-            'collection_id': standard_plant_collection.id,
+            'user_id': user.id,
             'chip_id': plant.chip_id
         })
     except PrismaUniqueViolationError:
@@ -397,14 +362,12 @@ async def update_plant(user_email: str, plant_id: str, plant: schemas.PlantUpdat
     _plant = await get_plant_by_id(user_email, plant_id)
     if _plant is None:
         return None
-
-    collection_id = plant.collection_id
-    if collection_id is None:
-        collection_id = _plant.collection_id
     
-    collection = await get_plant_collection(user_email, collection_id)
-    if collection is None:
-        collection_id = _plant.collection_id
+    user = await get_user_by_email(user_email)
+    user_id = _plant.user_id
+
+    if user is None or user_id != user.id:
+        return
     
     # Update periodstamp
     if plant.periodstamp_times_a_week != _plant.periodstamp_times_a_week:
@@ -437,9 +400,9 @@ async def update_plant(user_email: str, plant_id: str, plant: schemas.PlantUpdat
         'irrigation_type': plant.irrigation_type,
         'moisture_percentage_treshold': plant.moisture_percentage_treshold,
         'periodstamp_times_a_week': plant.periodstamp_times_a_week,
-        'collection': {
+        'user': {
             'connect': {
-                'id': collection_id
+                'id': user_id
             }
         }
     },
@@ -447,7 +410,7 @@ async def update_plant(user_email: str, plant_id: str, plant: schemas.PlantUpdat
         'id': _plant.id,
     },
     include={
-        'collection': True
+        'user': True
     })
 
 async def delete_plant(user_email: str, plant_id: str):

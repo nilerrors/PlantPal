@@ -12,11 +12,9 @@ ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
   <React.StrictMode>
     <Suspense fallback={<p className='text-white'>Loading...</p>}>
       <AuthenticationContextProvider>
-        <PlantsCollectionsContextProvider>
-          <BrowserRouter>
-            <App />
-          </BrowserRouter>
-        </PlantsCollectionsContextProvider>
+        <BrowserRouter>
+          <App />
+        </BrowserRouter>
       </AuthenticationContextProvider>
     </Suspense>
   </React.StrictMode>

@@ -31,7 +31,6 @@ class ChipID(str):
 
 class PlantGet(PlantBase):
     id: str
-    collection_id: str = '$Plants'
 
 
 class PlantESPGet(PlantBase):
@@ -52,7 +51,6 @@ class PlantUpdate(PlantBase):
     irrigation_type: IrrigationType = IrrigationType.period
     moisture_percentage_treshold: int = 50
     periodstamp_times_a_week: int = 0
-    collection_id: str | None = None
 
     @validator('water_amount')
     def validate_water_amount_range(cls, value):
@@ -86,6 +84,10 @@ class PlantIdNameResponse(PlantBase):
     name: str
 
 
+class PlantResponseSmall(PlantBase):
+    id: str
+    name: str
+
 class PlantResponse(PlantBase):
     id: str
     chip_id: ChipID
@@ -97,8 +99,6 @@ class PlantResponse(PlantBase):
     irrigation_type: str
     moisture_percentage_treshold: int = 50
     periodstamp_times_a_week: int = 0
-    collection: Any = None
-    collection_id: str | None = None
 
 
 class TimeStamp(BaseModel):

@@ -6,7 +6,6 @@ import { Home } from './pages/Home'
 import { Login } from './pages/Login'
 import { Plant } from './pages/Plant'
 import { Plants } from './pages/Plants'
-import { PlantsCollection } from './pages/PlantsCollection'
 import { Settings } from './pages/Settings'
 import { SetupTutorial } from './pages/SetupTutorial'
 import { Signout } from './pages/Signout'
@@ -38,11 +37,10 @@ function App() {
               <Route index element={<Home />} />
               <Route path='/tutorial' element={<SetupTutorial />} />
               <Route path='/plants' element={<Plants />} />
-              <Route path='/plants/:id' element={<PlantsCollection />} />
-              <Route path='/plant/:id' element={<Plant />} />
-              <Route path='/plant/:id/timestamps' element={<Timestamps />} />
+              <Route path='/plants/:id' element={<Plant />} />
+              <Route path='/plants/:id/timestamps' element={<Timestamps />} />
               <Route
-                path='/plant/:id/periodstamps'
+                path='/plants/:id/periodstamps'
                 element={<Periodstamps />}
               />
               <Route path='/settings' element={<Settings />} />

@@ -13,8 +13,8 @@ export function IrrigationsGraph({ plant_id }: Props) {
   const { useApi } = useAuthentication()
 
   useEffect(() => {
-    useApi(`/plants_collection/plants/${plant_id}/irrigations_graph.svg`)
-      .then((res) => {
+    useApi(`/plants/${plant_id}/irrigations_graph.svg`)
+      .then(({ res }) => {
         if (!res.ok) return
         return res.text()
       })

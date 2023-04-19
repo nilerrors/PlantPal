@@ -8,14 +8,14 @@ from src.utils.graph_period import GraphPeriod
 router = APIRouter(prefix="/plants")
 
 
-@router.get('/', response_model=schemas.PlantResponse)
-async def get_plants(collection_id: str, Authorize: AuthJWT = Depends()):
+@router.get('/', response_model=list[schemas.PlantResponseSmall])
+async def get_plants(Authorize: AuthJWT = Depends()):
     Authorize.jwt_required()
 
     user_email = Authorize.get_jwt_subject()
-    user_plants = await crud.get_plants(user_email, collection_id)
+    user_plants = await crud.get_plants(user_email)
 
-    return {'plants': user_plants}
+    return user_plants
 
 
 @router.get('/{plant_id}', response_model=schemas.PlantResponse)

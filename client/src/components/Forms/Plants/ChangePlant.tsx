@@ -11,7 +11,7 @@ type Props = {
 export function ChangePlant({ plant, form }: Props) {
   const navigate = useNavigate()
 
-  const { collections, refetch } = usePlantsCollections()
+  // const { collections, refetch } = usePlantsCollections()
 
   return (
     <Form onSubmit={form.onSubmit}>
@@ -105,7 +105,7 @@ export function ChangePlant({ plant, form }: Props) {
                   value={form.values?.periodstamp_times_a_week}
                 />
               </Form.Group>
-              <Form.Group className='mb-4 mx-5 w-100'>
+              {/* <Form.Group className='mb-4 mx-5 w-100'>
                 <Form.Select
                   name='collection_id'
                   placeholder='Collection'
@@ -123,7 +123,7 @@ export function ChangePlant({ plant, form }: Props) {
                     </option>
                   ))}
                 </Form.Select>
-              </Form.Group>
+              </Form.Group> */}
               <Form.Text className='mb-4 mx-5'>
                 <Button
                   className='mx-1'
@@ -140,7 +140,9 @@ export function ChangePlant({ plant, form }: Props) {
                       )
                         return
                     }
-                    navigate(`/plant/${plant.id}/timestamps`, { replace: true })
+                    navigate(`/plants/${plant.id}/timestamps`, {
+                      replace: true,
+                    })
                   }}
                 >
                   Change Timestamps
