@@ -30,7 +30,7 @@ bool Plant::fetch() {
     Serial.println('Plant not created');
     return false;
   }
-  String url = String(SERVER_URL) + '/plants_collection/plants/espget';
+  String url = String(SERVER_URL) + "/plants/espget";
   _http.begin(url.c_str());
 
   int status_code = _http.POST(this->credentials());
@@ -73,7 +73,7 @@ bool Plant::shouldIrrigate(uint8_t moisture_percentage) {
       return false;
     }
     String url =
-        String(SERVER_URL) + '/plants_collection/plants/should_irrigate_now';
+        String(SERVER_URL) + "/plants/should_irrigate_now";
     _http.begin(url.c_str());
 
     int status_code = _http.POST(this->credentials());
