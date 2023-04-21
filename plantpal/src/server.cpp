@@ -70,6 +70,10 @@ ConfigServer::ConfigServer() {
                          "password do not correspond.</p>";
             response_base(401, res, "401 Unauthorized");
           } else if (httpResponseCode == 409) {
+
+            String res = "<h1>Conflict</h1><hr><p>This device is already "
+                         "registered.</p>";
+            response_base(401, res, "401 Unauthorized");
           }
           Serial.println(payload);
         } else {
