@@ -1,7 +1,7 @@
 #define SERVER_URL "http://10.3.41.39:8000/"
 
-#define PROTO_SSID "ESPCONF"
-#define PROTO_PASSWORD "esp12345"
+#define PROTO_SSID "PlantPalConfig"
+#define PROTO_PASSWORD "plantpal"
 #define HOSTNAME "PlantPal"
 
 #define MOISTURE_SENSOR_PIN 36
