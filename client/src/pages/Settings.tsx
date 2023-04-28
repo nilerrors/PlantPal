@@ -16,7 +16,9 @@ export function Settings() {
         <>
           <h3>
             User Account
-            <span>
+            <span
+              style={{ display: window.innerWidth < 600 ? 'none' : undefined }}
+            >
               <Button
                 onClick={() => setOpenForm(!openForm)}
                 style={{ float: 'right' }}
@@ -31,11 +33,19 @@ export function Settings() {
               <UserOverview user={user} />
             </div>
           </Collapse>
-          <Collapse in={openForm}>
-            <div>
+          {window.innerWidth > 600 ? (
+            <>
+              <Collapse in={openForm}>
+                <div>
+                  <UserAccountForm user={user} setOpenForm={setOpenForm} />
+                </div>
+              </Collapse>
+            </>
+          ) : (
+            <>
               <UserAccountForm user={user} setOpenForm={setOpenForm} />
-            </div>
-          </Collapse>
+            </>
+          )}
         </>
       ) : null}
     </Container>

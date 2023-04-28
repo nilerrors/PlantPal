@@ -4,12 +4,14 @@ import { Button } from '../components/Button'
 import { useNavigate, useParams } from 'react-router-dom'
 import { useAuthentication } from '../contexts/AuthenticationContext'
 import { PeriodStamp } from '../types'
+import { PeriodstampsChange } from '../components/Forms/Plants/PeriodstampsChange'
 
 export function Periodstamps() {
   document.title = 'Periodstamps'
   const { id } = useParams()
   const { useApi } = useAuthentication()
   const navigate = useNavigate()
+  const [loading, setLoading] = useState(false)
   const [periodstamps, setPeriodstamps] = useState<PeriodStamp[]>([])
 
   if (id == undefined) {
@@ -25,7 +27,8 @@ export function Periodstamps() {
     ':' +
     (m < 10 ? `0${m.toString()}` : m.toString())
 
-  useEffect(() => {
+  const fetchPeriodstamps = () => {
+    setLoading(true)
     useApi(`/plants/${id}/periodstamps`)
       .then(({ res, data }) => {
         if (!res.ok) return
@@ -36,6 +39,11 @@ export function Periodstamps() {
           setPeriodstamps(data.periodstamps)
         }
       })
+    setLoading(false)
+  }
+
+  useEffect(() => {
+    fetchPeriodstamps()
   }, [])
 
   return (
@@ -53,26 +61,38 @@ export function Periodstamps() {
         Periodstamps
       </h3>
       <hr />
-      {periodstamps.length > 0 ? (
+      {loading ? null : (
         <>
-          {periodstamps.map((p, i) => (
-            <div className='list-group-flush list-group text-underline-hover'>
-              <div
-                className={`mt-3 input-group-btn input-group ${
-                  periodstamps.length - i === 1 ? 'mb-3' : ''
-                }`}
-              >
-                <div className='form-control p-0'>
-                  <ListGroup.Item key={p.id} variant='secondary'>
-                    {capitalize(p.day_of_week)} at {time(p.hour, p.minute)}
-                  </ListGroup.Item>
+          {periodstamps.length > 0 ? (
+            <>
+              {periodstamps.map((p, i) => (
+                <div
+                  key={p.id}
+                  className='list-group-flush list-group text-underline-hover'
+                >
+                  <div
+                    className={`mt-3 input-group-btn input-group ${
+                      periodstamps.length - i === 1 ? 'mb-3' : ''
+                    }`}
+                  >
+                    <div className='form-control p-0'>
+                      <ListGroup.Item key={p.id} variant='secondary'>
+                        {capitalize(p.day_of_week)} at {time(p.hour, p.minute)}
+                      </ListGroup.Item>
+                    </div>
+                  </div>
                 </div>
-              </div>
-            </div>
-          ))}
+              ))}
+            </>
+          ) : (
+            <h1>No Periodstamps</h1>
+          )}
+          <PeriodstampsChange
+            plant_id={id}
+            times_a_week={periodstamps.length}
+            refetch={() => fetchPeriodstamps()}
+          />
         </>
-      ) : (
-        <h1>No Periodstamps</h1>
       )}
     </Container>
   )

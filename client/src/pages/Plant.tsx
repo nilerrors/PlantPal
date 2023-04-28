@@ -12,6 +12,7 @@ import { PlantGraphs } from '../components/Graphs/PlantGraphs'
 export function Plant() {
   const [plant, setPlant] = useState<Plant>({} as Plant)
   document.title = plant != null ? plant?.name : 'Plant'
+  const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [openForm, setOpenForm] = useState(false)
   const form = useForm<Plant>(async () => {
@@ -49,6 +50,7 @@ export function Plant() {
   }
 
   useEffect(() => {
+    setLoading(true)
     useApi(`/plants/${id}`)
       .then(({ res, data }) => {
         if (!res.ok) {
@@ -60,12 +62,13 @@ export function Plant() {
       .then((data) => {
         setPlant(data ?? plant)
         form.set(data ?? plant)
+        setLoading(false)
       })
   }, [])
 
   return (
     <Container className='bg-dark text-align-center'>
-      {JSON.stringify(plant) != JSON.stringify({}) && (
+      {loading ? null : (
         <>
           <h3 style={{ display: window.innerWidth < 600 ? 'flex' : undefined }}>
             <span

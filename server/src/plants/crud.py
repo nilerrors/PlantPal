@@ -1,6 +1,6 @@
 import random
 from prisma.errors import UniqueViolationError as PrismaUniqueViolationError
-import pygal
+import pygal, pygal.style
 import datetime
 from src.auth.crud import get_user_by_email
 from src.utils.graph_period import GraphPeriod
@@ -123,6 +123,42 @@ async def get_plant_periodstamps(user_email: str, plant_id: str):
         'user': True,
         'periodstamps': True
     })
+
+
+async def change_plant_periodstamps(user_email: str, plant_id: str, periodstamp: schemas.PeriodStampsChange):
+    plant = await get_plant_by_id(user_email, plant_id)
+    if plant is None:
+        return None
+
+    plant = await prisma.plant.update({
+        'periodstamp_times_a_week': periodstamp.times_a_week
+    },
+    {'id': plant.id,})
+    if plant is None:
+        return None
+
+    await prisma.periodstamp.delete_many(where={
+        'plant_id': plant.id
+    })
+    if periodstamp.times_a_week != 0:
+        WEEK_IN_MINUTES = 10_080
+        irrigation_delay = WEEK_IN_MINUTES // periodstamp.times_a_week
+        periods = [
+            minutes_to_weektime(
+                ((irrigation_delay * m) + random.randint(0, 10)) if irrigation_delay * m < WEEK_IN_MINUTES else WEEK_IN_MINUTES
+            ) for m in range(periodstamp.times_a_week)
+        ]
+        return await prisma.periodstamp.create_many(data=[
+            {
+                'plant_id': plant.id,
+                'day_of_week': p.weekday,
+                'hour': p.hour,
+                'minute': p.minute
+            }
+            for p in periods if p is not None
+        ])
+
+    return 0
 
 
 async def get_plant_times(user_email: str, plant_id: str):
@@ -308,25 +344,6 @@ async def get_current_moisture(user_email: str, plant_id: str):
     order={
         'at': 'desc'
     })
-
-
-async def get_current_moisture_chart(user_email: str, plant_id: str):
-    plant = await get_plant_by_id(user_email, plant_id)
-    if plant is None:
-        return False
-
-    moisture_record = await prisma.moisturepercentagerecord.find_first(where={
-        'plant_id': plant.id
-    },
-    order={
-        'at': 'desc'
-    })
-
-    if moisture_record is None:
-        return None
-    
-    donut = pygal.Pie(inner_radius=0.4)
-
 
 
 async def register_current_moisture(percentage: int, plant: schemas.PlantESPGet):

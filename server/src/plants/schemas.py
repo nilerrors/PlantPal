@@ -128,6 +128,10 @@ class TimeStampAdd(BaseModel):
         return value
 
 
+class PeriodStampsChange(BaseModel):
+    times_a_week: int = 0
+
+
 class PlantWithTimeStampsResponse(PlantResponse):
     timestamps: List[TimeStamp]
 

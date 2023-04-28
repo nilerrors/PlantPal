@@ -12,37 +12,27 @@ export function PlantsOverview({ plants, removePlant }: Props) {
   const { useApi } = useAuthentication()
   return (
     <>
-      {plants != undefined && plants.length !== 0 ? (
-        <>
-          <Collapse in={true}>
-            <ListGroup className='list-group-flush'>
-              {plants.map((plant) => (
-                <ListItemRemoveButton
-                  id={plant.id}
-                  to={`/plants/${plant.id}`}
-                  key={plant.id}
-                  name={plant.name}
-                  type='plant'
-                  onRemove={() => {
-                    useApi(`/plants_collection/plants/${plant.id}`, {
-                      method: 'DELETE',
-                    })
-                      .then(({ res, data }) => data)
-                      .then((data) => {
-                        alert(data?.message ?? data?.detail ?? '')
-                      })
-                    removePlant(plant.id)
-                  }}
-                />
-              ))}
-            </ListGroup>
-          </Collapse>
-        </>
-      ) : (
-        <>
-          <h6>No Plants</h6>
-        </>
-      )}
+      <ListGroup className='list-group-flush'>
+        {plants.map((plant) => (
+          <ListItemRemoveButton
+            id={plant.id}
+            to={`/plants/${plant.id}`}
+            key={plant.id}
+            name={plant.name}
+            type='plant'
+            onRemove={() => {
+              useApi(`/plants_collection/plants/${plant.id}`, {
+                method: 'DELETE',
+              })
+                .then(({ res, data }) => data)
+                .then((data) => {
+                  alert(data?.message ?? data?.detail ?? '')
+                })
+              removePlant(plant.id)
+            }}
+          />
+        ))}
+      </ListGroup>
     </>
   )
 }

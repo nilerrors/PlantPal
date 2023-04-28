@@ -6,16 +6,19 @@ import { Plant } from '../types'
 
 export function Plants() {
   document.title = 'Plants'
+  const [loading, setLoading] = useState(true)
   const [plants, setPlants] = useState<Plant[]>([])
 
   const { useApi } = useAuthentication()
 
   useEffect(() => {
+    setLoading(true)
     useApi('/plants/', { method: 'GET' })
       .then(({ res, data }) => data)
       .then((data) => {
         setPlants(data ?? [])
         console.log('')
+        setLoading(false)
       })
   }, [])
 
@@ -23,16 +26,26 @@ export function Plants() {
     <Container className='bg-dark text-align-center'>
       <h3>Plants</h3>
       <hr />
-      <Collapse in={true}>
-        <div>
-          <PlantsOverview
-            plants={plants}
-            removePlant={(id) =>
-              setPlants((plants) => plants.filter((p) => p.id != id))
-            }
-          />
-        </div>
-      </Collapse>
+      {loading ? null : (
+        <>
+          <Collapse in={true}>
+            <div>
+              {plants != undefined && plants.length > 0 ? (
+                <>
+                  <PlantsOverview
+                    plants={plants}
+                    removePlant={(id) =>
+                      setPlants((plants) => plants.filter((p) => p.id != id))
+                    }
+                  />
+                </>
+              ) : (
+                <h1 className='display-1'>No plants</h1>
+              )}
+            </div>
+          </Collapse>
+        </>
+      )}
     </Container>
   )
 }

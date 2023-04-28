@@ -151,6 +151,19 @@ async def get_plant_periodstamps(plant_id: str, Authorize: AuthJWT = Depends()):
     return plant_data
 
 
+@router.post('/{plant_id}/periodstamps')
+async def change_plant_periodstamps(plant_id: str, periodstamp: schemas.PeriodStampsChange, Authorize: AuthJWT = Depends()):
+    Authorize.jwt_required()
+    
+    user_email = Authorize.get_jwt_subject()
+    plant_data = await crud.change_plant_periodstamps(user_email, plant_id, periodstamp)
+
+    if plant_data is None:
+        raise HTTPException(status.HTTP_409_CONFLICT, "Plant with given id not found")
+
+    return {"amount_of_irrigations_per_week": plant_data}
+
+
 @router.get('/{plant_id}/irrigations_graph.svg')
 async def get_plant_irrigations_graph(plant_id: str, Authorize: AuthJWT = Depends()):
     Authorize.jwt_required()
