@@ -26,7 +26,7 @@ export function Periodstamps() {
     (m < 10 ? `0${m.toString()}` : m.toString())
 
   useEffect(() => {
-    useApi(`/plants_collection/plants/${id}/periodstamps`)
+    useApi(`/plants/${id}/periodstamps`)
       .then(({ res, data }) => {
         if (!res.ok) return
         return data
@@ -45,7 +45,7 @@ export function Periodstamps() {
           size='sm'
           variant='secondary'
           onClick={() => {
-            navigate(`/plant/${id}`)
+            navigate(`/plants/${id}`)
           }}
         >
           {'<'} Back
@@ -53,21 +53,27 @@ export function Periodstamps() {
         Periodstamps
       </h3>
       <hr />
-      {periodstamps.map((p, i) => (
-        <div className='list-group-flush list-group text-underline-hover'>
-          <div
-            className={`mt-3 input-group-btn input-group ${
-              periodstamps.length - i === 1 ? 'mb-3' : ''
-            }`}
-          >
-            <div className='form-control p-0'>
-              <ListGroup.Item key={p.id} variant='secondary'>
-                {capitalize(p.day_of_week)} at {time(p.hour, p.minute)}
-              </ListGroup.Item>
+      {periodstamps.length > 0 ? (
+        <>
+          {periodstamps.map((p, i) => (
+            <div className='list-group-flush list-group text-underline-hover'>
+              <div
+                className={`mt-3 input-group-btn input-group ${
+                  periodstamps.length - i === 1 ? 'mb-3' : ''
+                }`}
+              >
+                <div className='form-control p-0'>
+                  <ListGroup.Item key={p.id} variant='secondary'>
+                    {capitalize(p.day_of_week)} at {time(p.hour, p.minute)}
+                  </ListGroup.Item>
+                </div>
+              </div>
             </div>
-          </div>
-        </div>
-      ))}
+          ))}
+        </>
+      ) : (
+        <h1>No Periodstamps</h1>
+      )}
     </Container>
   )
 }

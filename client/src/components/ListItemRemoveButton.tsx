@@ -20,7 +20,7 @@ export function ListItemRemoveButton({
   onRemove,
 }: Props) {
   return (
-    <InputGroup className='input-group-btn'>
+    <InputGroup className='input-group-btn mb-2'>
       {to != undefined ? (
         <Link to={to} className='form-control text-underline-hover p-0'>
           <ListGroup.Item variant='secondary'>

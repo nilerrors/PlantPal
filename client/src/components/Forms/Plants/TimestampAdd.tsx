@@ -19,7 +19,7 @@ export function TimestampAdd({ plant_id, add }: Props) {
     async () => {
       setLoading(true)
 
-      const { res, data } = await useApi(`plants/${plant_id}/timestamps`, {
+      const { res, data } = await useApi(`/plants/${plant_id}/timestamps`, {
         method: 'POST',
         body: {
           day_of_week: form.values.day_of_week,
@@ -100,7 +100,7 @@ export function TimestampAdd({ plant_id, add }: Props) {
                   <Form.Control
                     type='number'
                     className='bg-dark text-white'
-                    placeholder='Hour'
+                    placeholder='Minute'
                     size='lg'
                     name='minute'
                     max={59}

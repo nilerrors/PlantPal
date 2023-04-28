@@ -158,6 +158,9 @@ async def get_plant_irrigations_graph(plant_id: str, Authorize: AuthJWT = Depend
     user_email = Authorize.get_jwt_subject()
     svg = await crud.get_plant_irrigation_graph(user_email, plant_id)
 
+    if type(svg) == bool and not svg:
+        raise HTTPException(status.HTTP_204_NO_CONTENT, "No irrigation data")
+
     if svg is None:
         raise HTTPException(status.HTTP_404_NOT_FOUND, "Plant with given id not found")
 
@@ -170,6 +173,9 @@ async def get_moisture_percentage_graph(plant_id: str, p: GraphPeriod = GraphPer
 
     user_email = Authorize.get_jwt_subject()
     svg = await crud.get_moisture_percentage_graph(user_email, plant_id, p)
+
+    if type(svg) == bool and not svg:
+        raise HTTPException(status.HTTP_204_NO_CONTENT, "No moisture data")
 
     if svg is None:
         raise HTTPException(status.HTTP_404_NOT_FOUND, "Plant with given id not found")

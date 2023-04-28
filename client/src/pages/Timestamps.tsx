@@ -39,7 +39,7 @@ export function Timestamps() {
           size='sm'
           variant='secondary'
           onClick={() => {
-            navigate(`/plant/${id}`)
+            navigate(`/plants/${id}`)
           }}
         >
           {'<'} Back

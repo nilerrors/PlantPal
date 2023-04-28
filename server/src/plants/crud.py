@@ -228,6 +228,9 @@ async def get_plant_irrigation_graph(user_email: str, plant_id: str):
         'plant_id': plant.id
     })
 
+    if len(irrigation_records) == 0:
+        return False
+
     records = list(map(
         lambda r: {
             'x': r.at.strftime('%Y-%m-%d %H:%M:%S'),
@@ -261,6 +264,9 @@ async def get_moisture_percentage_graph(user_email: str, plant_id: str, graph_pe
     moisture_record = await prisma.moisturepercentagerecord.find_many(where={
         'plant_id': plant.id
     })
+
+    if len(moisture_record) == 0:
+        return False
 
     time_format = '%Y-%m-%d %H:%M:%S'
     if graph_period in (GraphPeriod.past_hour, GraphPeriod.past_12_hours, GraphPeriod.past_day):

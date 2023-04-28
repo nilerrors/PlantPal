@@ -8,7 +8,12 @@ type Props = {
 export function PlantGraphs({ id }: Props) {
   return (
     <>
-      <div>
+      <div
+        style={{
+          width: window.innerWidth < 600 ? '100%' : undefined,
+          marginInline: window.innerWidth < 600 ? -30 : undefined,
+        }}
+      >
         <IrrigationsGraph plant_id={id} />
         <MoisturePercentageGraph plant_id={id} />
       </div>

@@ -78,42 +78,44 @@ export function Plant() {
             >
               {plant?.name}
             </span>
-            <span style={{ float: 'right' }}>
-              <span
-                style={{
-                  display: window.innerWidth > 770 ? 'none' : undefined,
-                }}
-              >
-                <Button
-                  onClick={() => setOpenForm(!openForm)}
-                  style={{ float: 'right' }}
+            {window.innerWidth > 600 ? (
+              <span style={{ float: 'right' }}>
+                <span
+                  style={{
+                    display: window.innerWidth > 770 ? 'none' : undefined,
+                  }}
                 >
-                  {openForm ? 'Close Form' : 'Change'}
+                  <Button
+                    onClick={() => setOpenForm(!openForm)}
+                    style={{ float: 'right' }}
+                  >
+                    {openForm ? 'Close Form' : 'Change'}
+                  </Button>
+                </span>
+                <Button
+                  style={{ float: 'right' }}
+                  className={`mx-${window.innerWidth < 600 ? 1 : 2}`}
+                >
+                  <Link
+                    to={`/plants/${plant.id}/timestamps`}
+                    className='text-white text-underline-hover'
+                  >
+                    Timestamps
+                  </Link>
+                </Button>
+                <Button
+                  style={{ float: 'right' }}
+                  className={`mt-${window.innerWidth < 600 ? '1' : undefined}`}
+                >
+                  <Link
+                    to={`/plants/${plant.id}/periodstamps`}
+                    className='text-white text-underline-hover'
+                  >
+                    Periodstamps
+                  </Link>
                 </Button>
               </span>
-              <Button
-                style={{ float: 'right' }}
-                className={`mx-${window.innerWidth < 600 ? 1 : 2}`}
-              >
-                <Link
-                  to={`/plants/${plant.id}/timestamps`}
-                  className='text-white text-underline-hover'
-                >
-                  Timestamps
-                </Link>
-              </Button>
-              <Button
-                style={{ float: 'right' }}
-                className={`mt-${window.innerWidth < 600 ? '1' : undefined}`}
-              >
-                <Link
-                  to={`/plants/${plant.id}/periodstamps`}
-                  className='text-white text-underline-hover'
-                >
-                  Periodstamps
-                </Link>
-              </Button>
-            </span>
+            ) : null}
           </h3>
           <hr />
           {error != null ? (
@@ -125,6 +127,7 @@ export function Plant() {
                   <div
                     style={{
                       display: window.innerWidth > 770 ? 'flex' : undefined,
+                      textAlign: window.innerWidth < 770 ? 'center' : undefined,
                     }}
                   >
                     <div
@@ -144,7 +147,48 @@ export function Plant() {
                       </div>
                     ) : null}
                   </div>
-                  <PlantGraphs id={plant.id} />
+                  {window.innerWidth > 600 ? (
+                    <>
+                      <PlantGraphs id={plant.id} />
+                    </>
+                  ) : (
+                    <div className='nav nav-pills nav-fill justify-content-center fixed-bottom mb-3'>
+                      <span
+                        style={{
+                          display: window.innerWidth > 770 ? 'none' : undefined,
+                        }}
+                        className='nav-item'
+                      >
+                        <Button onClick={() => setOpenForm(!openForm)}>
+                          <span className='nav-link text-white'>
+                            {openForm ? 'Close Form' : 'Change'}
+                          </span>
+                        </Button>
+                      </span>
+                      <span className='nav-item'>
+                        <Button
+                          className={`mx-${window.innerWidth < 600 ? 1 : 2}`}
+                        >
+                          <Link
+                            to={`/plants/${plant.id}/timestamps`}
+                            className='text-white text-underline-hover nav-link'
+                          >
+                            Timestamps
+                          </Link>
+                        </Button>
+                      </span>
+                      <span className='nav-item'>
+                        <Button>
+                          <Link
+                            to={`/plants/${plant.id}/periodstamps`}
+                            className='text-white text-underline-hover nav-link'
+                          >
+                            Periodstamps
+                          </Link>
+                        </Button>
+                      </span>
+                    </div>
+                  )}
                 </div>
               </Collapse>
               <Collapse in={openForm}>

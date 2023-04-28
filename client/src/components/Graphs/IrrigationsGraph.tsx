@@ -9,6 +9,7 @@ type Props = {
 
 export function IrrigationsGraph({ plant_id }: Props) {
   const [graph, setGraph] = useState<string | null>()
+  const [noData, setNoData] = useState(true)
 
   const { useApi } = useAuthentication()
 
@@ -18,16 +19,23 @@ export function IrrigationsGraph({ plant_id }: Props) {
         if (!res.ok) return
         return res.text()
       })
-      .then((data) => setGraph(data))
+      .then((data) => {
+        setGraph(data)
+        setNoData(false)
+      })
   }, [])
 
   return (
-    <Container>
-      {graph != null ? (
-        <>
-          <SVG src={graph} style={{ maxWidth: '80vw' }} />
-        </>
-      ) : null}
-    </Container>
+    <>
+      {noData ? null : (
+        <Container>
+          {graph != null ? (
+            <>
+              <SVG src={graph} style={{ maxWidth: '100vw' }} />
+            </>
+          ) : null}
+        </Container>
+      )}
+    </>
   )
 }

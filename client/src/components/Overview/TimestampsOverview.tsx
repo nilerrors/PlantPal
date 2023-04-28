@@ -23,34 +23,40 @@ export function TimestampsOverview({ plant_id, timestamps, remove }: Props) {
 
   return (
     <>
-      <ListGroup className='list-group-flush'>
-        {timestamps
-          .sort((t1, t2) => compareTimestamps(t1, t2))
-          .map((timestamp) => (
-            <ListItemRemoveButton
-              id={timestamp.id}
-              key={timestamp.id}
-              name={`${capitalize(timestamp.day_of_week)} at ${time(
-                timestamp.hour,
-                timestamp.minute
-              )}`}
-              type='timestamp'
-              onRemove={() => {
-                useApi(
-                  `/plants_collection/plants/${plant_id}/timestamps/${timestamp.id}`,
-                  {
-                    method: 'DELETE',
-                  }
-                )
-                  .then(({ res, data }) => data)
-                  .then((data) => {
-                    alert(data?.message ?? data?.detail ?? '')
-                  })
-                remove(timestamp.id)
-              }}
-            />
-          ))}
-      </ListGroup>
+      {timestamps.length > 0 ? (
+        <>
+          <ListGroup className='list-group-flush'>
+            {timestamps
+              .sort((t1, t2) => compareTimestamps(t1, t2))
+              .map((timestamp) => (
+                <ListItemRemoveButton
+                  id={timestamp.id}
+                  key={timestamp.id}
+                  name={`${capitalize(timestamp.day_of_week)} at ${time(
+                    timestamp.hour,
+                    timestamp.minute
+                  )}`}
+                  type='timestamp'
+                  onRemove={() => {
+                    useApi(
+                      `/plants_collection/plants/${plant_id}/timestamps/${timestamp.id}`,
+                      {
+                        method: 'DELETE',
+                      }
+                    )
+                      .then(({ res, data }) => data)
+                      .then((data) => {
+                        alert(data?.message ?? data?.detail ?? '')
+                      })
+                    remove(timestamp.id)
+                  }}
+                />
+              ))}
+          </ListGroup>
+        </>
+      ) : (
+        <h1>No Timestamps</h1>
+      )}
     </>
   )
 }
