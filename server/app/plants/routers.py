@@ -2,7 +2,7 @@ from typing import List
 from fastapi import APIRouter, Depends, HTTPException, status, Response
 from fastapi_jwt_auth import AuthJWT
 from . import crud, schemas
-from src.utils.graph_period import GraphPeriod
+from app.utils.graph_period import GraphPeriod
 
 
 router = APIRouter(prefix="/plants")

@@ -1,6 +1,6 @@
-from src.utils import hasher
+from app.utils import hasher
 from . import schemas
-from src.prisma import prisma
+from app.prisma import prisma
 
 
 async def get_user(user_id: str):

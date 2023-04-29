@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi_jwt_auth import AuthJWT
-from src.utils.send_email import send_email_async
+from app.utils.send_email import send_email_async
 from . import crud, schemas
 
 

@@ -2,12 +2,12 @@ import random
 from prisma.errors import UniqueViolationError as PrismaUniqueViolationError
 import pygal, pygal.style
 import datetime
-from src.auth.crud import get_user_by_email
-from src.utils.graph_period import GraphPeriod
-from src.utils.comparedatetime import filter_timestamps, filter_periodstamps
-from src.utils.minutes_to_weektime import minutes_to_weektime
-from src.prisma import prisma
-from src import auth
+from app.auth.crud import get_user_by_email
+from app.utils.graph_period import GraphPeriod
+from app.utils.comparedatetime import filter_timestamps, filter_periodstamps
+from app.utils.minutes_to_weektime import minutes_to_weektime
+from app.prisma import prisma
+import app.auth as auth
 from . import schemas
 
 

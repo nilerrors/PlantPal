@@ -1,4 +1,4 @@
-from typing import Any, List
+from typing import List
 import datetime
 from prisma.enums import DayOfWeek, IrrigationType
 from pydantic import BaseModel, EmailStr, validator
