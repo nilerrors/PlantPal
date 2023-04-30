@@ -7,7 +7,9 @@ import { Text, View } from "../../components/Themed";
 import { WIFI } from "../../constants/Wifi";
 
 export default function Home() {
-  const [network, setNetwork] = useState<WifiManager.WifiEntry>();
+  const [ESPNetwork, setESPNetwork] = useState<
+    WifiManager.WifiEntry | null | undefined
+  >(null);
 
   const checkNetworkAvailability = async () => {
     const { status } = await Location.requestForegroundPermissionsAsync();
@@ -18,7 +20,11 @@ export default function Home() {
     const list = (await WifiManager.loadWifiList()).filter(
       (n) => n.SSID === WIFI.ssid
     );
-    setNetwork(list.length === 0 ? undefined : list[0]);
+    setESPNetwork(list.length === 0 ? undefined : list[0]);
+  };
+
+  const connectToNetwork = async () => {
+    await WifiManager.connectToProtectedSSID(WIFI.ssid, WIFI.pass, false);
   };
 
   useEffect(() => {
@@ -27,25 +33,34 @@ export default function Home() {
 
   return (
     <View style={styles.container}>
-      {network == undefined ? (
-        <Text>Network Not Found</Text>
+      {ESPNetwork === undefined ? (
+        <>
+          <Text style={styles.title}>Network Not Found</Text>
+          <Text>Device may be OFF</Text>
+        </>
       ) : (
         <>
-          <Text>{JSON.stringify(network)}</Text>
-          <View style={styles.end}>
-            <Button
-              title="Connect"
-              color={"#333"}
-              onPress={() => checkNetworkAvailability()}
-            />
-          </View>
+          {ESPNetwork === null ? null : (
+            <>
+              <Text>{JSON.stringify(ESPNetwork)}</Text>
+            </>
+          )}
         </>
       )}
       <View style={styles.end}>
         <Button
-          title="Check if available"
-          color={"#333"}
-          onPress={() => checkNetworkAvailability()}
+          title={
+            ESPNetwork === null
+              ? "Check if available"
+              : ESPNetwork === undefined
+              ? "Recheck if available"
+              : "Connect"
+          }
+          onPress={() =>
+            ESPNetwork === null || ESPNetwork === undefined
+              ? checkNetworkAvailability()
+              : connectToNetwork()
+          }
         />
       </View>
     </View>
@@ -70,5 +85,6 @@ const styles = StyleSheet.create({
   end: {
     bottom: "5%",
     position: "absolute",
+    width: "60%",
   },
 });
