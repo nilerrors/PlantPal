@@ -9,6 +9,7 @@ private:
   WebServer *server;
 
   void response_base(int statusCode, String body, String title);
+  void response_base_json(int statusCode, String body);
 
   WifiChangeHandler changeWifiCallback;
   PlantCreateHandler plantCreateCallback;

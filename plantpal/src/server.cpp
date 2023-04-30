@@ -4,7 +4,6 @@
 #include <HTTPClient.h>
 #include <WiFi.h>
 
-
 ConfigServer::ConfigServer() {
   server = new WebServer(80);
 
@@ -138,6 +137,116 @@ ConfigServer::ConfigServer() {
     Serial.println("Credentials Form");
   });
 
+  server->on("/api/create_plant", HTTP_POST, [&]() {
+    if (!server->hasArg("email") || !server->hasArg("pass")) {
+      String res = "{\"title\":\"Bad server-request\",\"message\":\"Data could "
+                   "not be validated\"}";
+      response_base_json(400, res);
+    } else {
+      if (WiFi.status() == WL_CONNECTED) {
+        HTTPClient http;
+
+        http.begin("https://10.3.41.39:8000/plants_collection/plants/");
+
+        String email = server->arg("email");
+        String password = server->arg("pass");
+
+        uint64_t chipid = ESP.getEfuseMac();
+        char chipid_str[17];
+        sprintf(chipid_str, "%016llX", chipid);
+
+        http.addHeader("Content-Type", "application/json");
+        String httpServerRequestData = "{\"email\":\"" + email +
+                                       "\",\"password\":\"" + password +
+                                       "\",\"chip_id\":\"" + chipid_str + "\"}";
+
+        int httpResponseCode = http.POST(httpServerRequestData);
+
+        String payload = "";
+
+        if (httpResponseCode > 0) {
+          payload = http.getString();
+          if (httpResponseCode == 200) {
+            String res = "{\"title\":\"Succesfully "
+                         "Created\",\"message\":\"Plant added to "
+                         "account.\",\"payload\":" +
+                         payload + "}";
+            response_base_json(200, res, "Plant Created");
+
+            plantCreateCallback(payload);
+          } else if (httpResponseCode == 401) {
+            String res =
+                "{\"title\":\"Unauthorized\",\"message\":\"Account email and "
+                "password do not correspond.\"}";
+            response_base_json(401, res);
+          } else if (httpResponseCode == 409) {
+            String res = "{\"title\":\"Conflict\",\"message\":\"This device is "
+                         "already registered.\"}";
+            response_base_json(401, res);
+          }
+          Serial.println(payload);
+        } else {
+          String res =
+              "{\"title\":\"Network Error\",\"message\":\"Could not reach the "
+              "Database server\"}";
+          response_base_json(500, res);
+        }
+
+        http.end();
+      } else {
+        String res =
+            "{\"title\":\"Network Error\",\"message\":\"Not connected to "
+            "network\"}";
+        response_base_json(500, res);
+      }
+    }
+  });
+
+  server->on("/api/change_wifi", HTTP_POST, [&]() {
+    if (!server->hasArg("ssid") || !server->hasArg("pass")) {
+      String res = "{\"title\":\"Bad server-request\",\"message\":\"Data could "
+                   "not be validated\"}";
+      response_base_json(400, res);
+    } else {
+      String ssid = server->arg("ssid");
+      String pass = server->arg("pass");
+
+      Serial.print(ssid);
+      Serial.print(" :=: ");
+      Serial.println(pass);
+
+      WiFi.begin(ssid.c_str(), pass.c_str());
+
+      int times = 0;
+      while (WiFi.status() != WL_CONNECTED) {
+        if (times > 10) {
+          String res = "{\"title\":\"Network Error\",\"message\":\"Could not "
+                       "connect to network\"}";
+          response_base_json(500, res);
+          WiFi.disconnect();
+          return;
+        }
+        times++;
+        Serial.print(".");
+        delay(1000);
+      }
+      Serial.println("Connected");
+      Serial.println(WiFi.localIP());
+
+      changeWifiCallback(ssid, pass);
+
+      String res =
+          "{\"title\":\"Connection Successful\",\"message\":\"Connected to "
+          "network with SSID " +
+          ssid + "\"}";
+      response_base_json(500, res);
+    }
+  });
+
+  server->on("/api/change_network_ssid", HTTP_POST, [&]() {
+
+  });
+
   server->onNotFound([&]() {
     response_base(404, "<h1>Not Found</h1>", "404 Page Not Found");
     Serial.print("Not Found: ");
@@ -156,6 +265,10 @@ void ConfigServer::response_base(int statusCode, String body, String title) {
                "</body>";
 
   server->send(statusCode, "text/html", res.c_str());
+}
+
+void ConfigServer::response_base_json(int statusCode, String body) {
+  server->send(statusCode, "application/json", body.c_str());
 }
 
 void ConfigServer::onChangeWifi(WifiChangeHandler fn) {

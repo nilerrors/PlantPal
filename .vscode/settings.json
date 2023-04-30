@@ -4,5 +4,8 @@
   "files.associations": {
     "functional": "cpp"
   },
-  "editor.formatOnSave": true
+  "editor.formatOnSave": true,
+  "[cpp]": {
+    "editor.defaultFormatter": "xaver.clang-format"
+  }
 }
