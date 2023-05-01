@@ -4,6 +4,8 @@
 #include <HTTPClient.h>
 #include <WiFi.h>
 
+Credentials cred;
+
 ConfigServer::ConfigServer() {
   server = new WebServer(80);
 
@@ -171,7 +173,7 @@ ConfigServer::ConfigServer() {
                          "Created\",\"message\":\"Plant added to "
                          "account.\",\"payload\":" +
                          payload + "}";
-            response_base_json(200, res, "Plant Created");
+            response_base_json(200, res);
 
             plantCreateCallback(payload);
           } else if (httpResponseCode == 401) {
@@ -243,8 +245,28 @@ ConfigServer::ConfigServer() {
     }
   });
 
-  server->on("/api/change_network_ssid", HTTP_POST, [&]() {
+  server->on("/api/change_network_ssid_pass", HTTP_POST, [&]() {
+    if (!server->hasArg("ssid") || !server->hasArg("pass") ||
+        strlen(server->arg("pass").c_str()) < 8) {
+      String res = "{\"title\":\"Bad server-request\",\"message\":\"Data could "
+                   "not be validated\"}";
+      response_base_json(400, res);
+    } else {
+      String ssid = server->arg("ssid");
+      String pass = server->arg("pass");
 
+      Serial.print(ssid);
+      Serial.print(" =:= ");
+      Serial.println(pass);
+
+      cred.writeLocalWiFi(ssid, pass);
+
+      WiFi.softAP(ssid.c_str(), pass.c_str());
+
+      String res = "{\"title\":\"Successfully Changed\",\"message\":\"Changed "
+                   "WiFi SSID and Password\"}";
+      response_base_json(500, res);
+    }
   });
 
   server->onNotFound([&]() {

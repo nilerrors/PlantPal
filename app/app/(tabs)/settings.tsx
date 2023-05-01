@@ -1,17 +1,14 @@
-import { StyleSheet } from "react-native";
+import { Button, StyleSheet } from "react-native";
 
 import { Text, View } from "../../components/Themed";
 
-export default function TabTwoScreen() {
+export default function Settings() {
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Tab Two</Text>
-      <View
-        style={styles.separator}
-        lightColor="#eee"
-        darkColor="rgba(255,255,255,0.1)"
-      />
-      <Text>Hello</Text>
+      <Text style={styles.title}></Text>
+      <View>
+        <Button title="Remove Account Details" color="red" onPress={() => {}} />
+      </View>
     </View>
   );
 }

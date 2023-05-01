@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "scripts": {
     "start": "expo start --dev-client",
-    "android": "expo start --android",
+    "android": "expo start --android --dev-client",
     "ios": "expo start --ios",
     "web": "expo start --web",
     "test": "jest --watchAll"
@@ -30,6 +30,7 @@
     "react-native": "0.71.7",
     "react-native-safe-area-context": "4.5.0",
     "react-native-screens": "~3.20.0",
+    "react-native-select-dropdown": "^3.3.3",
     "react-native-web": "~0.18.10",
     "react-native-wifi-reborn": "^4.7.0"
   },

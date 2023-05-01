@@ -3,15 +3,15 @@ import { useEffect, useState } from "react";
 import { API_URL } from "../constants/Api";
 
 export type Account = {
-  email: string | null;
-  pass: string | null;
+  email?: string | null;
+  pass?: string | null;
 };
 
 export type AccountExtended = {
-  isAccountCreated: boolean;
+  isAccountCreated?: boolean;
   user: {
-    email: string | null;
-    pass: string | null;
+    email?: string | null;
+    pass?: string | null;
   };
   set: (email: string, pass: string) => Promise<{ res: Response; data: any }>;
 };
@@ -59,7 +59,10 @@ export function useAccount() {
   }, []);
 
   return {
-    isAccountCreated: account.email != null && account.pass != null,
+    isAccountCreated:
+      account.email === undefined && account.pass === undefined
+        ? undefined
+        : account.email != null && account.pass != null,
     user: {
       email: account.email,
       pass: account.pass,

@@ -2,7 +2,7 @@ import { createContext, useContext, useEffect, useState } from "react";
 import { AccountExtended, useAccount } from "../utils/account";
 
 type Setup = {
-  isSetupDone: boolean;
+  isSetupDone?: boolean;
   account: AccountExtended;
 };
 
@@ -19,7 +19,7 @@ export function useSetup() {
 export function SetupContextProvider(props: {
   children: JSX.Element[] | JSX.Element;
 }) {
-  const [isSetupDone, setIsSetupDone] = useState<boolean>(false);
+  const [isSetupDone, setIsSetupDone] = useState<boolean>();
   const account = useAccount();
 
   const setup: Setup = {

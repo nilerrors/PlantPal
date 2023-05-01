@@ -32,7 +32,9 @@ void setup() {
   WiFi.config(INADDR_NONE, INADDR_NONE, INADDR_NONE, INADDR_NONE);
   WiFi.setHostname(HOSTNAME);
   WiFi.softAPConfig(local_IP, gateway, subnet);
-  WiFi.softAP(PROTO_SSID, PROTO_PASSWORD);
+  String localSSID, localPass;
+  credentials.readLocalWiFi(&localSSID, &localPass);
+  WiFi.softAP(localSSID.c_str(), localPass.c_str());
 
   Serial.print("IP Address = ");
   Serial.println(WiFi.softAPIP());
