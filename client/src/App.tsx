@@ -19,37 +19,39 @@ function App() {
 
   const { loggedin } = useAuthentication()
 
+  if (!loggedin) {
+    return (
+      <Routes>
+        <Route path='/login' element={<Login />} />
+        <Route path='/signup' element={<Signup />} />
+        <Route path='/verify' element={<EmailVerification />} />
+        <Route path='/verify/:id' element={<VerifyEmail />} />
+        <Route path='*' element={<Navigate to='/login' />} />
+      </Routes>
+    )
+  }
+
   return (
     <>
-      {!loggedin ? (
+      <NavBar />
+      <main className='bg-dark text-white position-absolute p-0 m-0'>
         <Routes>
-          <Route path='/login' element={<Login />} />
-          <Route path='/signup' element={<Signup />} />
-          <Route path='/verify' element={<EmailVerification />} />
-          <Route path='/verify/:id' element={<VerifyEmail />} />
-          <Route path='*' element={<Navigate to='/login' />} />
+          <Route index element={<Home />} />
+          <Route path='/tutorial' element={<SetupTutorial />} />
+          <Route path='/plants' element={<Plants />} />
+          <Route path='/plants/:id' element={<Plant />} />
+          <Route path='/plants/:id/timestamps' element={<Timestamps />} />
+          <Route path='/plants/:id/periodstamps' element={<Periodstamps />} />
+          <Route path='/settings' element={<Settings />} />
+          <Route path='/signout' element={<Signout />} />
+          <Route path='*' element={<Navigate to='/' />} />
         </Routes>
-      ) : (
-        <>
-          <NavBar />
-          <main className='bg-dark text-white position-absolute p-0 m-0'>
-            <Routes>
-              <Route index element={<Home />} />
-              <Route path='/tutorial' element={<SetupTutorial />} />
-              <Route path='/plants' element={<Plants />} />
-              <Route path='/plants/:id' element={<Plant />} />
-              <Route path='/plants/:id/timestamps' element={<Timestamps />} />
-              <Route
-                path='/plants/:id/periodstamps'
-                element={<Periodstamps />}
-              />
-              <Route path='/settings' element={<Settings />} />
-              <Route path='/signout' element={<Signout />} />
-              <Route path='*' element={<Navigate to='/' />} />
-            </Routes>
-          </main>
-        </>
-      )}
+        <footer className='fixed-bottom mb-0 mx-3'>
+          <p className='text-white' style={{ float: 'right', fontSize: 10 }}>
+            by <a href='https://github.com/nilerrors'>nilerrors</a>
+          </p>
+        </footer>
+      </main>
     </>
   )
 }

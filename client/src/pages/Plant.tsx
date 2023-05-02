@@ -151,11 +151,14 @@ export function Plant() {
                     ) : null}
                   </div>
                   {window.innerWidth > 600 ? (
-                    <>
+                    <div style={{}} className='d-flex justify-content-center'>
                       <PlantGraphs id={plant.id} />
-                    </>
+                    </div>
                   ) : (
-                    <div className='nav nav-pills nav-fill justify-content-center fixed-bottom mb-3'>
+                    <div
+                      className='nav nav-pills nav-fill justify-content-center fixed-bottom mb-5'
+                      style={{ zIndex: 100 }}
+                    >
                       <span
                         style={{
                           display: window.innerWidth > 770 ? 'none' : undefined,
