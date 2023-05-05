@@ -28,7 +28,7 @@ if __name__ == '__main__':
     IP_ADDRESS  = socket.gethostbyname(socket.gethostname())
 
 
-    PRISMA_COMMAND = f'cd {SERVER_PATH}/src/prisma && PowerShell if (Test-Path -Path ./migrations) {"{"}rm -r -fo ./migrations{"}"} && prisma generate && prisma migrate {"dev" if DEV else "prod"} --name={MIGRATION_NAME}'
+    PRISMA_COMMAND = f'cd {SERVER_PATH} && prisma generate && prisma migrate {"dev" if DEV else "prod"} --name={MIGRATION_NAME}'
 
     if "--prisma" in argv:
         os.system(PRISMA_COMMAND)
@@ -53,11 +53,11 @@ if __name__ == '__main__':
         text += 'DATABASE_URL="postgresql://postgres:postgres@localhost:5432/management"\n'
         f.write(text)
 
-    with open(SERVER_PATH + 'src\\prisma\\.env', 'w') as f:
-        text = 'DATABASE_URL="postgresql://postgres:postgres@localhost:5432/management"\n'
-        f.write(text)
+    # with open(SERVER_PATH + '/prisma\\.env', 'w') as f:
+    #     text = 'DATABASE_URL="postgresql://postgres:postgres@localhost:5432/management"\n'
+    #     f.write(text)
 
-    os.system(f'cd {SERVER_PATH} && py -m venv venv && pip install -r requirements.txt')
+    os.system(f'cd {SERVER_PATH} && py -m venv venv && .\\venv\\Scripts\\Activate.ps1 && pip install -r requirements.txt')
 
     ## Prisma
-    os.system(f'cd {SERVER_PATH} && cd src/prisma && prisma generate && prisma migrate {"dev" if DEV else "prod"} --name={MIGRATION_NAME}')
+    os.system(PRISMA_COMMAND)
