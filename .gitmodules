@@ -1,3 +1,6 @@
 [submodule "server"]
 	path = server
 	url = https://github.com/nilerrors/PlantPal-server
+[submodule "client"]
+	path = client
+	url = https://github.com/nilerrors/PlantPal-client
