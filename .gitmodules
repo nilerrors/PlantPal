@@ -7,3 +7,6 @@
 [submodule "app"]
 	path = app
 	url = https://github.com/nilerrors/PlantPal-app
+[submodule "plantpal"]
+	path = plantpal
+	url = https://github.com/nilerrors/PlantPal-device
