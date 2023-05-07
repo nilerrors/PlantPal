@@ -70,7 +70,7 @@ Write-Host ".\run.ps1 client"
 cd ..
 
 Set-Content .\server\.env ('
-AUTHJWT_SECRET_KEY="$RANDOM_STRING"
+AUTHJWT_SECRET_KEY="' + $RANDOM_STRING + '"
 
 MAIL_USERNAME="' + $EMAIL + '"
 MAIL_PASSWORD=""
