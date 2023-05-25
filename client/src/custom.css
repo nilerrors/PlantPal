@@ -1,0 +1,23 @@
+@import 'bootstrap/dist/css/bootstrap.min.css';
+
+main {
+  overflow-y: auto;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  top: 55px;
+}
+
+@media (max-width: 992px) {
+  main {
+    top: 60px;
+  }
+}
+
+.text-underline-hover {
+  text-decoration: none;
+}
+
+.text-underline-hover:hover {
+  text-decoration: underline;
+}
