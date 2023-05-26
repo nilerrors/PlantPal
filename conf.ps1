@@ -64,7 +64,7 @@ if (ArgsContains("--prisma")) {
   exit
 }
 
-Set-Content .\client\.env ('VITE_API_BASE_URL="http://' + $EMAIL + ':8000"')
+Set-Content .\client\.env ('VITE_API_BASE_URL="http://' + (Get-NetIPAddress -AddressFamily IPv4 -InterfaceAlias Ethernet).IPAddress + ':8000"')
 cd client && yarn --silent
 Write-Host ".\run.ps1 client"
 cd ..

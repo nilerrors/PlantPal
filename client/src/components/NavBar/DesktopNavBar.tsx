@@ -27,7 +27,7 @@ export function DesktopNavBar({ urls }: DesktopNavBarProps) {
             <Nav.Item key={url.title} className='my-lg-0'>
               <Link
                 to={url.path}
-                className={`text-white mx-2 text-underline-hover px-2`}
+                className='text-white mx-2 text-underline-hover px-2'
                 onClick={() => setShow(false)}
               >
                 {url.title}

@@ -26,11 +26,6 @@ export function Home() {
           <span className='display-1'>Settings</span>
         </Link>
       </h2>
-      <h2 className='fixed-bottom mb-5 mx-5'>
-        <Link to='/signout' className='text-underline-hover'>
-          <span className='display-4 text-danger'>Sign Out</span>
-        </Link>
-      </h2>
     </Container>
   )
 }

@@ -37,7 +37,10 @@ export function NavBar() {
             navigate(0)
           }}
         >
-          <Navbar.Brand className='text-dark text-underline-hover'>
+          <Navbar.Brand
+            className='text-dark text-underline-hover'
+            style={{ fontSize: '2.3rem' }}
+          >
             PlantPal
           </Navbar.Brand>
         </Link>
