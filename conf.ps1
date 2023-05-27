@@ -64,11 +64,23 @@ if (ArgsContains("--prisma")) {
   exit
 }
 
+# app
+cd .\app
+yarn
+cd ..
+
+# client
 Set-Content .\client\.env ('VITE_API_BASE_URL="http://' + (Get-NetIPAddress -AddressFamily IPv4 -InterfaceAlias Ethernet).IPAddress + ':8000"')
 cd client && yarn --silent
 Write-Host ".\run.ps1 client"
 cd ..
 
+# plantpal
+cd .\plantpal
+Set-Content .\server_url.h ('#define SERVER_URL "http://' + (Get-NetIPAddress -AddressFamily IPv4 -InterfaceAlias Ethernet).IPAddress + ':8000"')
+cd ..
+
+# server
 Set-Content .\server\.env ('
 AUTHJWT_SECRET_KEY="' + $RANDOM_STRING + '"
 

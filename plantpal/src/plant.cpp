@@ -1,17 +1,22 @@
 #include "plant.h"
 #include "consts.h"
+#include "server_url.h"
 #include <ArduinoJson.h>
 
-char *chip_id() {
+void chip_id(char *chipid_str) {
   uint64_t chipid = ESP.getEfuseMac();
-  char chipid_str[17];
   sprintf(chipid_str, "%016llX", chipid);
-  return chipid_str;
 }
 
 String Plant::credentials() {
-  return String(String("{\"plant_id\":\"") + this->ID() + "\",\"chip_id\":\"" +
-                chip_id() + "\"");
+  String creds;
+  StaticJsonDocument<512> doc;
+  doc["plant_id"] = this->ID();
+  char chipid[17];
+  chip_id(chipid);
+  doc["chip_id"] = String(chipid);
+  serializeJson(doc, creds);
+  return creds;
 }
 
 bool Plant::isCreated() { return this->ID() != ""; }
@@ -28,7 +33,7 @@ bool Plant::create(String id) {
 }
 
 bool Plant::fetch() {
-  if (this->ID() == "") {
+  if (!this->isCreated()) {
     Serial.println('Plant not created');
     return false;
   }
@@ -70,7 +75,7 @@ bool Plant::shouldIrrigate(uint8_t moisture_percentage) {
   // if value is 255 then check server
   // else compare with moisture_pecentage_threshold
   if (moisture_percentage == 255) {
-    if (this->ID() == "") {
+    if (!this->isCreated()) {
       Serial.println('Plant not created');
       return false;
     }
@@ -92,6 +97,23 @@ bool Plant::shouldIrrigate(uint8_t moisture_percentage) {
   }
 
   return moisture_percentage < this->moisturePercentageThreshold();
+}
+
+bool Plant::setMoisturePercentage(uint8_t percentage) {
+  if (!this->isCreated()) {
+    Serial.println('Plant not created');
+    return false;
+  }
+  String url =
+      String(SERVER_URL) + "/plants/current_moisture/" + String(percentage);
+  _http.begin(url.c_str());
+
+  int status_code = _http.POST(this->credentials());
+  if (status_code == 400 || status_code == 404) {
+    return false;
+  }
+
+  return true;
 }
 
 String Plant::ID() {

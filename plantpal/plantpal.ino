@@ -17,7 +17,7 @@ unsigned long last_time = 0;
 unsigned long last_time_pump_check = 0;
 unsigned long last_time_plant_fetch = 0;
 
-IPAddress local_IP(168, 192, 1, 1);
+IPAddress local_IP(192, 168, 1, 1);
 IPAddress gateway = local_IP;
 IPAddress subnet(255, 255, 255, 0);
 
@@ -119,6 +119,7 @@ void loop() {
 
   if ((millis() - last_time_plant_fetch) > 30000) {
     plant.fetch();
+    last_time_plant_fetch = millis();
   }
 
   // Get data about irrigation
@@ -135,6 +136,7 @@ void loop() {
       // delay(1000);
       digitalWrite(WATER_PUMP_PIN, HIGH);
     }
+    last_time_pump_check = millis();
   }
 
   if ((millis() - last_time) > INTERVAL) {
@@ -142,7 +144,7 @@ void loop() {
      * moisture_sensor
      */
     uint16_t moisture_analog = analogRead(MOISTURE_SENSOR_PIN);
-    Serial.println(moisture_analog);
+    // Serial.println(moisture_analog);
     uint8_t moisture_percentage =
         map(moisture_analog, MOISTURE_NONE, MOISTURE_WET, 0, 100);
     if (moisture_percentage > 100)
@@ -150,16 +152,18 @@ void loop() {
     if (moisture_percentage < 0)
       moisture_percentage = 0;
 
-    // Serial.print("Moisture = ");
-    // Serial.print(moisture_percentage);
-    // Serial.println("%");
+    plant.setMoisturePercentage(moisture_percentage);
+
+    Serial.print("Moisture = ");
+    Serial.print(moisture_percentage);
+    Serial.println("%");
     // delay(1000);
 
     // Check if plant should be irrigated
     // based on the data from irrigation
     if (plant.shouldIrrigate(moisture_percentage)) {
       // start pomp
-      // Serial.println("Start pomp");
+      Serial.println("Start pomp");
       // delay(1000);
       digitalWrite(WATER_PUMP_PIN, HIGH);
     }
@@ -190,7 +194,7 @@ void loop() {
       if (flow_meter.total_milli_litres >= plant.waterAmount()) {
         flow_meter.total_milli_litres = 0;
         // stop pomp
-        // Serial.println("Stop pomp");
+        Serial.println("Stop pomp");
         // delay(1000);
         digitalWrite(WATER_PUMP_PIN, LOW);
       }

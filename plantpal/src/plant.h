@@ -19,5 +19,6 @@ public:
   bool isCreated();
   bool create(String id);
   bool shouldIrrigate(uint8_t moisture_percentage = 255);
+  bool setMoisturePercentage(uint8_t percentage);
   bool fetch();
 };

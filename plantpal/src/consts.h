@@ -1,5 +1,3 @@
-#define SERVER_URL "http://10.3.41.39:8000"
-
 #define PROTO_SSID "PlantPalConfig"
 #define PROTO_PASSWORD "plantpal"
 #define HOSTNAME "PlantPal"
@@ -10,8 +8,6 @@
 
 #define MOISTURE_NONE 2680
 #define MOISTURE_WET 1050
-#define IRRIGATION_THRESHOLD_PERCENTAGE 50
-#define IRRIGATION_AMOUNT 1000
 #define CALIBRATION_FACTOR 4.5
 
 #define INTERVAL 1000
