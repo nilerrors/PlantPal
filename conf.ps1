@@ -77,7 +77,7 @@ cd ..
 
 # plantpal
 cd .\plantpal
-Set-Content .\server_url.h ('#define SERVER_URL "http://' + (Get-NetIPAddress -AddressFamily IPv4 -InterfaceAlias Ethernet).IPAddress + ':8000"')
+Set-Content .\src\server_url.h ('#define SERVER_URL "http://' + (Get-NetIPAddress -AddressFamily IPv4 -InterfaceAlias Ethernet).IPAddress + ':8000"')
 cd ..
 
 # server
