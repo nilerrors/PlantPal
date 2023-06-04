@@ -219,6 +219,8 @@ async def get_plant_today_next_time(plant_id: str, chip_id: str):
     times = await get_plant_today_times(plant_id, chip_id)
     if times is None:
         return None
+    if len(times) == 0:
+        return 'no times'
     
     return times[0]
 

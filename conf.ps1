@@ -70,17 +70,84 @@ yarn
 cd ..
 
 # client
-Set-Content .\client\.env ('VITE_API_BASE_URL="http://' + (Get-NetIPAddress -AddressFamily IPv4 -InterfaceAlias Ethernet).IPAddress + ':8000"')
+Set-Content .\client\.env ('VITE_API_BASE_URL="http://' + (GetIP) + ':8000"')
 cd client && yarn --silent
 Write-Host ".\run.ps1 client"
 cd ..
 
 # plantpal
 cd .\plantpal
-Set-Content .\src\server_url.h ('#define SERVER_URL "http://' + (Get-NetIPAddress -AddressFamily IPv4 -InterfaceAlias Ethernet).IPAddress + ':8000"')
+Set-Content .\src\server_url.h ('#define SERVER_URL "http://' + (GetIP) + ':8000"')
 cd ..
 
 # server
+Set-Content .\server\app\templates\email\verify.html ('<!DOCTYPE html>
+<html>
+  <body
+    style="
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: Arial, Helvetica, sans-serif;
+    "
+  >
+    <div
+      style="
+        width: 100%;
+        background: #efefef;
+        border-radius: 10px;
+        padding: 10px;
+      "
+    >
+      <div style="margin: 0 auto; width: 90%; text-align: center">
+        <h1
+          style="
+            background-color: rgba(0, 53, 102, 1);
+            padding: 5px 10px;
+            border-radius: 5px;
+            color: white;
+          "
+        >
+          {{ title }}
+        </h1>
+        <div
+          style="
+            margin: 30px auto;
+            background: white;
+            width: 40%;
+            border-radius: 10px;
+            padding: 50px;
+            text-align: center;
+          "
+        >
+          <h2 style="margin-bottom: 100px; font-size: 24px">Hi {{ name }}!</h2>
+          <p style="margin-bottom: 30px">Verification Code:</p>
+          <h4><b>{{ code }}</b></h4>
+          <p style="margin-bottom: 30px">You can verify your account here:</p>
+          <a
+            style="
+              display: block;
+              margin: 0 auto;
+              background-color: linear-gradient(
+                to right,
+                rgba(106, 17, 203, 1),
+                rgba(37, 117, 252, 1)
+              );
+              color: black;
+              cursor: pointer;
+              text-decoration: none;
+            "
+            href="http://' + (GetIP) + '/verify/{{ user_id }}/{{ code }}"
+            target="_blank"
+          >
+            Verify Account
+          </a>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>')
+
 Set-Content .\server\.env ('
 AUTHJWT_SECRET_KEY="' + $RANDOM_STRING + '"
 

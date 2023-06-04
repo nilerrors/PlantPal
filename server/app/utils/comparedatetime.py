@@ -74,9 +74,7 @@ def stamps_args_today(now: datetime.datetime):
             },
         ],
         'where': {
-            'day_of_week': {
-                'eq': inttoweekday(now.weekday())
-            },
+            'day_of_week': inttoweekday(now.weekday()),
             'hour': {
                 'gte': now.hour,
             },

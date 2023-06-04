@@ -6,7 +6,7 @@
 #include <ArduinoJson.h>
 #include <WiFi.h>
 
-FlowMeter flow_meter = {FLOW_METER_PIN, 0, 0, false, 0};
+volatile FlowMeter flow_meter = {FLOW_METER_PIN, 0, 0, false, 0};
 
 void IRAM_ATTR pulseCounter() {
   flow_meter.pulses_count++;
@@ -62,7 +62,7 @@ void setup() {
     int times = 0;
     while (WiFi.status() != WL_CONNECTED) {
       times++;
-      if (times > 20) { // 60000 -> 60sec
+      if (times > 20) {
         Serial.println(" Could not connect");
         credentials.writeWiFi("", "");
         Serial.println("Wifi network credentials need to be updated.");
@@ -114,30 +114,19 @@ void loop() {
     return;
   }
 
-  // Get plant configuration data
-  // every 5 minutes or custom
-
   if ((millis() - last_time_plant_fetch) > 30000) {
     plant.fetch();
     last_time_plant_fetch = millis();
   }
 
-  // Get data about irrigation
-  // every 30 seconds
-  if ((millis() - last_time_pump_check) > 30000) {
-    if (plant.shouldIrrigate()) {
-      // start pomp
-      // Serial.println("Start pomp");
-      // delay(1000);
-      digitalWrite(WATER_PUMP_PIN, HIGH);
-    } else {
-      // start pomp
-      // Serial.println("Start pomp");
-      // delay(1000);
-      digitalWrite(WATER_PUMP_PIN, HIGH);
-    }
+  if ((millis() - last_time_pump_check) > 30000 && plant.shouldIrrigate()) {
+    Serial.println("Start pomp hi");
+    digitalWrite(WATER_PUMP_PIN, HIGH);
     last_time_pump_check = millis();
   }
+  //  else {
+  //   digitalWrite(WATER_PUMP_PIN, LOW);
+  // }
 
   if ((millis() - last_time) > INTERVAL) {
     /*
@@ -157,14 +146,9 @@ void loop() {
     Serial.print("Moisture = ");
     Serial.print(moisture_percentage);
     Serial.println("%");
-    // delay(1000);
 
-    // Check if plant should be irrigated
-    // based on the data from irrigation
     if (plant.shouldIrrigate(moisture_percentage)) {
-      // start pomp
-      Serial.println("Start pomp");
-      // delay(1000);
+      Serial.println("Start pomp hoi");
       digitalWrite(WATER_PUMP_PIN, HIGH);
     }
 
@@ -193,9 +177,7 @@ void loop() {
 
       if (flow_meter.total_milli_litres >= plant.waterAmount()) {
         flow_meter.total_milli_litres = 0;
-        // stop pomp
-        Serial.println("Stop pomp");
-        // delay(1000);
+        Serial.println("Stop pomp lkj");
         digitalWrite(WATER_PUMP_PIN, LOW);
       }
     }
