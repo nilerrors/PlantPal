@@ -98,7 +98,7 @@ void loop() {
       times++;
       if (times > 30) {
         Serial.println(" Could not connect");
-        credentials.writeWiFi("", "");
+        // credentials.writeWiFi("", "");
         Serial.println("Wifi network credentials need to be updated.");
         Serial.println("Restarting ESP");
         ESP.restart();
@@ -117,18 +117,19 @@ void loop() {
   if ((millis() - last_time_plant_fetch) > 30000) {
     plant.fetch();
     last_time_plant_fetch = millis();
+    Serial.println("Plant fetched");
   }
 
-  if ((millis() - last_time_pump_check) > 30000 && plant.shouldIrrigate()) {
-    Serial.println("Start pomp hi");
-    digitalWrite(WATER_PUMP_PIN, HIGH);
-    last_time_pump_check = millis();
-  }
+  // if ((millis() - last_time_pump_check) > 30000 && plant.shouldIrrigate()) {
+  //   Serial.println("Start pomp hi");
+  //   digitalWrite(WATER_PUMP_PIN, HIGH);
+  //   last_time_pump_check = millis();
+  // }
   //  else {
   //   digitalWrite(WATER_PUMP_PIN, LOW);
   // }
 
-  if ((millis() - last_time) > INTERVAL) {
+  if ((millis() - last_time) > 1000) {
     /*
      * moisture_sensor
      */
@@ -166,17 +167,17 @@ void loop() {
       flow_meter.running = false;
 
       float flow_milli_litres = (flow_rate / 60) * 1000;
-      // Serial.print("Flow Milli Litres: ");
-      // Serial.println(flow_milli_litres);
-      // delay(1000);
       flow_meter.total_milli_litres += flow_milli_litres;
 
-      // Serial.print("Total milli Litres: ");
-      // Serial.println(flow_meter.total_milli_litres);
+      Serial.print("Total milli Litres: ");
+      Serial.println(flow_meter.total_milli_litres);
       // delay(1000);
 
-      if (flow_meter.total_milli_litres >= plant.waterAmount()) {
+      if (flow_meter.total_milli_litres > plant.waterAmount()) {
+        Serial.print("Water Amount: ");
+        Serial.println(plant.waterAmount());
         flow_meter.total_milli_litres = 0;
+        flow_meter.pulses_count = 0;
         Serial.println("Stop pomp lkj");
         digitalWrite(WATER_PUMP_PIN, LOW);
       }

@@ -1,5 +1,5 @@
 # Templates
-/app/templates/email/verify.html
+**/templates/email/verify.html
 
 # Prisma
 **/prisma/migrations/

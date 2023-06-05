@@ -74,29 +74,30 @@ bool Plant::fetch() {
 bool Plant::shouldIrrigate(uint8_t moisture_percentage) {
   // if value is 255 then check server
   // else compare with moisture_pecentage_threshold
-  if (moisture_percentage == 255) {
-    if (!this->isCreated()) {
-      Serial.println('Plant not created');
-      return false;
-    }
-    String url = String(SERVER_URL) + "/plants/should_irrigate_now";
-    _http.begin(url.c_str());
-
-    int status_code = _http.POST(this->credentials());
-    if (status_code == 404) {
-      return false;
-    }
-
-    // parse json
-    String payload = _http.getString();
-    StaticJsonDocument<512> doc;
-    deserializeJson(doc, payload.c_str());
-
-    bool should_irrigate_now = doc["irrigate"].as<bool>();
-    return should_irrigate_now;
+  if (!this->isCreated()) {
+    Serial.println('Plant not created');
+    return false;
+  }
+  if (this->autoIrrigation() &&
+      moisture_percentage < this->moisturePercentageThreshold()) {
+    return true;
   }
 
-  return moisture_percentage < this->moisturePercentageThreshold();
+  String url = String(SERVER_URL) + "/plants/should_irrigate_now";
+  _http.begin(url.c_str());
+
+  int status_code = _http.POST(this->credentials());
+  if (status_code == 404) {
+    return false;
+  }
+
+  // parse json
+  String payload = _http.getString();
+  StaticJsonDocument<512> doc;
+  deserializeJson(doc, payload.c_str());
+
+  bool should_irrigate_now = doc["irrigate"].as<bool>();
+  return should_irrigate_now;
 }
 
 bool Plant::setMoisturePercentage(uint8_t percentage) {
