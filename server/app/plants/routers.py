@@ -222,7 +222,7 @@ async def get_current_moisture_chart(plant_id: str, Authorize: AuthJWT = Depends
 
 @router.post('/current_moisture/{percentage}')
 async def set_current_moisture(percentage: int, plant: schemas.PlantESPGet):
-    if not (0 < percentage < 100):
+    if not (0 <= percentage <= 100):
         raise HTTPException(status.HTTP_400_BAD_REQUEST, "Percentage should be in range(0, 100)")
     current_moisture = await crud.register_current_moisture(percentage, plant)
     if current_moisture is None:
