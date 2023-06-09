@@ -6,7 +6,7 @@ import { useNetwork } from "../../contexts/NetworkContext";
 
 export function CustomDeviceCredentials() {
   const {
-    allNetworks,
+    allPlantPalNetworks,
     checkNetworkAvailability: refetchNetworks,
     wifi: network,
     setWifi: setNetwork,
@@ -17,7 +17,7 @@ export function CustomDeviceCredentials() {
         SSID
       </Text>
       <SelectDropdown
-        data={allNetworks.map((n) => n.SSID)}
+        data={allPlantPalNetworks.map((n) => n.SSID)}
         onSelect={(value) => {
           setNetwork({ ...network, ssid: value });
           refetchNetworks();

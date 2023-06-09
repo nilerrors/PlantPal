@@ -1,4 +1,3 @@
-import WifiManager from "react-native-wifi-reborn";
 import { useEffect, useState } from "react";
 import { Button, TextInput, View } from "react-native";
 import { Checkbox } from "expo-checkbox";
@@ -6,24 +5,20 @@ import SelectDropdown from "react-native-select-dropdown";
 import { Text } from "../Themed";
 import { FontAwesome } from "@expo/vector-icons";
 import { getNetwork, setNetwork } from "../../utils/networkCredentials";
+import { useNetwork } from "../../contexts/NetworkContext";
 
 type Props = {
-  allNetworks: WifiManager.WifiEntry[];
-  refetchNetworks: () => void;
   onDeviceConnect: () => void;
 };
 
-export function WiFiNetwork({
-  allNetworks,
-  refetchNetworks,
-  onDeviceConnect,
-}: Props) {
+export function WiFiNetwork({ onDeviceConnect }: Props) {
+  const { allOtherNetworks, checkNetworkAvailability: refetchNetworks } =
+    useNetwork();
   const [ssid, setSsid] = useState("");
   const [pass, setPass] = useState("");
   const [saveForNext, setSaveForNext] = useState(true);
   const [error, setError] = useState<string>();
   const [loading, setLoading] = useState(false);
-  const [isDeviceConnected, setIsDeviceConnected] = useState<boolean>(false);
 
   useEffect(() => {
     getNetwork().then((network) => {
@@ -60,9 +55,8 @@ export function WiFiNetwork({
         setLoading(false);
         if (data.title == "Connection Successful") {
           setError(undefined);
-          setIsDeviceConnected(true);
-          onDeviceConnect();
           alert("Device is connected to network");
+          onDeviceConnect();
           if (saveForNext) {
             setNetwork(ssid, pass);
           }
@@ -98,7 +92,7 @@ export function WiFiNetwork({
         )}
         <Text style={{ fontSize: 30 }}>Network SSID</Text>
         <SelectDropdown
-          data={allNetworks.map((n) => n.SSID)}
+          data={allOtherNetworks.map((n) => n.SSID)}
           onFocus={refetchNetworks}
           onSelect={(s) => {
             setSsid(s);

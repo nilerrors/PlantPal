@@ -12,6 +12,7 @@ export type Account = {
 };
 
 export type AccountExtended = {
+  firstLoading: boolean;
   loading: boolean;
   user: Account;
   isSetupDone: boolean;
@@ -36,6 +37,7 @@ export function AccountContextProvider(props: {
 }): JSX.Element {
   const [account, setAccountData] = useState<Account>({} as Account);
   const [isSetupDone, setIsSetupDone] = useState(false);
+  const [firstLoading, setFirstLoading] = useState(false);
   const [loading, setLoading] = useState(false);
 
   async function set(
@@ -98,14 +100,14 @@ export function AccountContextProvider(props: {
   }
 
   useEffect(() => {
-    setLoading(true);
+    setFirstLoading(true);
     getAccount()
       .then((a) => {
         setAccountData(a);
-        setLoading(false);
+        setFirstLoading(false);
       })
       .catch((err) => {
-        setLoading(false);
+        setFirstLoading(false);
         console.log(err);
       });
   }, []);
@@ -122,6 +124,7 @@ export function AccountContextProvider(props: {
   return (
     <AccountContext.Provider
       value={{
+        firstLoading,
         loading,
         isSetupDone,
         user: account,

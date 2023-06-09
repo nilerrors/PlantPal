@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Button, TextInput, View } from "react-native";
 import { Text } from "../Themed";
+import { WIFI } from "../../constants/Wifi";
 
 type Props = {
   name: string;
@@ -14,7 +15,11 @@ export function ChangeWifi({ name, onChangeWifi }: Props) {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    setSsid("plantpal-" + name);
+    if (name === WIFI.ssid) {
+      setSsid(WIFI.ssid);
+    } else {
+      setSsid("plantpal-" + name);
+    }
   }, []);
 
   const handleSubmit = () => {

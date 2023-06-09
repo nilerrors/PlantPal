@@ -5,7 +5,10 @@ import { WIFI } from "../constants/Wifi";
 
 type Network = {
   allNetworks: WifiManager.WifiEntry[];
+  allPlantPalNetworks: WifiManager.WifiEntry[];
+  allOtherNetworks: WifiManager.WifiEntry[];
   ESPNetwork?: WifiManager.WifiEntry;
+  found: boolean;
   isCustomNetwork: boolean;
   setIsCustomNetwork: (value: boolean) => void;
   wifi: { ssid: string; pass: string };
@@ -31,6 +34,9 @@ export function NetworkContextProvider(props: {
   children: JSX.Element[] | JSX.Element;
 }) {
   const [allNetworks, setAllNetworks] = useState<WifiManager.WifiEntry[]>([]);
+  const [allPlantPalNetworks, setAllPlantPalNetworks] = useState<
+    WifiManager.WifiEntry[]
+  >([]);
   const [ESPNetwork, setESPNetwork] = useState<WifiManager.WifiEntry>();
   const [isCustomNetwork, setIsCustomNetwork] = useState(false);
   const [wifi, setWifi] = useState<{
@@ -58,6 +64,13 @@ export function NetworkContextProvider(props: {
       ).then((list) => {
         list.filter((n) => n.SSID != "(hidden SSID)");
         setAllNetworks(list.filter((n) => n.SSID != "(hidden SSID)"));
+        setAllPlantPalNetworks(
+          list.filter(
+            (n) =>
+              n.SSID != "(hidden SSID)" &&
+              (n.SSID.startsWith("plantpal-") || n.SSID === WIFI.ssid)
+          )
+        );
         setESPNetwork(
           list
             .filter((n) => n.SSID != "(hidden SSID)")
@@ -67,6 +80,10 @@ export function NetworkContextProvider(props: {
                 .filter((n) => n.SSID != "(hidden SSID)")
                 .filter((n) => n.SSID === wifi.ssid)[0]
         );
+
+        WifiManager.getCurrentWifiSSID().then((ssid) => {
+          setConnected(ssid === wifi.ssid);
+        });
       });
 
       return wifi;
@@ -81,7 +98,7 @@ export function NetworkContextProvider(props: {
         });
       })
       .catch((err) => {
-        console.log(err);
+        console.error(err);
       });
   };
 
@@ -95,11 +112,7 @@ export function NetworkContextProvider(props: {
     checkNetworkAvailability(true);
     const checkNetworkIsAvailable = setInterval(() => {
       checkNetworkAvailability();
-      WifiManager.getCurrentWifiSSID().then((ssid) => {
-        // console.log(wifi);
-        setConnected(ssid === wifi.ssid);
-      });
-    }, 8000);
+    }, 5000);
     return () => clearInterval(checkNetworkIsAvailable);
   }, []);
 
@@ -107,7 +120,12 @@ export function NetworkContextProvider(props: {
     <NetworkContext.Provider
       value={{
         allNetworks,
+        allPlantPalNetworks,
+        allOtherNetworks: allNetworks.filter(
+          (n) => n.SSID !== WIFI.ssid && !n.SSID.startsWith("plantpal-")
+        ),
         ESPNetwork,
+        found: ESPNetwork !== undefined,
         isCustomNetwork,
         setIsCustomNetwork,
         wifi,

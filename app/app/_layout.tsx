@@ -49,9 +49,11 @@ export default function RootLayout() {
 
 function RootLayoutNav() {
   const colorScheme = useColorScheme();
-  const { loading, isSetupDone } = useAccount();
+  const { firstLoading, loading, isSetupDone } = useAccount();
 
-  console.log(isSetupDone);
+  if (firstLoading) {
+    return <SplashScreen />;
+  }
 
   return (
     <>

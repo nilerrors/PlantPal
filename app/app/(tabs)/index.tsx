@@ -13,7 +13,9 @@ import { useNetwork } from "../../contexts/NetworkContext";
 export default function Home() {
   const {
     allNetworks,
-    ESPNetwork,
+    allOtherNetworks,
+    // ESPNetwork,
+    found,
     isCustomNetwork,
     setIsCustomNetwork,
     wifi,
@@ -27,19 +29,13 @@ export default function Home() {
 
   const [recheckLoading, setRecheckLoading] = useState(false);
   const [currentForm, setCurrentForm] = useState<
-    "wifi_cred" | "create_plant" | "change_wifi"
-  >();
+    "connect" | "wifi_cred" | "create_plant" | "change_wifi"
+  >("connect");
   const [currentPlantID, setCurrenPlantID] = useState<string>();
 
   useEffect(() => {
-    setInterval(() => {
-      WifiManager.getCurrentWifiSSID().then((ssid) => {
-        if (ssid !== wifi.ssid) {
-          setCurrentForm("wifi_cred");
-        }
-      });
-    }, 2000);
-  }, []);
+    setCurrentForm((form) => (connected ? form : "wifi_cred"));
+  }, [connected]);
 
   if (locationAccess !== undefined && !locationAccess) {
     return (
@@ -56,7 +52,7 @@ export default function Home() {
     );
   }
 
-  if (ESPNetwork === undefined) {
+  if (!found) {
     return (
       <View style={styles.container}>
         <View style={{ width: "100%" }}>
@@ -111,8 +107,6 @@ export default function Home() {
           {currentForm === "wifi_cred" ? (
             <>
               <WiFiNetwork
-                allNetworks={allNetworks.filter((n) => n.SSID != WIFI.ssid)}
-                refetchNetworks={() => checkNetworkAvailability()}
                 onDeviceConnect={() => setCurrentForm("create_plant")}
               />
             </>
@@ -121,8 +115,8 @@ export default function Home() {
             <>
               <CreatePlant
                 onCreatePlant={(id) => {
-                  setCurrentForm("change_wifi");
                   setCurrenPlantID(id);
+                  setCurrentForm("change_wifi");
                 }}
               />
             </>
@@ -130,10 +124,10 @@ export default function Home() {
           {currentForm === "change_wifi" ? (
             <>
               <ChangeWifi
-                name={currentPlantID ?? WIFI.ssid}
+                name={currentPlantID ?? wifi.ssid}
                 onChangeWifi={() => {
                   clear();
-                  setCurrentForm(undefined);
+                  setCurrentForm("connect");
                   setCurrenPlantID(undefined);
                 }}
               />
@@ -160,7 +154,14 @@ export default function Home() {
                 color="#7393B3"
               />
             </View>
-            <Button title="Connect" onPress={() => connectToNetwork()} />
+            <Button
+              title="Connect"
+              onPress={() =>
+                connectToNetwork().then(() => {
+                  setCurrentForm("wifi_cred");
+                })
+              }
+            />
           </>
         ) : null}
       </View>
