@@ -10,18 +10,16 @@ from app.prisma import prisma
 from . import auth
 from app import schemas
 
-
-charts_style = pygal.style.Style(
-    background='transparent',
-    plot_background='transparent',
-    foreground='#bbb',
-    foreground_strong='#fff',
-    foreground_subtle='#bbb',
-    opacity='.4',
-    opacity_hover='.9',
-    transition='400ms ease-in',
-    colors=('#E853A0', '#E8537A', '#E95355', '#E87653', '#E89B53')
-)
+charts_style = pygal.style.Style(background='transparent',
+                                 plot_background='transparent',
+                                 foreground='#bbb',
+                                 foreground_strong='#fff',
+                                 foreground_subtle='#bbb',
+                                 opacity='.4',
+                                 opacity_hover='.9',
+                                 transition='400ms ease-in',
+                                 colors=('#E853A0', '#E8537A', '#E95355',
+                                         '#E87653', '#E89B53'))
 
 
 async def get_plant_by_chip_id(plant_id: str, chip_id: str):
@@ -29,9 +27,7 @@ async def get_plant_by_chip_id(plant_id: str, chip_id: str):
         'id': plant_id,
         'chip_id': chip_id
     },
-    include={
-        'user': True
-    })
+                                         include={'user': True})
 
 
 async def get_plant_by_id(user_email: str, plant_id: str):
@@ -43,9 +39,7 @@ async def get_plant_by_id(user_email: str, plant_id: str):
         'id': plant_id,
         'user_id': user.id
     },
-    include={
-        'user': True
-    })
+                                         include={'user': True})
 
 
 async def get_plant(user_email: str, plant_id: str):
@@ -63,23 +57,25 @@ async def get_plant_timestamps(user_email: str, plant_id: str):
     return await prisma.plant.find_first(where={
         'id': plant.id,
     },
-    include={
-        'user': True,
-        'timestamps': True
-    })
+                                         include={
+                                             'user': True,
+                                             'timestamps': True
+                                         })
 
 
-async def add_plant_timestamp(user_email: str, plant_id: str, timestamp: schemas.plants.TimeStampAdd):
+async def add_plant_timestamp(user_email: str, plant_id: str,
+                              timestamp: schemas.plants.TimeStampAdd):
     plant = await get_plant_by_id(user_email, plant_id)
     if plant is None:
         return None
-    
-    if await prisma.timestamp.find_first(where={
-        'day_of_week': timestamp.day_of_week,
-        'hour': timestamp.hour,
-        'minute': timestamp.minute,
-        'plant_id': plant.id
-    }) is not None:
+
+    if await prisma.timestamp.find_first(
+            where={
+                'day_of_week': timestamp.day_of_week,
+                'hour': timestamp.hour,
+                'minute': timestamp.minute,
+                'plant_id': plant.id
+            }) is not None:
         return "already exists"
 
     return await prisma.timestamp.create({
@@ -95,12 +91,11 @@ async def remove_plant_all_timestamps(user_email: str, plant_id: str):
     if plant is None:
         return None
 
-    return await prisma.timestamp.delete_many(where={
-        'plant_id': plant.id
-    })
+    return await prisma.timestamp.delete_many(where={'plant_id': plant.id})
 
 
-async def remove_plant_timestamp(user_email: str, plant_id: str, timestamp_id: str):
+async def remove_plant_timestamp(user_email: str, plant_id: str,
+                                 timestamp_id: str):
     plant = await get_plant_by_id(user_email, plant_id)
     if plant is None:
         return None
@@ -116,9 +111,7 @@ async def remove_plant_timestamp_all(user_email: str, plant_id: str):
     if plant is None:
         return None
 
-    return await prisma.timestamp.delete_many(where={
-        'plant_id': plant_id
-    })
+    return await prisma.timestamp.delete_many(where={'plant_id': plant_id})
 
 
 async def get_plant_periodstamps(user_email: str, plant_id: str):
@@ -129,46 +122,44 @@ async def get_plant_periodstamps(user_email: str, plant_id: str):
     return await prisma.plant.find_first(where={
         'id': plant.id,
     },
-    include={
-        'user': True,
-        'periodstamps': True
-    })
+                                         include={
+                                             'user': True,
+                                             'periodstamps': True
+                                         })
 
 
-async def change_plant_periodstamps(user_email: str, plant_id: str, periodstamp: schemas.plants.PeriodStampsChange):
+async def change_plant_periodstamps(
+        user_email: str, plant_id: str,
+        periodstamp: schemas.plants.PeriodStampsChange):
     plant = await get_plant_by_id(user_email, plant_id)
     if plant is None:
         return None
 
-    plant = await prisma.plant.update({
-        'periodstamp_times_a_week': periodstamp.times_a_week
-    },
-    {'id': plant.id,})
+    plant = await prisma.plant.update(
+        {'periodstamp_times_a_week': periodstamp.times_a_week}, {
+            'id': plant.id,
+        })
     if plant is None:
         return None
 
-    await prisma.periodstamp.delete_many(where={
-        'plant_id': plant.id
-    })
+    await prisma.periodstamp.delete_many(where={'plant_id': plant.id})
     if periodstamp.times_a_week == 0:
         return 0
-    
+
     WEEK_IN_MINUTES = 10_080
     irrigation_delay = WEEK_IN_MINUTES // periodstamp.times_a_week
     periods = [
-        minutes_to_weektime(
-            ((irrigation_delay * m) + random.randint(0, 10)) if irrigation_delay * m < WEEK_IN_MINUTES else WEEK_IN_MINUTES
-        ) for m in range(periodstamp.times_a_week)
+        minutes_to_weektime(((irrigation_delay * m) +
+                             random.randint(0, 10)) if irrigation_delay *
+                            m < WEEK_IN_MINUTES else WEEK_IN_MINUTES)
+        for m in range(periodstamp.times_a_week)
     ]
-    return await prisma.periodstamp.create_many(data=[
-        {
-            'plant_id': plant.id,
-            'day_of_week': p.weekday,
-            'hour': p.hour,
-            'minute': p.minute
-        }
-        for p in periods if p is not None
-    ])
+    return await prisma.periodstamp.create_many(data=[{
+        'plant_id': plant.id,
+        'day_of_week': p.weekday,
+        'hour': p.hour,
+        'minute': p.minute
+    } for p in periods if p is not None])
 
 
 async def get_plant_times(user_email: str, plant_id: str):
@@ -176,28 +167,23 @@ async def get_plant_times(user_email: str, plant_id: str):
     if plant is None:
         return None
 
-    plant_data = await prisma.plant.find_first(where={
-        'id': plant.id,
-        'user_id': plant.user_id
-    },
-    include={
-        'user': True,
-        'timestamps': plant.irrigation_type == 'time',
-        'periodstamps': plant.irrigation_type == 'period',
-    })
+    plant_data = await prisma.plant.find_first(
+        where={
+            'id': plant.id,
+            'user_id': plant.user_id
+        },
+        include={
+            'user': True,
+            'timestamps': plant.irrigation_type == 'time',
+            'periodstamps': plant.irrigation_type == 'period',
+        })
     if plant_data is None:
         return None
 
     if plant.irrigation_type == 'time':
-        return {
-            **plant_data.dict(),
-            'times': plant_data.timestamps
-        }
-    
-    return {
-        **plant_data.dict(),
-        'times': plant_data.periodstamps
-    }
+        return {**plant_data.dict(), 'times': plant_data.timestamps}
+
+    return {**plant_data.dict(), 'times': plant_data.periodstamps}
 
 
 async def get_plant_today_times(plant_id: str, chip_id: str):
@@ -208,46 +194,53 @@ async def get_plant_today_times(plant_id: str, chip_id: str):
     now = datetime.datetime.now()
 
     if plant.irrigation_type == 'time':
-        return await prisma.timestamp.find_many(order=[{'hour': 'asc',},{'minute': 'asc'}],
-            where={
-                'plant_id': plant.id,
-                'hour': {
-                    'gte': now.hour
-                },
-                'minute': {
-                    'gte': now.minute
-                },
-                'OR': [
-                    {
-                        'day_of_week': DayOfWeek.everyday,
-                    },
-                    {
-                        'day_of_week': inttoweekday(now.weekday())
-                    }
-                ]
-            }
-        )
+        return await prisma.timestamp.find_many(order=[{
+            'hour': 'asc',
+        }, {
+            'minute': 'asc'
+        }],
+                                                where={
+                                                    'plant_id':
+                                                    plant.id,
+                                                    'hour': {
+                                                        'gte': now.hour
+                                                    },
+                                                    'minute': {
+                                                        'gte': now.minute
+                                                    },
+                                                    'OR': [{
+                                                        'day_of_week':
+                                                        DayOfWeek.everyday,
+                                                    }, {
+                                                        'day_of_week':
+                                                        inttoweekday(
+                                                            now.weekday())
+                                                    }]
+                                                })
     else:
-        return await prisma.periodstamp.find_many(order=[{'hour': 'asc',},{'minute': 'asc'}],
-            where={
-                'plant_id': plant.id,
-                'hour': {
-                    'gte': now.hour
-                },
-                'minute': {
-                    'gte': now.minute
-                },
-                'OR': [
-                    {
-                        'day_of_week': DayOfWeek.everyday,
-                    },
-                    {
-                        'day_of_week': inttoweekday(now.weekday())
-                    }
-                ]
-            }
-        )
-
+        return await prisma.periodstamp.find_many(order=[{
+            'hour': 'asc',
+        }, {
+            'minute': 'asc'
+        }],
+                                                  where={
+                                                      'plant_id':
+                                                      plant.id,
+                                                      'hour': {
+                                                          'gte': now.hour
+                                                      },
+                                                      'minute': {
+                                                          'gte': now.minute
+                                                      },
+                                                      'OR': [{
+                                                          'day_of_week':
+                                                          DayOfWeek.everyday,
+                                                      }, {
+                                                          'day_of_week':
+                                                          inttoweekday(
+                                                              now.weekday())
+                                                      }]
+                                                  })
 
 
 async def get_plant_today_next_time(plant_id: str, chip_id: str):
@@ -257,7 +250,7 @@ async def get_plant_today_next_time(plant_id: str, chip_id: str):
         return None
     if len(times) == 0:
         return 'no times'
-    
+
     return times[0]
 
 
@@ -270,7 +263,7 @@ async def get_should_irrigate_now(plant_id: str, chip_id: str):
         return None
 
     print('Time:', time)
-    
+
     # moisture = await prisma.moisturepercentagerecord.find_first(where={
     #     'plant': {
     #         'is': {
@@ -282,7 +275,7 @@ async def get_should_irrigate_now(plant_id: str, chip_id: str):
     # order={
     #     'at': 'desc'
     # })
-    
+
     now = datetime.datetime.now()
     # threshold = plant.moisture_percentage_treshold
     # if moisture is None or moisture.percentage <= threshold:
@@ -297,29 +290,27 @@ async def get_plant_irrigation_graph(user_email: str, plant_id: str):
     plant = await get_plant_by_id(user_email, plant_id)
     if plant is None:
         return None
-    
-    irrigation_records = await prisma.irrigationrecord.find_many(where={
-        'plant_id': plant.id
-    })
+
+    irrigation_records = await prisma.irrigationrecord.find_many(
+        where={'plant_id': plant.id})
 
     if len(irrigation_records) == 0:
         return False
 
-    records = list(map(
-        lambda r: {
-            'x': r.at.strftime('%Y-%m-%d %H:%M:%S'),
-            'y': r.water_amount
-        },
-        irrigation_records
-    ))
+    records = list(
+        map(
+            lambda r: {
+                'x': r.at.strftime('%Y-%m-%d %H:%M:%S'),
+                'y': r.water_amount
+            }, irrigation_records))
 
     graph = pygal.Bar(
         title="Irrigations",
-        width = 1000,
-        height = 600,
+        width=1000,
+        height=600,
         show_legend=False,
-        explicit_size = True,
-        style = charts_style,
+        explicit_size=True,
+        style=charts_style,
     )
     graph.x_labels = list(map(lambda r: r['x'], records))
     graph.y_labels = list(range(0, 101, 5))
@@ -330,37 +321,36 @@ async def get_plant_irrigation_graph(user_email: str, plant_id: str):
     return graph.render()
 
 
-async def get_moisture_percentage_graph(user_email: str, plant_id: str, graph_period: GraphPeriod):
+async def get_moisture_percentage_graph(user_email: str, plant_id: str,
+                                        graph_period: GraphPeriod):
     plant = await get_plant_by_id(user_email, plant_id)
     if plant is None:
         return None
-    
-    moisture_record = await prisma.moisturepercentagerecord.find_many(where={
-        'plant_id': plant.id
-    })
+
+    moisture_record = await prisma.moisturepercentagerecord.find_many(
+        where={'plant_id': plant.id})
 
     if len(moisture_record) == 0:
         return False
 
     time_format = '%Y-%m-%d %H:%M:%S'
-    if graph_period in (GraphPeriod.past_hour, GraphPeriod.past_12_hours, GraphPeriod.past_day):
+    if graph_period in (GraphPeriod.past_hour, GraphPeriod.past_12_hours,
+                        GraphPeriod.past_day):
         time_format = '%H:%M:%S'
 
-    records = list(map(
-        lambda r: {
+    records = list(
+        map(lambda r: {
             'x': r.at.strftime(time_format),
             'y': r.percentage
-        },
-        moisture_record
-    ))
+        }, moisture_record))
 
     graph = pygal.Bar(
         title="Moisture Percentage",
-        width = 1000,
-        height = 600,
+        width=1000,
+        height=600,
         show_legend=False,
-        explicit_size = True,
-        style = charts_style,
+        explicit_size=True,
+        style=charts_style,
     )
     graph.x_labels = list(map(lambda r: r['x'], records))
     graph.y_labels = list(range(0, 101, 5))
@@ -376,23 +366,21 @@ async def get_current_moisture(user_email: str, plant_id: str):
     if plant is None:
         return False
 
-    return await prisma.moisturepercentagerecord.find_first(where={
-        'plant_id': plant.id
-    },
-    order={
-        'at': 'desc'
-    })
+    return await prisma.moisturepercentagerecord.find_first(
+        where={'plant_id': plant.id}, order={'at': 'desc'})
 
 
-async def register_current_moisture(percentage: int, plant: schemas.plants.PlantESPGet):
+async def register_current_moisture(percentage: int,
+                                    plant: schemas.plants.PlantESPGet):
     _plant = await get_plant_by_chip_id(plant.plant_id, plant.chip_id)
     if _plant is None:
         return None
 
-    return await prisma.moisturepercentagerecord.create(data={
-        'plant_id': _plant.id,
-        'percentage': percentage
-    })
+    return await prisma.moisturepercentagerecord.create(
+        data={
+            'plant_id': _plant.id,
+            'percentage': percentage
+        })
 
 
 async def get_plants(user_email: str):
@@ -409,7 +397,7 @@ async def create_plant(plant: schemas.plants.PlantCreate):
     user = await auth.get_user_by_email_password(plant.email, plant.password)
     if user is None:
         return None
-    
+
     try:
         created_plant = await prisma.plant.create(data={
             'user_id': user.id,
@@ -421,41 +409,38 @@ async def create_plant(plant: schemas.plants.PlantCreate):
     return created_plant
 
 
-async def update_plant(user_email: str, plant_id: str, plant: schemas.plants.PlantUpdate):
+async def update_plant(user_email: str, plant_id: str,
+                       plant: schemas.plants.PlantUpdate):
     _plant = await get_plant_by_id(user_email, plant_id)
     if _plant is None:
         return None
-    
+
     user = await auth.get_user_by_email(user_email)
     user_id = _plant.user_id
 
     if user is None or user_id != user.id:
         return
-    
+
     # Update periodstamp
     if plant.periodstamp_times_a_week != _plant.periodstamp_times_a_week:
-        await prisma.periodstamp.delete_many(where={
-            'plant_id': _plant.id
-        })
+        await prisma.periodstamp.delete_many(where={'plant_id': _plant.id})
         if plant.periodstamp_times_a_week != 0:
             WEEK_IN_MINUTES = 10_080
             irrigation_delay = WEEK_IN_MINUTES // plant.periodstamp_times_a_week
             periods = [
-                minutes_to_weektime(
-                    ((irrigation_delay * m) + random.randint(0, 10)) if irrigation_delay * m < WEEK_IN_MINUTES else WEEK_IN_MINUTES
-                ) for m in range(plant.periodstamp_times_a_week)
+                minutes_to_weektime((
+                    (irrigation_delay * m) +
+                    random.randint(0, 10)) if irrigation_delay *
+                                    m < WEEK_IN_MINUTES else WEEK_IN_MINUTES)
+                for m in range(plant.periodstamp_times_a_week)
             ]
-            await prisma.periodstamp.create_many(data=[
-                {
-                    'plant_id': _plant.id,
-                    'day_of_week': p.weekday,
-                    'hour': p.hour,
-                    'minute': p.minute
-                }
-                for p in periods if p is not None
-            ])
-        
-    
+            await prisma.periodstamp.create_many(data=[{
+                'plant_id': _plant.id,
+                'day_of_week': p.weekday,
+                'hour': p.hour,
+                'minute': p.minute
+            } for p in periods if p is not None])
+
     return await prisma.plant.update(data={
         'name': plant.name,
         'water_amount': plant.water_amount,
@@ -469,21 +454,18 @@ async def update_plant(user_email: str, plant_id: str, plant: schemas.plants.Pla
             }
         }
     },
-    where={
-        'id': _plant.id,
-    },
-    include={
-        'user': True
-    })
+                                     where={
+                                         'id': _plant.id,
+                                     },
+                                     include={'user': True})
+
 
 async def delete_plant(user_email: str, plant_id: str):
     db_plant = await get_plant_by_id(user_email, plant_id)
     if db_plant is None:
         return False
-    
-    deleted_plant = await prisma.plant.delete(where={
-        'id': db_plant.id
-    })
+
+    deleted_plant = await prisma.plant.delete(where={'id': db_plant.id})
 
     return deleted_plant is not None
 
@@ -493,9 +475,10 @@ async def irrigate_plant(irrigation: schemas.plants.PlantIrrigation):
     if plant is None:
         return False
 
-    plant_irrigation = await prisma.irrigationrecord.create(data={
-        'plant_id': plant.id,
-        'water_amount': plant.water_amount
-    })
+    plant_irrigation = await prisma.irrigationrecord.create(
+        data={
+            'plant_id': plant.id,
+            'water_amount': plant.water_amount
+        })
 
     return plant_irrigation is not None

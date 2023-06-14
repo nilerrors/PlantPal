@@ -4,7 +4,6 @@ from fastapi_jwt_auth import AuthJWT
 from app.utils.graph_period import GraphPeriod
 from app import schemas, crud
 
-
 router = APIRouter(prefix="/plants")
 
 
@@ -21,166 +20,206 @@ async def get_plants(Authorize: AuthJWT = Depends()):
 @router.get('/{plant_id}', response_model=schemas.plants.PlantResponse)
 async def get_plant(plant_id: str, Authorize: AuthJWT = Depends()):
     Authorize.jwt_required()
-    
+
     user_email = Authorize.get_jwt_subject()
     plant_data = await crud.plants.get_plant_by_id(user_email, plant_id)
 
     if plant_data is None:
-        raise HTTPException(status.HTTP_404_NOT_FOUND, "Plant with given id not found")
+        raise HTTPException(status.HTTP_404_NOT_FOUND,
+                            "Plant with given id not found")
 
     return plant_data
 
 
 @router.post('/espget', response_model=schemas.plants.PlantResponse)
 async def get_plant_esp(plant: schemas.plants.PlantESPGet):
-    plant_data = await crud.plants.get_plant_by_chip_id(plant.plant_id, plant.chip_id)
+    plant_data = await crud.plants.get_plant_by_chip_id(
+        plant.plant_id, plant.chip_id)
 
     if plant_data is None:
-        raise HTTPException(status.HTTP_404_NOT_FOUND, "Plant with given id not found")
+        raise HTTPException(status.HTTP_404_NOT_FOUND,
+                            "Plant with given id not found")
 
     return plant_data
 
 
 @router.post('/should_irrigate_now')
 async def get_should_irrigate_now(plant: schemas.plants.PlantESPGet):
-    should_irrigate = await crud.plants.get_should_irrigate_now(plant.plant_id, plant.chip_id)
+    should_irrigate = await crud.plants.get_should_irrigate_now(
+        plant.plant_id, plant.chip_id)
 
     if should_irrigate is None:
-        raise HTTPException(status.HTTP_404_NOT_FOUND, "No irrigations found for today")
+        raise HTTPException(status.HTTP_404_NOT_FOUND,
+                            "No irrigations found for today")
 
-    return {"irrigate":should_irrigate}
+    return {"irrigate": should_irrigate}
 
 
-@router.post('/today_next_irrigation_time', response_model=List[schemas.plants.TimeStamp])
+@router.post('/today_next_irrigation_time',
+             response_model=List[schemas.plants.TimeStamp])
 async def get_plant_today_next_time(plant: schemas.plants.PlantESPGet):
-    plant_data = await crud.plants.get_plant_today_next_time(plant.plant_id, plant.chip_id)
+    plant_data = await crud.plants.get_plant_today_next_time(
+        plant.plant_id, plant.chip_id)
 
     if plant_data is None:
-        raise HTTPException(status.HTTP_404_NOT_FOUND, "Plant with given id not found")
+        raise HTTPException(status.HTTP_404_NOT_FOUND,
+                            "Plant with given id not found")
 
     return plant_data
 
 
-@router.post('/today_irrigation_times', response_model=List[schemas.plants.TimeStamp])
+@router.post('/today_irrigation_times',
+             response_model=List[schemas.plants.TimeStamp])
 async def get_plant_today_times(plant: schemas.plants.PlantESPGet):
-    plant_data = await crud.plants.get_plant_today_times(plant.plant_id, plant.chip_id)
+    plant_data = await crud.plants.get_plant_today_times(
+        plant.plant_id, plant.chip_id)
 
     if plant_data is None:
-        raise HTTPException(status.HTTP_404_NOT_FOUND, "Plant with given id not found")
+        raise HTTPException(status.HTTP_404_NOT_FOUND,
+                            "Plant with given id not found")
 
     return plant_data
 
 
-@router.get('/{plant_id}/times', response_model=schemas.plants.PlantWithIrrigationStampsResponse)
+@router.get('/{plant_id}/times',
+            response_model=schemas.plants.PlantWithIrrigationStampsResponse)
 async def get_plant_times(plant_id: str, Authorize: AuthJWT = Depends()):
     Authorize.jwt_required()
-    
+
     user_email = Authorize.get_jwt_subject()
     plant_data = await crud.plants.get_plant_times(user_email, plant_id)
 
     if plant_data is None:
-        raise HTTPException(status.HTTP_404_NOT_FOUND, "Plant with given id not found")
+        raise HTTPException(status.HTTP_404_NOT_FOUND,
+                            "Plant with given id not found")
 
     return plant_data
 
 
-@router.get('/{plant_id}/timestamps', response_model=schemas.plants.PlantWithTimeStampsResponse)
+@router.get('/{plant_id}/timestamps',
+            response_model=schemas.plants.PlantWithTimeStampsResponse)
 async def get_plant_timestamps(plant_id: str, Authorize: AuthJWT = Depends()):
     Authorize.jwt_required()
-    
+
     user_email = Authorize.get_jwt_subject()
     plant_data = await crud.plants.get_plant_timestamps(user_email, plant_id)
 
     if plant_data is None:
-        raise HTTPException(status.HTTP_404_NOT_FOUND, "Plant with given id not found")
+        raise HTTPException(status.HTTP_404_NOT_FOUND,
+                            "Plant with given id not found")
 
     return plant_data
 
 
 @router.post('/{plant_id}/timestamps', response_model=schemas.plants.TimeStamp)
-async def add_plant_timestamp(plant_id: str, timestamp: schemas.plants.TimeStampAdd, Authorize: AuthJWT = Depends()):
+async def add_plant_timestamp(plant_id: str,
+                              timestamp: schemas.plants.TimeStampAdd,
+                              Authorize: AuthJWT = Depends()):
     Authorize.jwt_required()
-    
+
     user_email = Authorize.get_jwt_subject()
-    plant_data = await crud.plants.add_plant_timestamp(user_email, plant_id, timestamp)
+    plant_data = await crud.plants.add_plant_timestamp(user_email, plant_id,
+                                                       timestamp)
 
     if type(plant_data) == str and plant_data == 'already exists':
-        raise HTTPException(status.HTTP_404_NOT_FOUND, "Timestamp already exists")
+        raise HTTPException(status.HTTP_404_NOT_FOUND,
+                            "Timestamp already exists")
     if plant_data is None:
-        raise HTTPException(status.HTTP_409_CONFLICT, "Plant with given id not found")
+        raise HTTPException(status.HTTP_409_CONFLICT,
+                            "Plant with given id not found")
 
     return plant_data
 
 
 @router.delete('/{plant_id}/timestamps')
-async def remove_plant_all_timestamps(plant_id: str, timestamp_id: str, Authorize: AuthJWT = Depends()):
+async def remove_plant_all_timestamps(plant_id: str,
+                                      timestamp_id: str,
+                                      Authorize: AuthJWT = Depends()):
     Authorize.jwt_required()
-    
+
     user_email = Authorize.get_jwt_subject()
-    plant_data = await crud.plants.remove_plant_all_timestamps(user_email, plant_id)
+    plant_data = await crud.plants.remove_plant_all_timestamps(
+        user_email, plant_id)
 
     if plant_data is None:
-        raise HTTPException(status.HTTP_404_NOT_FOUND, "Plant with given id not found")
+        raise HTTPException(status.HTTP_404_NOT_FOUND,
+                            "Plant with given id not found")
 
     return {'message': 'Successfully deleted'}
 
 
 @router.delete('/{plant_id}/timestamps/all')
-async def remove_plant_timestamp_all(plant_id: str, Authorize: AuthJWT = Depends()):
+async def remove_plant_timestamp_all(plant_id: str,
+                                     Authorize: AuthJWT = Depends()):
     Authorize.jwt_required()
-    
+
     user_email = Authorize.get_jwt_subject()
-    plant_data = await crud.plants.remove_plant_timestamp_all(user_email, plant_id)
+    plant_data = await crud.plants.remove_plant_timestamp_all(
+        user_email, plant_id)
 
     if plant_data is None:
-        raise HTTPException(status.HTTP_404_NOT_FOUND, "Plant with given id not found")
+        raise HTTPException(status.HTTP_404_NOT_FOUND,
+                            "Plant with given id not found")
 
     return {'message': 'Successfully deleted'}
 
 
 @router.delete('/{plant_id}/timestamps/{timestamp_id}')
-async def remove_plant_timestamp(plant_id: str, timestamp_id: str, Authorize: AuthJWT = Depends()):
+async def remove_plant_timestamp(plant_id: str,
+                                 timestamp_id: str,
+                                 Authorize: AuthJWT = Depends()):
     Authorize.jwt_required()
-    
+
     user_email = Authorize.get_jwt_subject()
-    plant_data = await crud.plants.remove_plant_timestamp(user_email, plant_id, timestamp_id)
+    plant_data = await crud.plants.remove_plant_timestamp(
+        user_email, plant_id, timestamp_id)
 
     if plant_data is None:
-        raise HTTPException(status.HTTP_404_NOT_FOUND, "Plant with given id not found")
+        raise HTTPException(status.HTTP_404_NOT_FOUND,
+                            "Plant with given id not found")
 
     return {'message': 'Successfully deleted'}
 
 
-@router.get('/{plant_id}/periodstamps', response_model=schemas.plants.PlantWithPeriodStampsResponse)
-async def get_plant_periodstamps(plant_id: str, Authorize: AuthJWT = Depends()):
+@router.get('/{plant_id}/periodstamps',
+            response_model=schemas.plants.PlantWithPeriodStampsResponse)
+async def get_plant_periodstamps(plant_id: str,
+                                 Authorize: AuthJWT = Depends()):
     Authorize.jwt_required()
-    
+
     user_email = Authorize.get_jwt_subject()
     plant_data = await crud.plants.get_plant_periodstamps(user_email, plant_id)
 
     if plant_data is None:
-        raise HTTPException(status.HTTP_404_NOT_FOUND, "Plant with given id not found")
+        raise HTTPException(status.HTTP_404_NOT_FOUND,
+                            "Plant with given id not found")
 
     return plant_data
 
 
 @router.post('/{plant_id}/periodstamps')
-async def change_plant_periodstamps(plant_id: str, periodstamp: schemas.plants.PeriodStampsChange, Authorize: AuthJWT = Depends()):
+async def change_plant_periodstamps(
+    plant_id: str,
+    periodstamp: schemas.plants.PeriodStampsChange,
+    Authorize: AuthJWT = Depends()):
     Authorize.jwt_required()
-    
+
     user_email = Authorize.get_jwt_subject()
-    plant_data = await crud.plants.change_plant_periodstamps(user_email, plant_id, periodstamp)
+    plant_data = await crud.plants.change_plant_periodstamps(
+        user_email, plant_id, periodstamp)
 
     if plant_data is None:
-        raise HTTPException(status.HTTP_409_CONFLICT, "Plant with given id not found")
+        raise HTTPException(status.HTTP_409_CONFLICT,
+                            "Plant with given id not found")
 
     return {"amount_of_irrigations_per_week": plant_data}
 
 
 @router.get('/{plant_id}/irrigations_graph.svg')
-async def get_plant_irrigations_graph(plant_id: str, Authorize: AuthJWT = Depends()):
+async def get_plant_irrigations_graph(plant_id: str,
+                                      Authorize: AuthJWT = Depends()):
     Authorize.jwt_required()
-    
+
     user_email = Authorize.get_jwt_subject()
     svg = await crud.plants.get_plant_irrigation_graph(user_email, plant_id)
 
@@ -188,23 +227,28 @@ async def get_plant_irrigations_graph(plant_id: str, Authorize: AuthJWT = Depend
         raise HTTPException(status.HTTP_204_NO_CONTENT, "No irrigation data")
 
     if svg is None:
-        raise HTTPException(status.HTTP_404_NOT_FOUND, "Plant with given id not found")
+        raise HTTPException(status.HTTP_404_NOT_FOUND,
+                            "Plant with given id not found")
 
     return Response(svg, media_type='image/svg+xml')
 
 
 @router.get('/{plant_id}/moisture_percentage_graph.svg')
-async def get_moisture_percentage_graph(plant_id: str, p: GraphPeriod = GraphPeriod.all_time, Authorize: AuthJWT = Depends()):
+async def get_moisture_percentage_graph(plant_id: str,
+                                        p: GraphPeriod = GraphPeriod.all_time,
+                                        Authorize: AuthJWT = Depends()):
     Authorize.jwt_required()
 
     user_email = Authorize.get_jwt_subject()
-    svg = await crud.plants.get_moisture_percentage_graph(user_email, plant_id, p)
+    svg = await crud.plants.get_moisture_percentage_graph(
+        user_email, plant_id, p)
 
     if type(svg) == bool and not svg:
         raise HTTPException(status.HTTP_204_NO_CONTENT, "No moisture data")
 
     if svg is None:
-        raise HTTPException(status.HTTP_404_NOT_FOUND, "Plant with given id not found")
+        raise HTTPException(status.HTTP_404_NOT_FOUND,
+                            "Plant with given id not found")
 
     return Response(svg, media_type='image/svg+xml')
 
@@ -212,59 +256,73 @@ async def get_moisture_percentage_graph(plant_id: str, p: GraphPeriod = GraphPer
 @router.get('/{plant_id}/current_moisture')
 async def get_current_moisture(plant_id: str, Authorize: AuthJWT = Depends()):
     Authorize.jwt_required()
-    
-    user_email = Authorize.get_jwt_subject()
-    current_moisture = await crud.plants.get_current_moisture(user_email, plant_id)
-    if type(current_moisture) == bool and not current_moisture:
-        raise HTTPException(status.HTTP_404_NOT_FOUND, "Plant with given id not found")
 
-    return {"current_moisture":current_moisture}
+    user_email = Authorize.get_jwt_subject()
+    current_moisture = await crud.plants.get_current_moisture(
+        user_email, plant_id)
+    if type(current_moisture) == bool and not current_moisture:
+        raise HTTPException(status.HTTP_404_NOT_FOUND,
+                            "Plant with given id not found")
+
+    return {"current_moisture": current_moisture}
 
 
 @router.get('/{plant_id}/current_moisture_chart.svg')
-async def get_current_moisture_chart(plant_id: str, Authorize: AuthJWT = Depends()):
+async def get_current_moisture_chart(plant_id: str,
+                                     Authorize: AuthJWT = Depends()):
     Authorize.jwt_required()
-    
-    user_email = Authorize.get_jwt_subject()
-    current_moisture = await crud.plants.get_current_moisture_chart(user_email, plant_id)
-    if type(current_moisture) == bool and not current_moisture:
-        raise HTTPException(status.HTTP_404_NOT_FOUND, "Plant with given id not found")
 
-    return {"current_moisture":current_moisture}
+    user_email = Authorize.get_jwt_subject()
+    current_moisture = await crud.plants.get_current_moisture_chart(
+        user_email, plant_id)
+    if type(current_moisture) == bool and not current_moisture:
+        raise HTTPException(status.HTTP_404_NOT_FOUND,
+                            "Plant with given id not found")
+
+    return {"current_moisture": current_moisture}
 
 
 @router.post('/current_moisture/{percentage}')
-async def set_current_moisture(percentage: int, plant: schemas.plants.PlantESPGet):
+async def set_current_moisture(percentage: int,
+                               plant: schemas.plants.PlantESPGet):
     if not (0 <= percentage <= 100):
-        raise HTTPException(status.HTTP_400_BAD_REQUEST, "Percentage should be in range(0, 100)")
-    current_moisture = await crud.plants.register_current_moisture(percentage, plant)
+        raise HTTPException(status.HTTP_400_BAD_REQUEST,
+                            "Percentage should be in range(0, 100)")
+    current_moisture = await crud.plants.register_current_moisture(
+        percentage, plant)
     if current_moisture is None:
-        raise HTTPException(status.HTTP_404_NOT_FOUND, "Plant with given id not found")
+        raise HTTPException(status.HTTP_404_NOT_FOUND,
+                            "Plant with given id not found")
 
-    return {"current_moisture":current_moisture}
+    return {"current_moisture": current_moisture}
 
 
 @router.post("/")
 async def create_plant(plant: schemas.plants.PlantCreate):
     created_plant = await crud.plants.create_plant(plant)
-    
+
     if created_plant is None:
-        raise HTTPException(status.HTTP_401_UNAUTHORIZED, "User email and password do not correspond")
+        raise HTTPException(status.HTTP_401_UNAUTHORIZED,
+                            "User email and password do not correspond")
     elif created_plant == 'chipid exists':
-        raise HTTPException(status.HTTP_409_CONFLICT, "ESP with given Chip ID already exists")
+        raise HTTPException(status.HTTP_409_CONFLICT,
+                            "ESP with given Chip ID already exists")
 
     return created_plant.dict()
 
 
 @router.put("/{plant_id}", response_model=schemas.plants.PlantResponse)
-async def update_plant(plant_id: str, plant: schemas.plants.PlantUpdate, Authorize: AuthJWT = Depends()):
+async def update_plant(plant_id: str,
+                       plant: schemas.plants.PlantUpdate,
+                       Authorize: AuthJWT = Depends()):
     Authorize.jwt_required()
-    
+
     user_email = Authorize.get_jwt_subject()
     updated_plant = await crud.plants.update_plant(user_email, plant_id, plant)
 
     if not updated_plant:
-        raise HTTPException(status.HTTP_404_NOT_FOUND, "Plant with given id not found")
+        raise HTTPException(status.HTTP_404_NOT_FOUND,
+                            "Plant with given id not found")
 
     return updated_plant
 
@@ -272,12 +330,13 @@ async def update_plant(plant_id: str, plant: schemas.plants.PlantUpdate, Authori
 @router.delete("/{plant_id}")
 async def delete_plant(plant_id: str, Authorize: AuthJWT = Depends()):
     Authorize.jwt_required()
-    
+
     user_email = Authorize.get_jwt_subject()
     plant_deleted = await crud.plants.delete_plant(user_email, plant_id)
 
     if not plant_deleted:
-        raise HTTPException(status.HTTP_404_NOT_FOUND, "Plant with given id not found")
+        raise HTTPException(status.HTTP_404_NOT_FOUND,
+                            "Plant with given id not found")
 
     return {'message': 'Plant deleted'}
 
@@ -286,6 +345,7 @@ async def delete_plant(plant_id: str, Authorize: AuthJWT = Depends()):
 async def plant_irrigation(irrigation: schemas.plants.PlantIrrigation):
     plant_irrigated = await crud.plants.irrigate_plant(irrigation)
     if not plant_irrigated:
-        raise HTTPException(status.HTTP_404_NOT_FOUND, "Plant with given id and Chip ID not found")
-    
+        raise HTTPException(status.HTTP_404_NOT_FOUND,
+                            "Plant with given id and Chip ID not found")
+
     return {'message': 'Plant irrigated'}

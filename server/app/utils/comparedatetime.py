@@ -51,13 +51,12 @@ def compare_today_to_weekday(weekday: str) -> bool:
     today = datetime.datetime.now().weekday()
     if inttoweekday(today) == weekday:
         return True
-    
+
     return False
 
 
 def compare_date(timestamp: Timestamp):
     if not compare_today_to_weekday(timestamp.day_of_week):
         return False
-    
-    return True
 
+    return True

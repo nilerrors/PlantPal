@@ -8,12 +8,9 @@ from fastapi_jwt_auth.exceptions import AuthJWTException
 from . import routers, schemas
 from .prisma import prisma
 
-
-app = FastAPI(
-    title='Management',
-    description='Plant Watering Management System',
-    version='1.0.0'
-)
+app = FastAPI(title='Management',
+              description='Plant Watering Management System',
+              version='1.0.0')
 
 app.add_middleware(
     CORSMiddleware,
@@ -33,6 +30,7 @@ async def startup():
     print("Prisma Connected")
     await prisma.connect()
 
+
 @app.on_event("shutdown")
 async def shutdown():
     print("Prisma Disconnected")
@@ -43,12 +41,11 @@ async def shutdown():
 def get_config():
     return schemas.config.Settings()
 
+
 @app.exception_handler(AuthJWTException)
 def authjwt_exception_handler(request: Request, exc: AuthJWTException):
-    return JSONResponse(
-        status_code=exc.status_code,
-        content={"detail": exc.message}
-    )
+    return JSONResponse(status_code=exc.status_code,
+                        content={"detail": exc.message})
 
 
 @app.get('/health')

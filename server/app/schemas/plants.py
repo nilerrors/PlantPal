@@ -9,6 +9,7 @@ class PlantBase(BaseModel):
 
 
 class ChipID(str):
+
     @classmethod
     def __modify_schema__(cls, field_schema):
         field_schema.update(type='string', format='hex16')
@@ -57,14 +58,14 @@ class PlantUpdate(PlantBase):
         # Accepted range is: 0 -> 10 liters
         if value not in range(0, 10001):
             raise ValueError('value must be in range 0 to 10000')
-        
+
         return value
 
     @validator('moisture_percentage_treshold')
     def validate_moisture_percentage_range(cls, value):
         if value not in range(0, 101):
             raise ValueError('value must be in range 0 to 100')
-        
+
         return value
 
 
@@ -87,6 +88,7 @@ class PlantIdNameResponse(PlantBase):
 class PlantResponseSmall(PlantBase):
     id: str
     name: str
+
 
 class PlantResponse(PlantBase):
     id: str
@@ -119,7 +121,7 @@ class TimeStampAdd(BaseModel):
             raise ValueError('Hour must be in range(0, 24)')
 
         return value
-    
+
     @validator('hour')
     def validate_minute(cls, value):
         if value not in range(0, 60):
