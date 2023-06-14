@@ -51,5 +51,10 @@ def authjwt_exception_handler(request: Request, exc: AuthJWTException):
     )
 
 
+@app.get('/health')
+def health_check():
+    return 'hello world'
+
+
 app.include_router(auth.router, tags=["authentication"])
 app.include_router(plants.router, tags=["plants"])

@@ -1,10 +1,11 @@
 import random
+from prisma.enums import DayOfWeek
 from prisma.errors import UniqueViolationError as PrismaUniqueViolationError
 import pygal, pygal.style
 import datetime
 from app.auth.crud import get_user_by_email
 from app.utils.graph_period import GraphPeriod
-from app.utils.comparedatetime import filter_timestamps, filter_periodstamps
+from app.utils.comparedatetime import inttoweekday
 from app.utils.minutes_to_weektime import minutes_to_weektime
 from app.prisma import prisma
 import app.auth as auth
@@ -111,6 +112,16 @@ async def remove_plant_timestamp(user_email: str, plant_id: str, timestamp_id: s
     })
 
 
+async def remove_plant_timestamp_all(user_email: str, plant_id: str):
+    plant = await get_plant_by_id(user_email, plant_id)
+    if plant is None:
+        return None
+
+    return await prisma.timestamp.delete_many(where={
+        'plant_id': plant_id
+    })
+
+
 async def get_plant_periodstamps(user_email: str, plant_id: str):
     plant = await get_plant_by_id(user_email, plant_id)
     if plant is None:
@@ -195,28 +206,54 @@ async def get_plant_today_times(plant_id: str, chip_id: str):
     if plant is None or plant.user is None:
         return None
 
-    plant_data = await prisma.plant.find_first(where={
-        'id': plant.id,
-        'user_id': plant.user_id
-    },
-    include={
-        'user': True,
-        'timestamps': filter_timestamps(plant.irrigation_type == 'time'),
-        'periodstamps': filter_periodstamps(plant.irrigation_type == 'period'),
-    })
-    if plant_data is None:
-        return None
-    
+    now = datetime.datetime.now()
 
     if plant.irrigation_type == 'time':
-        return plant_data.timestamps
-
-    return plant_data.periodstamps
+        return await prisma.timestamp.find_many(order=[{'hour': 'asc',},{'minute': 'asc'}],
+            where={
+                'plant_id': plant.id,
+                'hour': {
+                    'gte': now.hour
+                },
+                'minute': {
+                    'gte': now.minute
+                },
+                'OR': [
+                    {
+                        'day_of_week': DayOfWeek.everyday,
+                    },
+                    {
+                        'day_of_week': inttoweekday(now.weekday())
+                    }
+                ]
+            }
+        )
+    else:
+        return await prisma.periodstamp.find_many(order=[{'hour': 'asc',},{'minute': 'asc'}],
+            where={
+                'plant_id': plant.id,
+                'hour': {
+                    'gte': now.hour
+                },
+                'minute': {
+                    'gte': now.minute
+                },
+                'OR': [
+                    {
+                        'day_of_week': DayOfWeek.everyday,
+                    },
+                    {
+                        'day_of_week': inttoweekday(now.weekday())
+                    }
+                ]
+            }
+        )
 
 
 
 async def get_plant_today_next_time(plant_id: str, chip_id: str):
     times = await get_plant_today_times(plant_id, chip_id)
+    print('All times:', times)
     if times is None:
         return None
     if len(times) == 0:
@@ -230,31 +267,31 @@ async def get_should_irrigate_now(plant_id: str, chip_id: str):
     if plant is None:
         return None
     time = await get_plant_today_next_time(plant_id, chip_id)
-    if time is None:
+    if time is None or time == 'no times':
         return None
+
+    print('Time:', time)
     
-    moisture = await prisma.moisturepercentagerecord.find_first(where={
-        'plant': {
-            'is': {
-                'id': plant_id,
-                'chip_id': chip_id
-            }
-        }
-    },
-    order={
-        'at': 'desc'
-    })
+    # moisture = await prisma.moisturepercentagerecord.find_first(where={
+    #     'plant': {
+    #         'is': {
+    #             'id': plant_id,
+    #             'chip_id': chip_id
+    #         }
+    #     }
+    # },
+    # order={
+    #     'at': 'desc'
+    # })
     
     now = datetime.datetime.now()
-    threshold = plant.moisture_percentage_treshold
-    if moisture is None:
-        return time.hour == now.hour and time.minute == now.minute
-    elif plant.auto_irrigation and moisture.percentage <= threshold:
-        return True
-    elif moisture.percentage <= threshold:
-        return time.hour == now.hour and time.minute == now.minute
-
-    return False
+    # threshold = plant.moisture_percentage_treshold
+    # if moisture is None or moisture.percentage <= threshold:
+    #     return time.hour == now.hour and time.minute == now.minute
+    # elif plant.auto_irrigation and moisture.percentage <= threshold:
+    #     return True
+    print('Time now:', now)
+    return time.hour == now.hour and time.minute == now.minute
 
 
 async def get_plant_irrigation_graph(user_email: str, plant_id: str):

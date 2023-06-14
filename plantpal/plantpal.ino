@@ -120,11 +120,6 @@ void loop() {
     Serial.println("Plant fetched");
   }
 
-  // if ((millis() - last_time_pump_check) > 30000 && plant.shouldIrrigate()) {
-  //   Serial.println("Start pomp hi");
-  //   digitalWrite(WATER_PUMP_PIN, HIGH);
-  //   last_time_pump_check = millis();
-  // }
   //  else {
   //   digitalWrite(WATER_PUMP_PIN, LOW);
   // }
@@ -148,9 +143,18 @@ void loop() {
     Serial.print(moisture_percentage);
     Serial.println("%");
 
-    if (plant.shouldIrrigate(moisture_percentage)) {
+    if (plant.autoIrrigation() &&
+        moisture_percentage < plant.moisturePercentageThreshold()) {
       Serial.println("Start pomp hoi");
       digitalWrite(WATER_PUMP_PIN, HIGH);
+    }
+
+    if ((millis() - last_time_pump_check) > 30000) {
+      if (plant.shouldIrrigate()) {
+        Serial.println("Start pomp hi");
+        digitalWrite(WATER_PUMP_PIN, HIGH);
+      }
+      last_time_pump_check = millis();
     }
 
     /*
@@ -178,7 +182,7 @@ void loop() {
         Serial.println(plant.waterAmount());
         flow_meter.total_milli_litres = 0;
         flow_meter.pulses_count = 0;
-        Serial.println("Stop pomp lkj");
+        Serial.println("Stop pomp");
         digitalWrite(WATER_PUMP_PIN, LOW);
       }
     }

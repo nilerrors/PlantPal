@@ -78,10 +78,10 @@ bool Plant::shouldIrrigate(uint8_t moisture_percentage) {
     Serial.println('Plant not created');
     return false;
   }
-  if (this->autoIrrigation() &&
-      moisture_percentage < this->moisturePercentageThreshold()) {
-    return true;
-  }
+  // if (moisture_percentage != 255) {
+  //   return this->autoIrrigation() &&
+  //          moisture_percentage < this->moisturePercentageThreshold();
+  // }
 
   String url = String(SERVER_URL) + "/plants/should_irrigate_now";
   _http.begin(url.c_str());
@@ -97,6 +97,7 @@ bool Plant::shouldIrrigate(uint8_t moisture_percentage) {
   deserializeJson(doc, payload.c_str());
 
   bool should_irrigate_now = doc["irrigate"].as<bool>();
+  Serial.println(doc["irrigate"].as<bool>());
   return should_irrigate_now;
 }
 

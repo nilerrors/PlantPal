@@ -63,7 +63,7 @@ def compare_date(timestamp: Timestamp):
     return True
 
 
-def stamps_args_today(now: datetime.datetime):
+def stamps_args_today(now: datetime.datetime = datetime.datetime.now()):
     return {
         'order_by': [
             {
@@ -74,13 +74,26 @@ def stamps_args_today(now: datetime.datetime):
             },
         ],
         'where': {
-            'day_of_week': inttoweekday(now.weekday()),
-            'hour': {
-                'gte': now.hour,
-            },
-            'minute': {
-                'gte': now.minute,
-            }
+            'OR': [
+                {
+                    'day_of_week': inttoweekday(now.weekday()),
+                    'hour': {
+                        'gte': now.hour,
+                    },
+                    'minute': {
+                        'gte': now.minute,
+                    }
+                },
+                {
+                    'day_of_week': 'everyday',
+                    'hour': {
+                        'gte': now.hour,
+                    },
+                    'minute': {
+                        'gte': now.minute,
+                    }
+                },
+            ]
         }
     }
 

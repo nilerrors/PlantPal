@@ -125,6 +125,19 @@ async def remove_plant_all_timestamps(plant_id: str, timestamp_id: str, Authoriz
     return {'message': 'Successfully deleted'}
 
 
+@router.delete('/{plant_id}/timestamps/all')
+async def remove_plant_timestamp_all(plant_id: str, Authorize: AuthJWT = Depends()):
+    Authorize.jwt_required()
+    
+    user_email = Authorize.get_jwt_subject()
+    plant_data = await crud.remove_plant_timestamp_all(user_email, plant_id)
+
+    if plant_data is None:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "Plant with given id not found")
+
+    return {'message': 'Successfully deleted'}
+
+
 @router.delete('/{plant_id}/timestamps/{timestamp_id}')
 async def remove_plant_timestamp(plant_id: str, timestamp_id: str, Authorize: AuthJWT = Depends()):
     Authorize.jwt_required()

@@ -42,6 +42,26 @@ export function Periodstamps() {
     setLoading(false)
   }
 
+  const removeAll = (): void => {
+    if (confirm(`Are you sure you want to remove all periodstamps?`)) {
+      useApi(`/plants/${id}/periodstamps`, {
+        method: 'POST',
+        body: {
+          times_a_week: 0,
+        },
+      })
+        .then(({ res, data }) => {
+          if (!res.ok) return
+          return data
+        })
+        .then((data) => {
+          if (data?.amount_of_irrigations_per_week === 0) {
+            setPeriodstamps([])
+          }
+        })
+    }
+  }
+
   useEffect(() => {
     fetchPeriodstamps()
   }, [])
@@ -59,6 +79,17 @@ export function Periodstamps() {
           {'<'} Back
         </Button>{' '}
         Periodstamps
+        {periodstamps.length > 0 ? (
+          <>
+            <Button
+              onClick={() => removeAll()}
+              style={{ float: 'right' }}
+              variant='danger'
+            >
+              Remove All
+            </Button>
+          </>
+        ) : null}
       </h3>
       <hr />
       {loading ? null : (

@@ -38,12 +38,9 @@ export function TimestampsOverview({ plant_id, timestamps, remove }: Props) {
                   )}`}
                   type='timestamp'
                   onRemove={() => {
-                    useApi(
-                      `/plants_collection/plants/${plant_id}/timestamps/${timestamp.id}`,
-                      {
-                        method: 'DELETE',
-                      }
-                    )
+                    useApi(`/plants/${plant_id}/timestamps/${timestamp.id}`, {
+                      method: 'DELETE',
+                    })
                       .then(({ res, data }) => data)
                       .then((data) => {
                         alert(data?.message ?? data?.detail ?? '')

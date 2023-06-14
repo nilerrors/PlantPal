@@ -46,11 +46,6 @@ function App() {
           <Route path='/signout' element={<Signout />} />
           <Route path='*' element={<Navigate to='/' />} />
         </Routes>
-        <footer className='fixed-bottom mb-0 mx-3'>
-          <p className='text-white' style={{ float: 'right', fontSize: 10 }}>
-            by <a href='https://github.com/nilerrors'>nilerrors</a>
-          </p>
-        </footer>
       </main>
     </>
   )

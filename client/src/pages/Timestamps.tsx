@@ -19,6 +19,21 @@ export function Timestamps() {
     return null
   }
 
+  const removeAll = (): void => {
+    if (confirm(`Are you sure you want to remove all timestamps?`)) {
+      useApi(`/plants/${id}/timestamps/all`, { method: 'DELETE' })
+        .then(({ res, data }) => {
+          if (!res.ok) return
+          return data
+        })
+        .then((data) => {
+          if (data?.message === 'Successfully deleted') {
+            setTimestamps([])
+          }
+        })
+    }
+  }
+
   useEffect(() => {
     useApi(`/plants/${id}/timestamps`)
       .then(({ res, data }) => {
@@ -45,13 +60,17 @@ export function Timestamps() {
           {'<'} Back
         </Button>{' '}
         Timestamps
-        <Button
-          onClick={() => undefined}
-          style={{ float: 'right' }}
-          variant='danger'
-        >
-          Remove All
-        </Button>
+        {timestamps.length > 0 ? (
+          <>
+            <Button
+              onClick={() => removeAll()}
+              style={{ float: 'right' }}
+              variant='danger'
+            >
+              Remove All
+            </Button>
+          </>
+        ) : null}
       </h3>
       <hr />
       <TimestampsOverview
