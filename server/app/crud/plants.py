@@ -1,15 +1,14 @@
 import random
+import datetime
+import pygal, pygal.style
 from prisma.enums import DayOfWeek
 from prisma.errors import UniqueViolationError as PrismaUniqueViolationError
-import pygal, pygal.style
-import datetime
-from app.auth.crud import get_user_by_email
 from app.utils.graph_period import GraphPeriod
 from app.utils.comparedatetime import inttoweekday
 from app.utils.minutes_to_weektime import minutes_to_weektime
 from app.prisma import prisma
-import app.auth as auth
-from . import schemas
+from . import auth
+from app import schemas
 
 
 charts_style = pygal.style.Style(
@@ -36,7 +35,7 @@ async def get_plant_by_chip_id(plant_id: str, chip_id: str):
 
 
 async def get_plant_by_id(user_email: str, plant_id: str):
-    user = await auth.crud.get_user_by_email(user_email)
+    user = await auth.get_user_by_email(user_email)
     if user is None:
         return None
 
@@ -70,7 +69,7 @@ async def get_plant_timestamps(user_email: str, plant_id: str):
     })
 
 
-async def add_plant_timestamp(user_email: str, plant_id: str, timestamp: schemas.TimeStampAdd):
+async def add_plant_timestamp(user_email: str, plant_id: str, timestamp: schemas.plants.TimeStampAdd):
     plant = await get_plant_by_id(user_email, plant_id)
     if plant is None:
         return None
@@ -136,7 +135,7 @@ async def get_plant_periodstamps(user_email: str, plant_id: str):
     })
 
 
-async def change_plant_periodstamps(user_email: str, plant_id: str, periodstamp: schemas.PeriodStampsChange):
+async def change_plant_periodstamps(user_email: str, plant_id: str, periodstamp: schemas.plants.PeriodStampsChange):
     plant = await get_plant_by_id(user_email, plant_id)
     if plant is None:
         return None
@@ -385,7 +384,7 @@ async def get_current_moisture(user_email: str, plant_id: str):
     })
 
 
-async def register_current_moisture(percentage: int, plant: schemas.PlantESPGet):
+async def register_current_moisture(percentage: int, plant: schemas.plants.PlantESPGet):
     _plant = await get_plant_by_chip_id(plant.plant_id, plant.chip_id)
     if _plant is None:
         return None
@@ -397,7 +396,7 @@ async def register_current_moisture(percentage: int, plant: schemas.PlantESPGet)
 
 
 async def get_plants(user_email: str):
-    user = await auth.crud.get_user_by_email(user_email)
+    user = await auth.get_user_by_email(user_email)
     if user is None:
         return None
 
@@ -406,8 +405,8 @@ async def get_plants(user_email: str):
     })
 
 
-async def create_plant(plant: schemas.PlantCreate):
-    user = await auth.crud.get_user_by_email_password(plant.email, plant.password)
+async def create_plant(plant: schemas.plants.PlantCreate):
+    user = await auth.get_user_by_email_password(plant.email, plant.password)
     if user is None:
         return None
     
@@ -422,12 +421,12 @@ async def create_plant(plant: schemas.PlantCreate):
     return created_plant
 
 
-async def update_plant(user_email: str, plant_id: str, plant: schemas.PlantUpdate):
+async def update_plant(user_email: str, plant_id: str, plant: schemas.plants.PlantUpdate):
     _plant = await get_plant_by_id(user_email, plant_id)
     if _plant is None:
         return None
     
-    user = await get_user_by_email(user_email)
+    user = await auth.get_user_by_email(user_email)
     user_id = _plant.user_id
 
     if user is None or user_id != user.id:
@@ -489,7 +488,7 @@ async def delete_plant(user_email: str, plant_id: str):
     return deleted_plant is not None
 
 
-async def irrigate_plant(irrigation: schemas.PlantIrrigation):
+async def irrigate_plant(irrigation: schemas.plants.PlantIrrigation):
     plant = await get_plant_by_chip_id(irrigation.plant_id, irrigation.chip_id)
     if plant is None:
         return False

@@ -1,6 +1,6 @@
 import enum
 
-
+# TODO: add graph period feature
 class GraphPeriod(enum.Enum):
     past_hour = "past_hour"
     past_12_hours = "past_12_hours"

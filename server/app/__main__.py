@@ -5,7 +5,7 @@ from fastapi.responses import JSONResponse
 from fastapi_jwt_auth import AuthJWT
 from fastapi_jwt_auth.exceptions import AuthJWTException
 
-from . import config, auth, plants
+from . import routers, schemas
 from .prisma import prisma
 
 
@@ -26,7 +26,7 @@ app.add_middleware(
 
 @app.on_event("startup")
 async def startup():
-    settings = config.Settings()
+    settings = schemas.config.Settings()
     if '' in settings.dict().values():
         sys.exit('Invalid Config')
 
@@ -41,7 +41,7 @@ async def shutdown():
 
 @AuthJWT.load_config
 def get_config():
-    return config.Settings()
+    return schemas.config.Settings()
 
 @app.exception_handler(AuthJWTException)
 def authjwt_exception_handler(request: Request, exc: AuthJWTException):
@@ -56,5 +56,5 @@ def health_check():
     return 'hello world'
 
 
-app.include_router(auth.router, tags=["authentication"])
-app.include_router(plants.router, tags=["plants"])
+app.include_router(routers.auth.router, tags=["authentication"])
+app.include_router(routers.plants.router, tags=["plants"])

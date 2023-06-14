@@ -1,6 +1,6 @@
 from app.utils import hasher
 from app.utils.generate_random_code import generate_random_code
-from . import schemas
+from app import schemas
 from app.prisma import prisma
 
 
@@ -37,7 +37,7 @@ async def get_user_by_email_password(email: str, password: str):
 
 
 
-async def create_user(user: schemas.UserSignup) -> dict | None:
+async def create_user(user: schemas.auth.UserSignup) -> dict | None:
     user_exists = await get_user_by_email(user.email) is not None
     if user_exists:
         return None
@@ -86,14 +86,14 @@ async def verify_user(user_id: str, code: str):
     })
 
 
-async def authenticate_user(user: schemas.UserLogin):
+async def authenticate_user(user: schemas.auth.UserLogin):
     db_user = await get_user_by_email(user.email)
     if db_user is None or not hasher.verify_password(user.password, db_user.password):
         return False
     return True
 
 
-async def update_user(user: schemas.UserUpdate):
+async def update_user(user: schemas.auth.UserUpdate):
     updated_user = await prisma.user.update(data={
         'email': user.email,
         'first_name': user.first_name,
@@ -109,7 +109,7 @@ async def update_user(user: schemas.UserUpdate):
     return updated_user
 
 
-async def update_user_password(user: schemas.UserUpdatePassword):
+async def update_user_password(user: schemas.auth.UserUpdatePassword):
     _user = await get_user_by_email_password(user.email, user.previous_password)
     if _user is None:
         return None
@@ -127,7 +127,7 @@ async def update_user_password(user: schemas.UserUpdatePassword):
     return updated_user
 
 
-async def remove_user(user: schemas.UserRemove):
+async def remove_user(user: schemas.auth.UserRemove):
     delete_user = await get_user_by_email_password(user.email, user.password)
     if delete_user is None:
         return False

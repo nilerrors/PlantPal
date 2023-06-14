@@ -1,4 +1,4 @@
-import random, math
+import math
 from pydantic.dataclasses import dataclass
 from prisma.enums import DayOfWeek
 from app.utils.comparedatetime import inttoweekday

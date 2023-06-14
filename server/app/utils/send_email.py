@@ -1,9 +1,9 @@
-from pydantic import DirectoryPath, EmailStr
+from pydantic import EmailStr
 from fastapi_mail import FastMail, MessageSchema, ConnectionConfig, MessageType
-import app.config as config
+from app import schemas
 
 
-settings = config.Settings()
+settings = schemas.config.Settings()
 
 conf = ConnectionConfig(
 	MAIL_USERNAME=settings.mail_username,

@@ -1,6 +1,5 @@
 import datetime
 from prisma.models import Timestamp
-from prisma.types import FindManyTimestampArgsFromPlant, FindManyPeriodstampArgsFromPlant
 from prisma.enums import DayOfWeek
 
 
@@ -61,53 +60,4 @@ def compare_date(timestamp: Timestamp):
         return False
     
     return True
-
-
-def stamps_args_today(now: datetime.datetime = datetime.datetime.now()):
-    return {
-        'order_by': [
-            {
-                'hour': 'asc',
-            },
-            {
-                'minute': 'asc',
-            },
-        ],
-        'where': {
-            'OR': [
-                {
-                    'day_of_week': inttoweekday(now.weekday()),
-                    'hour': {
-                        'gte': now.hour,
-                    },
-                    'minute': {
-                        'gte': now.minute,
-                    }
-                },
-                {
-                    'day_of_week': 'everyday',
-                    'hour': {
-                        'gte': now.hour,
-                    },
-                    'minute': {
-                        'gte': now.minute,
-                    }
-                },
-            ]
-        }
-    }
-
-
-def filter_timestamps(condition: bool, now: datetime.datetime = datetime.datetime.now()) -> bool | FindManyTimestampArgsFromPlant:
-    if not condition:
-        return False
-    
-    return stamps_args_today(now)
-
-
-def filter_periodstamps(condition: bool, now: datetime.datetime = datetime.datetime.now()) -> bool | FindManyPeriodstampArgsFromPlant:
-    if not condition:
-        return False
-    
-    return stamps_args_today(now)
 
