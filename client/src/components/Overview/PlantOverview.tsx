@@ -29,7 +29,7 @@ export function PlantOverview({ plant }: Props) {
   }, [])
 
   const moistureColor = () => {
-    if (!currentMoisturePercentage) return
+    if (currentMoisturePercentage == null) return
     if (plant.moisture_percentage_treshold + 5 < currentMoisturePercentage)
       return 'green'
     if (plant.moisture_percentage_treshold - 5 > currentMoisturePercentage)
