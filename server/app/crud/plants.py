@@ -194,53 +194,49 @@ async def get_plant_today_times(plant_id: str, chip_id: str):
     now = datetime.datetime.now()
 
     if plant.irrigation_type == 'time':
-        return await prisma.timestamp.find_many(order=[{
-            'hour': 'asc',
-        }, {
-            'minute': 'asc'
-        }],
-                                                where={
-                                                    'plant_id':
-                                                    plant.id,
-                                                    'hour': {
-                                                        'gte': now.hour
-                                                    },
-                                                    'minute': {
-                                                        'gte': now.minute
-                                                    },
-                                                    'OR': [{
-                                                        'day_of_week':
-                                                        DayOfWeek.everyday,
-                                                    }, {
-                                                        'day_of_week':
-                                                        inttoweekday(
-                                                            now.weekday())
-                                                    }]
-                                                })
+        return await prisma.timestamp.find_many(
+            order=[{
+                'hour': 'asc',
+            }, {
+                'minute': 'asc'
+            }],
+            where={
+                'plant_id':
+                    plant.id,
+                'hour': {
+                    'gte': now.hour
+                },
+                'minute': {
+                    'gte': now.minute
+                },
+                'OR': [{
+                    'day_of_week': DayOfWeek.everyday,
+                }, {
+                    'day_of_week': inttoweekday(now.weekday())
+                }]
+            })
     else:
-        return await prisma.periodstamp.find_many(order=[{
-            'hour': 'asc',
-        }, {
-            'minute': 'asc'
-        }],
-                                                  where={
-                                                      'plant_id':
-                                                      plant.id,
-                                                      'hour': {
-                                                          'gte': now.hour
-                                                      },
-                                                      'minute': {
-                                                          'gte': now.minute
-                                                      },
-                                                      'OR': [{
-                                                          'day_of_week':
-                                                          DayOfWeek.everyday,
-                                                      }, {
-                                                          'day_of_week':
-                                                          inttoweekday(
-                                                              now.weekday())
-                                                      }]
-                                                  })
+        return await prisma.periodstamp.find_many(
+            order=[{
+                'hour': 'asc',
+            }, {
+                'minute': 'asc'
+            }],
+            where={
+                'plant_id':
+                    plant.id,
+                'hour': {
+                    'gte': now.hour
+                },
+                'minute': {
+                    'gte': now.minute
+                },
+                'OR': [{
+                    'day_of_week': DayOfWeek.everyday,
+                }, {
+                    'day_of_week': inttoweekday(now.weekday())
+                }]
+            })
 
 
 async def get_plant_today_next_time(plant_id: str, chip_id: str):
@@ -254,36 +250,64 @@ async def get_plant_today_next_time(plant_id: str, chip_id: str):
     return times[0]
 
 
+async def get_plant_now_times(plant_id: str, chip_id: str):
+    plant = await get_plant_by_chip_id(plant_id, chip_id)
+    if plant is None or plant.user is None:
+        return None
+
+    now = datetime.datetime.now()
+
+    if plant.irrigation_type == 'time':
+        return await prisma.timestamp.find_first(
+            order=[{
+                'hour': 'asc',
+            }, {
+                'minute': 'asc'
+            }],
+            where={
+                'plant_id':
+                    plant.id,
+                'hour':
+                    now.hour,
+                'minute':
+                    now.minute,
+                'OR': [{
+                    'day_of_week': DayOfWeek.everyday,
+                }, {
+                    'day_of_week': inttoweekday(now.weekday())
+                }]
+            })
+    else:
+        return await prisma.periodstamp.find_first(
+            order=[{
+                'hour': 'asc',
+            }, {
+                'minute': 'asc'
+            }],
+            where={
+                'plant_id':
+                    plant.id,
+                'hour':
+                    now.hour,
+                'minute':
+                    now.minute,
+                'OR': [{
+                    'day_of_week': DayOfWeek.everyday,
+                }, {
+                    'day_of_week': inttoweekday(now.weekday())
+                }]
+            })
+
+
 async def get_should_irrigate_now(plant_id: str, chip_id: str):
     plant = await get_plant_by_chip_id(plant_id, chip_id)
     if plant is None:
         return None
-    time = await get_plant_today_next_time(plant_id, chip_id)
-    if time is None or time == 'no times':
-        return None
+    time = await get_plant_now_times(plant_id, chip_id)
+    if time is None:
+        return False
 
-    print('Time:', time)
-
-    # moisture = await prisma.moisturepercentagerecord.find_first(where={
-    #     'plant': {
-    #         'is': {
-    #             'id': plant_id,
-    #             'chip_id': chip_id
-    #         }
-    #     }
-    # },
-    # order={
-    #     'at': 'desc'
-    # })
-
-    now = datetime.datetime.now()
-    # threshold = plant.moisture_percentage_treshold
-    # if moisture is None or moisture.percentage <= threshold:
-    #     return time.hour == now.hour and time.minute == now.minute
-    # elif plant.auto_irrigation and moisture.percentage <= threshold:
-    #     return True
-    print('Time now:', now)
-    return time.hour == now.hour and time.minute == now.minute
+    return True
 
 
 async def get_plant_irrigation_graph(user_email: str, plant_id: str):
@@ -376,11 +400,10 @@ async def register_current_moisture(percentage: int,
     if _plant is None:
         return None
 
-    return await prisma.moisturepercentagerecord.create(
-        data={
-            'plant_id': _plant.id,
-            'percentage': percentage
-        })
+    return await prisma.moisturepercentagerecord.create(data={
+        'plant_id': _plant.id,
+        'percentage': percentage
+    })
 
 
 async def get_plants(user_email: str):
@@ -475,10 +498,9 @@ async def irrigate_plant(irrigation: schemas.plants.PlantIrrigation):
     if plant is None:
         return False
 
-    plant_irrigation = await prisma.irrigationrecord.create(
-        data={
-            'plant_id': plant.id,
-            'water_amount': plant.water_amount
-        })
+    plant_irrigation = await prisma.irrigationrecord.create(data={
+        'plant_id': plant.id,
+        'water_amount': plant.water_amount
+    })
 
     return plant_irrigation is not None

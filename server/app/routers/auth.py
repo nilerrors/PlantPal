@@ -18,8 +18,8 @@ async def login(user: schemas.auth.UserLogin, Authorize: AuthJWT = Depends()):
         raise HTTPException(status.HTTP_401_UNAUTHORIZED,
                             'Account is not verified')
 
-    access_token = Authorize.create_access_token(
-        subject=user.email, expires_time=user.expires_time)
+    access_token = Authorize.create_access_token(subject=user.email,
+                                                 expires_time=user.expires_time)
     return {'access_token': access_token}
 
 
@@ -119,8 +119,8 @@ async def user(Authorize: AuthJWT = Depends()):
 
     return {
         **user.dict(), "verified":
-        True if user.verification is not None and user.verification.verified
-        else False
+            True if user.verification is not None and user.verification.verified
+            else False
     }
 
 
@@ -140,9 +140,10 @@ async def update_user(user: schemas.auth.UserUpdate,
 
     return {
         "user":
-        updated,
+            updated,
         "access_token":
-        Authorize.create_access_token(subject=updated.email, expires_time=3600)
+            Authorize.create_access_token(subject=updated.email,
+                                          expires_time=3600)
     }
 
 
@@ -162,9 +163,10 @@ async def update_user_password(user: schemas.auth.UserUpdatePassword,
 
     return {
         "user":
-        updated,
+            updated,
         "access_token":
-        Authorize.create_access_token(subject=updated.email, expires_time=3600)
+            Authorize.create_access_token(subject=updated.email,
+                                          expires_time=3600)
     }
 
 

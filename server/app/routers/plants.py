@@ -33,8 +33,8 @@ async def get_plant(plant_id: str, Authorize: AuthJWT = Depends()):
 
 @router.post('/espget', response_model=schemas.plants.PlantResponse)
 async def get_plant_esp(plant: schemas.plants.PlantESPGet):
-    plant_data = await crud.plants.get_plant_by_chip_id(
-        plant.plant_id, plant.chip_id)
+    plant_data = await crud.plants.get_plant_by_chip_id(plant.plant_id,
+                                                        plant.chip_id)
 
     if plant_data is None:
         raise HTTPException(status.HTTP_404_NOT_FOUND,
@@ -183,8 +183,7 @@ async def remove_plant_timestamp(plant_id: str,
 
 @router.get('/{plant_id}/periodstamps',
             response_model=schemas.plants.PlantWithPeriodStampsResponse)
-async def get_plant_periodstamps(plant_id: str,
-                                 Authorize: AuthJWT = Depends()):
+async def get_plant_periodstamps(plant_id: str, Authorize: AuthJWT = Depends()):
     Authorize.jwt_required()
 
     user_email = Authorize.get_jwt_subject()

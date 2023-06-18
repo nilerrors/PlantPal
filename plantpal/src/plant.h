@@ -10,11 +10,22 @@ private:
 
   String credentials();
 
+  String getID();
+  uint16_t getWaterAmount();
+  bool getAutoIrrigation();
+  uint8_t getMoisturePercentageThreshold();
+
 public:
-  String ID();
-  uint16_t waterAmount();
-  bool autoIrrigation();
-  uint8_t moisturePercentageThreshold();
+  void init() {
+    this->ID = this->getID();
+    this->waterAmount = this->getWaterAmount();
+    this->autoIrrigation = this->getAutoIrrigation();
+    this->moisturePercentageThreshold = this->getMoisturePercentageThreshold();
+  }
+  String ID;
+  uint16_t waterAmount;
+  bool autoIrrigation;
+  uint8_t moisturePercentageThreshold;
 
   bool isCreated();
   bool create(String id);

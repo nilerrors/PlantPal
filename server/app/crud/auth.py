@@ -39,11 +39,10 @@ async def create_user(user: schemas.auth.UserSignup) -> dict | None:
             'password': hasher.get_password_hash(user.password)
         })
 
-    verification = await prisma.verification.create(
-        data={
-            'code': generate_random_code(6),
-            'user_id': created_user.id,
-        })
+    verification = await prisma.verification.create(data={
+        'code': generate_random_code(6),
+        'user_id': created_user.id,
+    })
 
     return {
         'id': created_user.id,
@@ -96,15 +95,12 @@ async def update_user(user: schemas.auth.UserUpdate):
 
 
 async def update_user_password(user: schemas.auth.UserUpdatePassword):
-    _user = await get_user_by_email_password(user.email,
-                                             user.previous_password)
+    _user = await get_user_by_email_password(user.email, user.previous_password)
     if _user is None:
         return None
     updated_user = await prisma.user.update(data={
-        'email':
-        _user.email,
-        'password':
-        hasher.get_password_hash(user.new_password)
+        'email': _user.email,
+        'password': hasher.get_password_hash(user.new_password)
     },
                                             where={'email': user.email},
                                             include={'verification': True})

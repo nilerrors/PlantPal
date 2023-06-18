@@ -11,7 +11,7 @@ void chip_id(char *chipid_str) {
 String Plant::credentials() {
   String creds;
   StaticJsonDocument<512> doc;
-  doc["plant_id"] = this->ID();
+  doc["plant_id"] = this->ID;
   char chipid[17];
   chip_id(chipid);
   doc["chip_id"] = String(chipid);
@@ -19,7 +19,7 @@ String Plant::credentials() {
   return creds;
 }
 
-bool Plant::isCreated() { return this->ID() != ""; }
+bool Plant::isCreated() { return this->getID() != ""; }
 
 bool Plant::create(String id) {
   if (!_prefs.begin("plantpal_plant")) {
@@ -55,6 +55,11 @@ bool Plant::fetch() {
   bool auto_irrigation = doc["auto_irrigation"].as<bool>();
   uint8_t moisture_pecentage_threshold =
       doc["moisture_percentage_treshold"].as<unsigned int>();
+
+  this->ID = plant_id;
+  this->waterAmount = water_amount;
+  this->autoIrrigation = auto_irrigation;
+  this->moisturePercentageThreshold = moisture_pecentage_threshold;
 
   if (!_prefs.begin("plantpal_plant")) {
     Serial.println("Preferences could not begin");
@@ -118,7 +123,7 @@ bool Plant::setMoisturePercentage(uint8_t percentage) {
   return true;
 }
 
-String Plant::ID() {
+String Plant::getID() {
   if (!_prefs.begin("plantpal_plant")) {
     Serial.println("Preferences could not begin");
     return "";
@@ -129,7 +134,7 @@ String Plant::ID() {
   return id;
 }
 
-uint16_t Plant::waterAmount() {
+uint16_t Plant::getWaterAmount() {
   if (!_prefs.begin("plantpal_plant")) {
     Serial.println("Preferences could not begin");
     return 65536;
@@ -140,7 +145,7 @@ uint16_t Plant::waterAmount() {
   return water_amount;
 }
 
-bool Plant::autoIrrigation() {
+bool Plant::getAutoIrrigation() {
   if (!_prefs.begin("plantpal_plant")) {
     Serial.println("Preferences could not begin");
     return false;
@@ -151,7 +156,7 @@ bool Plant::autoIrrigation() {
   return auto_irrigation;
 }
 
-uint8_t Plant::moisturePercentageThreshold() {
+uint8_t Plant::getMoisturePercentageThreshold() {
   if (!_prefs.begin("plantpal_plant")) {
     Serial.println("Preferences could not begin");
     return 255;
